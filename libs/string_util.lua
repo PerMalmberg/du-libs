@@ -1,7 +1,7 @@
 function split(str, pat)
     -- http://lua-users.org/wiki/SplitJoin
 
-    local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+   local t = {}  -- NOTE: use {n = 0} in Lua-5.0
    local fpat = "(.-)" .. pat
    local last_end = 1
    local s, e, cap = str:find(fpat, 1)
