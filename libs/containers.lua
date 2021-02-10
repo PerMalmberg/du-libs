@@ -1,44 +1,53 @@
+require("link_elements")
+
 function get_container_data(name)
     local w = 0
     local n = name
 
-    if name:find("^l_") ~= nil then
-        w = 14840
-        n = name:sub(3, #name)
+    if name:find("^xxl_") ~= nil then
+        w = 884013
+    elseif name:find("^xl_") ~= nil then
+        w = 44206
+    elseif name:find("^l_") ~= nil then
+        w = 14842.7
     elseif name:find("^m_") ~= nil then
-        w = 7420
-        n = name:sub(3, #name)
+        w = 7421.35
     elseif name:find("^s_") ~= nil then
-        w = 1280
-        n = name:sub(3, #name)
+        w = 1281.31
     elseif name:find("^xs_") ~= nil then
         w = 229.09
-        n = name:sub(4, #name)
     end
     
     res = {}
     res.weight = w
-    res.name = n
+    res.name = name
     
     return res
 end
 
-function get_containers()
+function get_containers(byName)
+    linkElements()
+
+    local byContainerName = byName or false
+
     local containers = {}
-    local element_ids = core.getElementIdList()
+    local element_ids = linkedCore.getElementIdList()
 
     for _, id in pairs(element_ids) do
-        if core.getElementTypeById(id) == "Container" then
-            local container_name = core.getElementNameById(id)
+        if linkedCore.getElementTypeById(id) == "Container" then
+            local container_name = linkedCore.getElementNameById(id)
             local cont_data = get_container_data(container_name)
       
-            if cont_data.weight > 0 then
-                local container_info = {
-                    "id", "name", "content_weight",
-                    id = id,
-                    name = cont_data.name,
-                    content_weight = core.getElementMassById(id) - cont_data.weight
-                }
+            local container_info = {
+                "id", "name", "content_weight",
+                id = id,
+                name = cont_data.name,
+                content_weight = linkedCore.getElementMassById(id) - cont_data.weight
+            }
+
+            if byContainerName then
+                containers[container_info.name] = container_info
+            else
                 table.insert(containers, container_info)
             end
          end
