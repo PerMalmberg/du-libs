@@ -35,3 +35,15 @@ function padLeft(s, width)
 
    return s
 end
+
+function formatThousands(value)
+   local formatted = value
+   done = false
+
+   while not done do
+       formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1 %2')
+       done = k == 0
+   end
+
+   return formatted
+end
