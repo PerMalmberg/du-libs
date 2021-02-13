@@ -1,28 +1,27 @@
 require("link_elements")
 
-function get_container_data(name)
-    local w = 0
-    local n = name
+function getContainerMassFromHitpoints(containerId)
+    local maxHitPoints = linkedCore.getElementMaxHitPointsById(containerId)
 
-    if name:find("^xxl_") ~= nil then
-        w = 884013
-    elseif name:find("^xl_") ~= nil then
-        w = 44206
-    elseif name:find("^l_") ~= nil then
-        w = 14842.7
-    elseif name:find("^m_") ~= nil then
-        w = 7421.35
-    elseif name:find("^s_") ~= nil then
-        w = 1281.31
-    elseif name:find("^xs_") ~= nil then
-        w = 229.09
+    if maxHitPoints >= 69267 then
+        -- XXL
+        return 884013
+    elseif maxHitPoints >= 34633 then
+        -- XL
+        return 44206
+    elseif maxHitPoints >= 17316 then
+        -- L
+        return 14842.7
+    elseif maxHitPoints >= 7997 then
+        -- M
+        return 7421.35
+    elseif maxHitPoints >= 999 then
+        -- S
+        return 1281.31
+    else
+        -- xs
+        return 229.09
     end
-    
-    res = {}
-    res.weight = w
-    res.name = name
-    
-    return res
 end
 
 function get_containers(byName)
@@ -35,14 +34,12 @@ function get_containers(byName)
 
     for _, id in pairs(element_ids) do
         if linkedCore.getElementTypeById(id) == "Container" then
-            local container_name = linkedCore.getElementNameById(id)
-            local cont_data = get_container_data(container_name)
       
             local container_info = {
-                "id", "name", "content_weight",
+                "id", "name", "content_mass",
                 id = id,
-                name = cont_data.name,
-                content_weight = linkedCore.getElementMassById(id) - cont_data.weight
+                name = linkedCore.getElementNameById(id),
+                content_mass = linkedCore.getElementMassById(id) - getContainerMassFromHitpoints(id)
             }
 
             if byContainerName then
