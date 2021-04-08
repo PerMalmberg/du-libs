@@ -8,6 +8,7 @@ linkedReceiver = {}
 linkedLight = {}
 linkedIndustry = {}
 linkedDatabank = {}
+linkedEmitter = {}
 
 local elementsLinked = false
 
@@ -41,6 +42,8 @@ function linkElements()
                     table.insert(linkedIndustry, #linkedIndustry + 1, slots[i])
                 elseif (elementClass == 'DataBankUnit') then
                     table.insert(linkedDatabank, #linkedDatabank + 1, slots[i])
+                elseif (elementClass == 'Emitter') then
+                    table.insert(linkedEmitter, #linkedEmitter + 1, slots[i])
                 else                
                     system.print(elementClass)
                 end
