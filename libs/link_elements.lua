@@ -73,3 +73,8 @@ function isDatabank(slot)
 
     return res
 end
+
+function getElementName(element)
+    local id = element.getId()
+    return linkedCore.getElementNameById(id)
+end

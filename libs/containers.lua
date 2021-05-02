@@ -68,13 +68,13 @@ function get_containers(byName)
     for _, id in pairs(element_ids) do
         if linkedCore.getElementTypeById(id) == "Container" then
       
-            -- The mass we get here is adjusted for skills applied to the container.
             local contData = getContainerDataFromHitpoints(id)
 
+            -- The mass we get here is adjusted for skills applied to the container.
             local reducedMass = linkedCore.getElementMassById(id) - contData.mass
 
             local container_info = {
-                "id", "name", "content_mass", "container_volume", "capacity",
+                "id", "name", "content_reduced_mass", "content_actual_mass", "capacity",
                 id = id,
                 name = linkedCore.getElementNameById(id),
                 content_reduced_mass = reducedMass,
