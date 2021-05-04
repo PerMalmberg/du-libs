@@ -12,14 +12,22 @@ function Container:New(elementId, core)
     o.ElementMass = 0
     o.Capacity = 0
     o.Name = "<Unknown>"
+    o.ReducedContentMass = 0
+    o.ActualContentMass = 0
+    o.ContentVolume = 0
 
     o:update()
 
     return o
 end
 
-function Container:update(core)
+function Container:update()
     self:updateBaseData()
+
+    -- The mass we get here is adjusted for skills applied to the container.
+    self.ReducedContentMass = self.core.getElementMassById(self.id) - self.ElementMass
+    skill = SkillManager:Instance()
+    self.ActualContentMass = skill:CalculateActualMass(self.ReducedContentMass)
 end
 
 function Container:updateBaseData()
@@ -60,32 +68,24 @@ function Container:updateBaseData()
 end
 
 function Container:ToString()
-    local s = self.Name .. ": " .. self.Capacity .. "L" .. " Element mass: " .. self.ElementMass .. "kg"
+    local s = self.Name .. ": " .. self.Capacity .. "L" .. 
+    " Element mass: " .. self.ElementMass .. "kg, Reduced Content mass: " .. self.ReducedContentMass ..
+    " Actual Content Mass: " .. self.ActualContentMass
     return s
 end
 
 function Container:ItemCount(weightOfOneItem)
-
+    return self.ActualContentMass / weightOfOneItem
 end
 
-function Container:ContentWeight()
-
+function Container:ItemVolume(volumeOfOneItem, weightOfOneItem)
+    local count = self:ItemCount(weightOfOneItem)
+    return count * volumeOfOneItem
 end
 
-function Container:ContentWeightUnskilled()
-
-end
-
-function Container:ItemVolume()
-
-end
-
-function Container:FillFactor()
-
-end
-
-function Container:Contents()
-
+function Container:FillFactor(volumeOfOneItem, weightOfOneItem)
+    local contentVolume = self:ItemVolume(volumeOfOneItem,weightOfOneItem)
+    return contentVolume / self.Capacity
 end
 
 
