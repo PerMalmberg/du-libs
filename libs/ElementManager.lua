@@ -67,7 +67,7 @@ function ElementManager:link()
             end
         end
 
-        system.print("Linked elements:")        
+--[[        system.print("Found elements:")        
         system.print("Core:      " .. tostring(self.Core ~= nil))
         system.print("Screen:    " .. #self.Screen)
         system.print("Container: " .. #self.Container)
@@ -78,7 +78,22 @@ function ElementManager:link()
         system.print("Light:     " .. #self.Light)
         system.print("Industry:  " .. #self.Industry)
         system.print("Databank:  " .. #self.Databank)
+]]
 
         linked = true
     end
+end
+
+function ElementManager:GetElementNameOfSlot(slot)
+    return self.Core.getElementNameById(slot.getId())
+end
+
+function ElementManager:IsDatabank(slot)
+    local elementClass = slot.getElementClass()
+    return elementClass == "DataBankUnit"   
+end
+
+function ElementManager:IsScreen(slot)
+    local elementClass = slot.getElementClass()
+    return elementClass == "ScreenUnit"   
 end
