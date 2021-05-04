@@ -1,0 +1,7 @@
+Main "tests.lua"
+
+Output "tests.squished.lua"
+
+Module "ElementManager" "../libs/ElementManager.lua"
+Module "SkillManager" "../libs/SkillManager.lua"
+Module "ContainerManager" "../libs/ContainerManager.lua"
