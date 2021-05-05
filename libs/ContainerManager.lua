@@ -58,7 +58,7 @@ function Container:updateBaseData()
         self.Capacity = skill:ApplyContainerProficency(8000)
     else
         -- xs
-        o.ElementMass = 229.09
+        self.ElementMass = 229.09
         self.Capacity = skill:ApplyContainerProficency(1000)
     end
 

@@ -1,3 +1,5 @@
+require("string_util")
+
 function splitByLine(str)
 	local lines = {}
 	for s in str:gmatch("[^\r\n]+") do
