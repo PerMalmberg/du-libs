@@ -88,6 +88,21 @@ function ElementManager:GetElementNameOfSlot(slot)
     return self.Core.getElementNameById(slot.getId())
 end
 
+function ElementManager:GetElementByName(name)
+    local element = nil
+
+    for i, s in ipairs(self.slots) do
+        if s ~= nil then
+            if name == self:GetElementNameOfSlot(s) then
+                element = s
+                break
+            end
+        end
+    end
+
+    return element
+end
+
 function ElementManager:IsDatabank(slot)
     local elementClass = slot.getElementClass()
     return elementClass == "DataBankUnit"   

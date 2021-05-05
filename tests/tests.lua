@@ -16,6 +16,9 @@ function script.onStart()
     assert(#el.Receiver > 0, "Receiver not linked")
     assert(#el.Databank > 0, "Databank not linked")
 
+    assert(el:GetElementByName("foo") == nil, "Should not find element")
+    assert(el:GetElementByName("TheCore"), "Should find element")
+
     local conMgr = ContainerManager:New()
     conMgr:Update()
 
