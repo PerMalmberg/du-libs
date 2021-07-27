@@ -78,6 +78,6 @@ end
 --- Executes a coroutine, calling the callback when the routine dies.
 function CoRunner:Execute(func, callback)
     local r = Runner:New(func, callback)
-    table.insert(self.runner, r)
+    table.insert(self.runner, #self.runner + 1, r)
 end
 
