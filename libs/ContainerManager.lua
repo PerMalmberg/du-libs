@@ -1,5 +1,6 @@
 require("ElementManager")
 require("SkillManager")
+require("CoRunner")
 
 Container = {}
 
@@ -97,26 +98,36 @@ function ContainerManager:New()
     setmetatable(o, self)
     self.__index = self
     self.containersByName = {}
-
+    self.complete = false
     return o
 end
 
-function ContainerManager:Update()
-    local core = ElementManager:Instance().Core
+function ContainerManager:BeginUpdate()
+    CoRunner:Instance():Execute(
+        function()
+            local core = ElementManager:Instance().Core
 
-    local element_ids = core.getElementIdList()
+            local element_ids = core.getElementIdList()
 
-    for _, id in pairs(element_ids) do
-        if core.getElementTypeById(id) == "Container" then      
-            local c = Container:New(id, core)
+            for _, id in pairs(element_ids) do
+                if core.getElementTypeById(id) == "Container" then      
+                    local c = Container:New(id, core)
 
-            self.containersByName[c.Name] = c
-         end
-    end
+                    self.containersByName[c.Name] = c
+                end
+            end
 
-    table.sort(self.containersByName,
-        function (a, b) return string.lower(a.Name) < string.lower(b.Name) end)
+            table.sort(self.containersByName, 
+                        function (a, b) return string.lower(a.Name) < string.lower(b.Name) end)    
+        end,
+        
+        function()
+            self.complete = true
+        end)
+end
 
+function ContainerManager:IsUpdateComplete()
+    return self.complete
 end
 
 function ContainerManager:GetContainerByName(name)
