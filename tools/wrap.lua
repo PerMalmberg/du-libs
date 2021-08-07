@@ -3240,7 +3240,7 @@ local types = {
   },
   receiver = {
     class = "ReceiverUnit",
-    filters = { "receive(channel,message)" }
+    filters = { "receive(message)" }
   },
   warpDrive = {
     class = "WarpDriveUnit",
@@ -3251,6 +3251,10 @@ local types = {
   container = {
     class = "ItemContainer",
     filters = { "storageAcquired()" }
+  },
+  manualswitch = {
+    class = "ManualSwitchUnit",
+    filters = { "pressed()", "released()" }
   },
 
   -- abstract
