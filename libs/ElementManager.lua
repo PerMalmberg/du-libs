@@ -88,6 +88,7 @@ function ElementManager:GetElementNameOfSlot(slot)
     return self.Core.getElementNameById(slot.getId())
 end
 
+-- Gets a linked element by the name
 function ElementManager:GetElementByName(name)
     local element = nil
 

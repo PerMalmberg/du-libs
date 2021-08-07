@@ -38,14 +38,21 @@ function CoRunner:Instance()
         setmetatable(instance, self)
         self.__index = self
     end
+
     return instance
 end
 
-function CoRunner:Run()
+-- Installs the CoRunner, with a tick of 'interval'.
+function CoRunner:Install(interval)
+    Tick:Instance():Add("corunner", function() self:run() end, interval)
+end
+
+-- Runs the corunner, called from a tick
+function CoRunner:run()
     if #self.runner > 0 then
         if self.main == nil or coroutine.status(self.main) == "dead" then
             self.main = coroutine.create(function()
-                self:Main()
+                self:work()
             end)
         end
         
@@ -55,7 +62,8 @@ function CoRunner:Run()
     end
 end
 
-function CoRunner:Main()
+-- The main routine, of the CoRunner
+function CoRunner:work()
     while true do
         for i, runner in ipairs(self.runner) do
             local done = runner:Run()
@@ -79,5 +87,23 @@ end
 function CoRunner:Execute(func, callback)
     local r = Runner:New(func, callback)
     table.insert(self.runner, #self.runner + 1, r)
+    return self -- Allow chaining Execute-calls.
+end
+
+function CoRunner:Delay(func, seconds)
+    self:Execute(
+        function() 
+            local start = system.getTime()
+            local endTime = start + seconds
+
+            -- Yield until time has passed
+            while system.getTime() < endTime do
+                coroutine.yield();
+            end
+
+            -- Call function
+            func()
+        end    
+    )
 end
 
