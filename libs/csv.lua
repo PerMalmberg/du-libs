@@ -48,6 +48,8 @@ function parseCSVLine (line,sep)
 				break
 			end 
 		end
+		
+		coroutine.yield()
 	end
 	return res
 end

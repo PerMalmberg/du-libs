@@ -38,6 +38,22 @@ function SkillManager:ApplyContainerProficency(baseVolume)
     return volume
 end
 
+function SkillManager:GetContainerOptimizationLevel()
+    return containerOptimizationLevel;
+end
+   
+function SkillManager:GetContainerProficiencyLevel()
+    return containerProficiencyLevel
+end
+
+function SkillManager:SetContainerOptimizationLevel(lvl)
+    containerOptimizationLevel = lvl
+end
+   
+function SkillManager:SetContainerProficiencyLevel(lvl)
+    containerProficiencyLevel = lvl
+end
+
 function SkillManager:ToString()
     local s = "Container Optimization Level: " .. containerOptimizationLevel .. ", " ..
     "Container Proficiency Level: " .. containerProficiencyLevel
