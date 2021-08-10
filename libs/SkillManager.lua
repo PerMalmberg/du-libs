@@ -1,5 +1,5 @@
-local containerOptimizationLevel = 0 --export: Container Optimization Level
-local containerProficiencyLevel = 0 --export: Container Proficiency Level
+local containerOptimizationLevel = 0
+local containerProficiencyLevel = 0
 
 SkillManager = {}
 
