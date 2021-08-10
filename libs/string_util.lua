@@ -11,6 +11,7 @@ function split(str, pat)
       end
       last_end = e+1
       s, e, cap = str:find(fpat, last_end)
+      coroutine.yield()
    end
    if last_end <= #str then
       cap = str:sub(last_end)
