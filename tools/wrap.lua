@@ -3270,7 +3270,7 @@ local types = {
     filters = { "stop()", "tick(timerId)" }
   },
   system = {
-    filters = { "actionStart(action)", "actionStop(action)", "actionLoop(action)", "update()", "flush()" },
+    filters = { "actionStart(action)", "actionStop(action)", "actionLoop(action)", "update()", "flush()", "inputText(text)" },
   },
   library = {
   }
