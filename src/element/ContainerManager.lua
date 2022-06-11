@@ -1,6 +1,6 @@
 require("ElementManager")
 require("SkillManager")
-require("CoRunner")
+require("system/CoRunner")
 
 Container = {}
 
@@ -133,5 +133,3 @@ end
 function ContainerManager:GetContainerByName(name)
     return self.containersByName[name]
 end
-
-

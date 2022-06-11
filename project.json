@@ -1,0 +1,20 @@
+{
+  "name": "du-libs",
+  "description": "Dual Universe Library by Yoarii",
+  "sourcePath": "src",
+  "outputPath": "out",
+  "builds": {
+    "tests/Universe_test": {
+      "name": "tests/Universe_test",
+      "type": "control",
+      "slots": {}
+    }
+  },
+  "targets": {
+    "development": {
+      "name": "development",
+      "handleErrors": false,
+      "minify": false
+    }
+  }
+}

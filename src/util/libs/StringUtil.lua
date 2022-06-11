@@ -1,4 +1,6 @@
-function split(str, pat)
+SU = {}
+
+function SU.split(str, pat)
     -- http://lua-users.org/wiki/SplitJoin
 
    local t = {}  -- NOTE: use {n = 0} in Lua-5.0
@@ -20,12 +22,12 @@ function split(str, pat)
    return t
 end
 
-function round(num, numDecimalPlaces)
+function SU.round(num, numDecimalPlaces)
    local mult = 10^(numDecimalPlaces or 0)
    return math.floor(num * mult + 0.5) / mult
 end
 
-function removeDecimal(s)
+function SU.removeDecimal(s)
    return s:gsub("%.%d", "")
 end
 
@@ -37,9 +39,10 @@ function padLeft(s, width)
    return s
 end
 
-function formatThousands(value)
+function SU.formatThousands(value)
    local formatted = value
-   done = false
+   local k
+   local done = false
 
    while not done do
        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1 %2')
