@@ -4,8 +4,18 @@
   "sourcePath": "src",
   "outputPath": "out",
   "builds": {
-    "tests/Universe_test": {
-      "name": "tests/Universe_test",
+    "tests/Universe": {
+      "name": "tests/Universe",
+      "type": "control",
+      "slots": {}
+    },
+    "tests/BufferedDB": {
+      "name": "tests/BufferedDB",
+      "type": "control",
+      "slots": {}
+    },
+    "tests/CoRunner": {
+      "name": "tests/coRunner",
       "type": "control",
       "slots": {}
     }

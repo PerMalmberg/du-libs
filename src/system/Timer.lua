@@ -13,7 +13,7 @@ end
 
 function timer:Start()
     self.startTime = utc()
-    self.endTime = nil
+    self.stopTime = nil
 end
 
 function timer:Stop()
@@ -23,10 +23,10 @@ end
 function timer:Elapsed()
     if self.startTime == nil then
         return 0
-    elseif self.endTime == nil then
+    elseif self.stopTime == nil then
         return utc() - self.startTime
     else
-        return self.endTime - self.startTime
+        return self.stopTime - self.startTime
     end
 end
 

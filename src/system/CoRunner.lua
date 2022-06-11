@@ -36,7 +36,7 @@ local function new(interval)
         main = nil
     }
 
-    setmetatable(o, coRunner)
+    setmetatable(instance, coRunner)
 
     tick:Add("CoRunnerTick" .. idCount,
             function()
@@ -88,7 +88,7 @@ end
 function coRunner:Execute(func, callback)
     local r = newRunner(func, callback)
     table.insert(self.runner, #self.runner + 1, r)
-    return self -- Allow chaining Execute-calls.
+    return self -- Allow chaining calls.
 end
 
 --- Delays the execution of func by timeout
@@ -97,14 +97,16 @@ function coRunner:Delay(func, timeout)
             function()
                 local timer = Timer()
                 timer:Start()
-
                 -- Yield until time has passed
                 while timer:Elapsed() < timeout do
-                    coroutine.yield();
+                    coroutine.yield()
                 end
             end,
-            func()
+            function()
+                func()
+            end
     )
+    return self -- Allow chaining calls
 end
 
 return setmetatable(

@@ -9,7 +9,13 @@ local singleton = nil
 local function new()
     local instance = {}
     instance.functions = {}
-    return setmetatable(instance, tick)
+    setmetatable(instance, tick)
+
+    -- Register with du-luac event handler
+    unit:onEvent("tick", function(system, id)
+        instance:run(id)
+    end)
+    return instance
 end
 
 function tick:Add(id, func, interval)
@@ -28,7 +34,7 @@ end
 
 --- Call this from script.OnTick()
 ---@param tickId any
-function tick:Run(tickId)
+function tick:run(tickId)
     local f = self.functions[tickId]
     if f ~= nil then
         f()
