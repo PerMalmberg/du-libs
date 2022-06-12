@@ -1,5 +1,6 @@
 require("util/Enum")
 local typeComp = require("debug/TypeComp")
+local json = require("dkjson")
 
 local log = {}
 log.__index = log
@@ -43,11 +44,11 @@ local function formatValues(...)
         elseif typeComp.IsNumber(v) then
             s = string.format("%s", tonumber(v))
         elseif typeComp.IsVec3(v) then
-            s = string.format("vec3(%s, %s, %s)", v.x, v.y, v.z)
+            s = string.format("Vec3(%s, %s, %s)", v.x, v.y, v.z)
         elseif typeComp.IsBoolean(v) then
             s = tostring(v)
         else
-            s = "Unsupported table type:" .. type(v)
+            s = json.encode(v)
         end
 
         table.insert(parts, #parts + 1, string.format(" %s", s))
@@ -87,7 +88,7 @@ function log:Debug(msg, ...)
     self:print(log.LogLevel.DEBUG, msg, ...)
 end
 
-local singleton = nil
+local singleton
 
 return setmetatable(
         {
