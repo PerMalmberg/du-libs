@@ -15,7 +15,12 @@
       "slots": {}
     },
     "tests/CoRunner": {
-      "name": "tests/coRunner",
+      "name": "tests/CoRunner",
+      "type": "control",
+      "slots": {}
+    },
+    "tests/Input": {
+      "name": "tests/Input",
       "type": "control",
       "slots": {}
     }

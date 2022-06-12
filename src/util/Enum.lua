@@ -8,6 +8,8 @@ function Enum(tbl)
     return tbl
 end
 
+return Enum
+
 --[[Usage
 
 From: https://unendli.ch/posts/2016-07-22-enumerations-in-lua.html

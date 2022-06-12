@@ -57,14 +57,9 @@ local function formatValues(...)
     return table.concat(parts)
 end
 
-function log:print(level, msg, ...)
+function log:print(level, ...)
     if self.level >= level then
-        local extra = {...}
-        if #extra == 0 then
-            system.print(string.format("[%s] %s", getLevelStr(level), msg))
-        else
-            system.print(string.format("[%s] %s:%s", getLevelStr(level), msg, formatValues(...)))
-        end
+        system.print(string.format("[%s] %s", getLevelStr(level), formatValues(...)))
     end
 end
 
