@@ -5,8 +5,15 @@ local runner = {}
 runner.__index = runner
 
 local function newRunner(func, callback)
+    local runnerFunction = function()
+        local status, ret = xpcall(func, traceback)
+        if not status then
+            system.print(ret)
+        end
+    end
+
     o = {
-        co = coroutine.create(func),
+        co = coroutine.create(runnerFunction),
         callback = callback
     }
     return setmetatable(o, runner)
