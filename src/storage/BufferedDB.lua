@@ -11,10 +11,14 @@ local function new(storageName)
     local o = {
         name = storageName,
         buffer = {},
-        db = nil,
+        db = library:GetLinkByName(storageName),
         loaded = false,
         dirtyCount = 0
     }
+
+    if o.db == nil then
+        log:Error("Databank not found", storageName)
+    end
 
     setmetatable(o, storage)
 
@@ -22,14 +26,13 @@ local function new(storageName)
 end
 
 function storage:BeginLoad()
-    self.db = library:GetLinkByName(self.name)
     if self.db == nil then
-        log:Error("Databank not found", self.name)
         return false
     end
 
     self.coRunner = CoRunner(0.1)
     self:load()
+
     return true
 end
 
@@ -42,7 +45,6 @@ function storage:load()
                 for i, k in ipairs(keys) do
                     local data = json.decode(self.db.getStringValue(k))
                     -- We always expect a table here, if we don't get that, then the data isn't written by this class
-                    log:Debug("1")
                     if data ~= nil and type(data) == "table" and data.t and data.d then
                         local o = { dirty = false }
 
@@ -50,14 +52,12 @@ function storage:load()
                             o.value = tonumber(data.d)
                         elseif data.t == "string" then
                             o.value = data.d
-                        elseif data.t == "table" then
+                        else
+                            -- table
                             o.value = data.d
                         end
 
                         self.buffer[k] = o
-                        log:Debug("Key", k, self.buffer[k].value)
-                    else
-                        log:Warning("Skipped", k)
                     end
                     -- Load X keys at a time
                     if i % 10 == 0 then
@@ -69,17 +69,20 @@ function storage:load()
                 log:Info(#self.buffer .. " keys loaded from", self.name)
                 self.loaded = true
                 self.coRunner:Execute(function()
-                    self:Persist()
+                    self:persist()
                 end)
             end)
 end
 
 function storage:Clear()
     self.buffer = {}
-    self.db.Clear()
+    self.dirtyCount = 0
+    if self.db ~= nil then
+        self.db:clear()
+    end
 end
 
-function storage:Persist()
+function storage:persist()
     while true do
         coroutine.yield()
         if self:IsDirty() then
@@ -88,15 +91,13 @@ function storage:Persist()
                 if i % 5 == 0 then
                     coroutine.yield()
                 end
-                log:Info("ASDF")
+
                 if data.dirty then
                     local v = data.value
                     local s = json.encode({ t = type(v), d = v })
                     self.db.setStringValue(key, s)
                     self.buffer[key].dirty = false
                     self.dirtyCount = self.dirtyCount - 1
-                    log:Debug("Wrote key", key, "of type", type(v))
-                    log:Debug("DirtyCount", self.dirtyCount)
                 end
                 i = i + 1
             end
