@@ -21,6 +21,7 @@ function test.Parse1()
     cmd:Option("--c"):AsBoolean():Mandatory()
 
     input:Exec("command -a 1 --boo abc --c true 'text with space'")
+    input:Exec("command 'text with space' -a 1 --boo abc --c true")
 end
 
 local status, err, _ = xpcall(function()

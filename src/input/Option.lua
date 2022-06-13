@@ -40,35 +40,29 @@ function option:Parse(args, target)
     for i, key in ipairs(args) do
 
         if key == self.name then
-            log:Debug("Found", key)
             -- Next value is the argument, if it exists
             if i + 1 <= #args then
                 table.remove(args, i) -- Remove the arg itself
                 local v = table.remove(args, i) -- Remove and store the value
-                log:Debug("Value", v)
 
                 if self.type == argType.BOOLEAN then
-                    log:Debug("Boolean", v)
                     if v == "true" or v == "1" then
                         target[self.sanitizedName] = true
                     elseif v == "false" or v == "0" then
                         target[self.sanitizedName] = false
                     end
                 elseif self.type == argType.NUMBER then
-                    log:Debug("Number", v)
                     local match = string.match(v, "(%d*%.?%d+)")
                     if match == nil then
-                        log:Error(v, "is not a number")
+                        log:Error("Not a number:", v)
                     else
-                        log:Debug("Match", match)
                         target[self.sanitizedName] = tonumber(match)
                     end
                 else
-                    log:Debug("String", v)
                     target[self.sanitizedName] = v
                 end
             elseif self.mandatory then
-                log:Error("Missing value for mandatory option ", k)
+                log:Error("Missing value for mandatory option ", key)
                 return false
             end
 
