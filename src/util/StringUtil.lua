@@ -62,16 +62,14 @@ function SU.SplitQuoted(s)
 
    local function isSpace(c)return c == " " end
 
-   local function add(target, s)
-      s = SU.Trim(s)
-      if s:len() > 0 then
-         table.insert(target, #target + 1, s)
+   local function add(target, v)
+      v = SU.Trim(v)
+      if v:len() > 0 then
+         table.insert(target, #target + 1, v)
       end
    end
 
-
    local inQuote = false
-   local i = 1
    local parts = {}
    local current = ""
 
@@ -96,6 +94,9 @@ function SU.SplitQuoted(s)
          current = current .. c
       end
    end
+
+   -- Add whatever is at the end of the string.
+   add(parts, current)
 
    return parts
 end
