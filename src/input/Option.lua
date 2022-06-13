@@ -9,7 +9,8 @@ local function new(name)
         name = name,
         sanitizedName = name:gsub("^%-*", ""),
         type = nil,
-        mandatory = false
+        mandatory = false,
+        default = nil
     }
 
     return setmetatable(o, option)
@@ -33,6 +34,10 @@ end
 function option:Mandatory()
     self.mandatory = true
     return self
+end
+
+function option:Default(v)
+    self.default = v
 end
 
 function option:Parse(args, target)
@@ -68,6 +73,10 @@ function option:Parse(args, target)
 
             break
         end
+    end
+
+    if target[self.sanitizedName] == nil and self.default ~= nil then
+        target[self.sanitizedName] = self.default
     end
 
     local res = (not self.mandatory) or target[self.sanitizedName] ~= nil
