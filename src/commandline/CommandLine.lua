@@ -10,7 +10,15 @@ local function new()
         command = {}
     }
 
-    return setmetatable(o, input)
+    setmetatable(o, input)
+
+    system:onEvent("inputText", o.inputText, o)
+
+    return o
+end
+
+function input.inputText(inp, text)
+    inp:Exec(text)
 end
 
 function input:Accept(command, func)

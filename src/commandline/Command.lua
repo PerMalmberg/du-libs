@@ -9,7 +9,8 @@ local function new()
     local o = {
         type = nil,
         mandatory = false,
-        option = {}
+        option = {},
+        mandatory = false
     }
 
     return setmetatable(o, command)
@@ -51,7 +52,8 @@ function command:Parse(args)
         end
     end
 
-    data.commandValue = args[1]
+    data.commandValue = argType.parseValue(self.type, args[1])
+
     if data.commandValue == nil and self.mandatory then
         log:Error("Missing mandatory value for command")
         return nil

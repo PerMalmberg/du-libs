@@ -25,8 +25,20 @@ function test.Parse1()
     cmd:Option("-f"):AsNumber():Mandatory()
     cmd:Option("-default"):AsNumber():Mandatory():Default(678)
 
+    local echo = function(data)
+        log:Info("echoing '", data.commandValue, "'")
+    end
+
+    local add = function(data)
+        log:Info("Sum: ", data.commandValue + data["+"])
+    end
+
+    input:Accept("echo", echo):AsString():Mandatory()
+    input:Accept("add", add):AsNumber():Mandatory():Option("+"):AsNumber():Mandatory()
+
     input:Exec("command -a 1 --boo abc --c true 'text with space' -f 123.456")
     input:Exec("command -f 123.456 'text with space' -a 1 --boo abc --c true")
+    log:Info("Try the 'echo' and 'add' commands")
 end
 
 local status, err, _ = xpcall(function()
@@ -36,5 +48,3 @@ end, traceback)
 if not status then
     system.print(err)
 end
-
-unit.exit()

@@ -40,6 +40,8 @@ function option:Default(v)
     self.default = v
 end
 
+
+
 function option:Parse(args, target)
     -- Find the argument in the input data
     for i, key in ipairs(args) do
@@ -50,22 +52,7 @@ function option:Parse(args, target)
                 table.remove(args, i) -- Remove the arg itself
                 local v = table.remove(args, i) -- Remove and store the value
 
-                if self.type == argType.BOOLEAN then
-                    if v == "true" or v == "1" then
-                        target[self.sanitizedName] = true
-                    elseif v == "false" or v == "0" then
-                        target[self.sanitizedName] = false
-                    end
-                elseif self.type == argType.NUMBER then
-                    local match = string.match(v, "(%d*%.?%d+)")
-                    if match == nil then
-                        log:Error("Not a number:", v)
-                    else
-                        target[self.sanitizedName] = tonumber(match)
-                    end
-                else
-                    target[self.sanitizedName] = v
-                end
+                target[self.sanitizedName] = argType.parseValue(self.type, v)
             elseif self.mandatory then
                 log:Error("Missing value for mandatory option ", key)
                 return false
