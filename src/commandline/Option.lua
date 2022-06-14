@@ -1,5 +1,5 @@
 local log = require("debug/Log")()
-local argType = require("input/Types")
+local argType = require("commandline/Types")
 
 local option = {}
 option.__index = option

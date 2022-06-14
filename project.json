@@ -19,8 +19,8 @@
       "type": "control",
       "slots": {}
     },
-    "tests/Input": {
-      "name": "tests/Input",
+    "tests/CommandLine": {
+      "name": "tests/CommandLine",
       "type": "control",
       "slots": {}
     }

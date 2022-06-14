@@ -1,6 +1,6 @@
 local log = require("debug/Log")()
 local su = require("util/StringUtil")
-local Command = require("input/Command")
+local Command = require("commandline/Command")
 
 local input = {}
 input.__index = input

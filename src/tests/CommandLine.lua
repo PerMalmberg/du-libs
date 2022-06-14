@@ -1,12 +1,12 @@
 local log = require("debug/Log")()
-local Input = require("input/Input")
+local CommandLine = require("commandline/CommandLine")
 
 log:SetLevel(log.LogLevel.DEBUG)
 
 local test = {}
 
 function test.Parse1()
-    local input = Input()
+    local input = CommandLine()
 
     local f = function(data)
         log:Info(data)
