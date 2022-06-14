@@ -17,8 +17,8 @@ local function new()
     return o
 end
 
-function commandLine.inputText(inp, text)
-    inp:Exec(text)
+function commandLine.inputText(cmd, text)
+    cmd:Exec(text)
 end
 
 function commandLine:Accept(command, func)
