@@ -2,32 +2,32 @@ local log = require("debug/Log")()
 local su = require("util/StringUtil")
 local Command = require("commandline/Command")
 
-local input = {}
-input.__index = input
+local commandLine = {}
+commandLine.__index = commandLine
 
 local function new()
     local o = {
         command = {}
     }
 
-    setmetatable(o, input)
+    setmetatable(o, commandLine)
 
     system:onEvent("inputText", o.inputText, o)
 
     return o
 end
 
-function input.inputText(inp, text)
+function commandLine.inputText(inp, text)
     inp:Exec(text)
 end
 
-function input:Accept(command, func)
+function commandLine:Accept(command, func)
     local o = Command()
     self.command[command] = { cmd = o, exec = func }
     return o
 end
 
-function input:Exec(command)
+function commandLine:Exec(command)
     local parts = su.SplitQuoted(command)
     -- We now have each part of the command in an array, where the first part is the command.
     local possibleCmd = table.remove(parts, 1)
