@@ -23,6 +23,11 @@
       "name": "tests/CommandLine",
       "type": "control",
       "slots": {}
+    },
+    "tests/Input": {
+      "name": "tests/Input",
+      "type": "control",
+      "slots": {}
     }
   },
   "targets": {
