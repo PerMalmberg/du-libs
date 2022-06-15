@@ -23,14 +23,15 @@ function criteria:Matches(input, isRepeat, isPressed)
 
     if (isRepeat and not self.onRepeat) then
         return false
-    end
+    elseif not isRepeat then
 
-    if (not self.onPress and not self.onRelease) then
-        return false
-    end
+        if (not self.onPress and not self.onRelease) then
+            return false
+        end
 
-    if not ((self.onPress and isPressed) or (self.onRelease and not isPressed)) then
-        return false
+        if not ((self.onPress and isPressed) or (self.onRelease and not isPressed)) then
+            return false
+        end
     end
 
     for _, k in pairs(self.requiredMods) do
