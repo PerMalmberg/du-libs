@@ -8,6 +8,10 @@ function Enum(tbl)
     return tbl
 end
 
+function EnumName(enum, value)
+    return enum[value]
+end
+
 return Enum
 
 --[[Usage

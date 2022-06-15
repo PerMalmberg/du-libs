@@ -1,4 +1,3 @@
-local log = require("debug/Log")()
 local keys = require("input/Keys")
 
 local input = {}
@@ -7,23 +6,15 @@ input.__index = input
 local function new()
     local o = {
         lookup = {},
-        leftControlHeld = false,
-        leftAltHeld = false,
-        leftShift = false,
-        keyToModifier = {},
         keyState = {}
     }
 
     setmetatable(o, input)
 
     -- Create handles for each of the known input actions
-    for _, m in ipairs(keys) do
-        o.keyToModifier[m] = function(inp, status)
-            inp.keyState[m] = status
-        end
-
+    for _, k in ipairs(keys) do
         -- Start with all keys in released state
-        o.keyState[m] = false
+        o.keyState[k] = false
     end
 
     system:onEvent("actionStart", o.keyPress, o)
@@ -33,31 +24,46 @@ local function new()
     return o
 end
 
-function input:decode(key, status)
-    local f = self.keyToModifier[key]
-    if f == nil then
-        log:Warning("Unsupported key: ", key)
-    else
-        f(self, status)
+function input:decode(key, isPressed, isRepeat)
+    self.keyState[key] = isPressed
+
+    local l = self.lookup[key]
+    if l ~= nil then
+        for _, entry in ipairs(l) do
+            if entry.criteria:Matches(self, isRepeat, isPressed) then
+                entry.func()
+            end
+        end
     end
 end
 
 function input:keyPress(key)
-    self:decode(key, true)
+    self:decode(key, true, false)
 end
 
 function input:keyRelease(key)
-    self:decode(key, false)
+    self:decode(key, false, false)
 end
 
 function input:keyHold(key)
-    -- Holding a key means it is pressed
-    self:keyPress(key)
+    self:decode(key, true, true)
+end
+
+function input:IsPressed(key)
+    return self.keyState[key]
 end
 
 -- Register a function to be triggered when a key is pressed and certain modifiers are set
-function input:Register(key, modifiers, func)
+function input:Register(key, criteria, func)
+    key = EnumName(keys, key)
+    local l = self.lookup[key]
 
+    if l == nil then
+        l = {}
+        self.lookup[key] = l
+    end
+
+    table.insert(l, { criteria = criteria, func = func})
 end
 
 local singleton
