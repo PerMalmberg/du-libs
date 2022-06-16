@@ -17,10 +17,6 @@ local function new()
 end
 
 function criteria:Matches(input, isRepeat, isPressed)
-    if #self.requiredMods == 0 then
-        return false
-    end
-
     if (isRepeat and not self.onRepeat) then
         return false
     elseif not isRepeat then
