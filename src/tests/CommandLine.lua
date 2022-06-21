@@ -16,6 +16,7 @@ function test.Parse1()
         assert(data.c, "c")
         assert(data.f == 123.456)
         assert(data.default == 678)
+        assert(data.negative == -123.456)
     end
 
     local cmd = input:Accept("command", f):AsString():Mandatory()
@@ -24,6 +25,7 @@ function test.Parse1()
     cmd:Option("--c"):AsBoolean():Mandatory()
     cmd:Option("-f"):AsNumber():Mandatory()
     cmd:Option("-default"):AsNumber():Mandatory():Default(678)
+    cmd:Option("-negative"):AsNumber():Mandatory()
 
     local echo = function(data)
         log:Info("echoing '", data.commandValue, "'")
@@ -36,8 +38,8 @@ function test.Parse1()
     input:Accept("echo", echo):AsString():Mandatory()
     input:Accept("add", add):AsNumber():Mandatory():Option("+"):AsNumber():Mandatory()
 
-    input:Exec("command -a 1 --boo abc --c true 'text with space' -f 123.456")
-    input:Exec("command -f 123.456 'text with space' -a 1 --boo abc --c true")
+    input:Exec("command -a 1 --boo abc --c true 'text with space' -f 123.456 -negative -123.456")
+    input:Exec("command -f 123.456 'text with space' -a 1 --boo abc --c true -negative -123.456")
     log:Info("Try the 'echo' and 'add' commands")
 end
 

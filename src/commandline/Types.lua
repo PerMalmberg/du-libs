@@ -17,7 +17,7 @@ function argType.parseValue(wantedType, raw)
             log:Error("Not a boolean", raw)
         end
     elseif wantedType == argType.NUMBER then
-        local match = string.match(raw, "(%d*%.?%d+)")
+        local match = string.match(raw, "([+-]?%d*%.?%d+)")
         if match == nil then
             log:Error("Not a number:", raw)
             return nil
