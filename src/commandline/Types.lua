@@ -8,6 +8,10 @@ local argType = Enum {
 }
 
 function argType.parseValue(wantedType, raw)
+    if raw == nil then
+        return nil
+    end
+
     if wantedType == argType.BOOLEAN then
         if raw == "true" or raw == "1" then
             return true

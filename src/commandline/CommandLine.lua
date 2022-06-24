@@ -28,22 +28,29 @@ function commandLine:Accept(command, func)
 end
 
 function commandLine:Exec(command)
-    local parts = su.SplitQuoted(command)
-    -- We now have each part of the command in an array, where the first part is the command.
-    local possibleCmd = table.remove(parts, 1)
-    local cmd = self.command[possibleCmd]
-    if cmd == nil then
-        log:Error("Command not supported:", possibleCmd)
-    else
-        -- Let the command parse the rest of the arguments. If successful, we get back a table with the values as per the options.
-        -- The command-value itself may be empty if it is not mandatory.
-        local data = cmd.cmd:Parse(parts)
-        if data == nil then
-            log:Error("Cannot execute:", command)
+    local exeFunc = function(self, commandString)
+        local parts = su.SplitQuoted(commandString)
+        -- We now have each part of the command in an array, where the first part is the command.
+        local possibleCmd = table.remove(parts, 1)
+        local cmd = self.command[possibleCmd]
+        if cmd == nil then
+            log:Error("Command not supported:", possibleCmd)
         else
-            log:Debug("Executing:", command)
-            cmd.exec(data)
+            -- Let the command parse the rest of the arguments. If successful, we get back a table with the values as per the options.
+            -- The command-value itself may be empty if it is not mandatory.
+            local data = cmd.cmd:Parse(parts)
+            if data == nil then
+                log:Error("Cannot execute:", commandString)
+            else
+                log:Debug("Executing:", commandString)
+                cmd.exec(data)
+            end
         end
+    end
+
+    local status, ret = xpcall(exeFunc, traceback, self, command)
+    if not status then
+        log:Error(ret)
     end
 end
 
