@@ -1,15 +1,15 @@
 local library = require("abstraction/Library")()
 local construct = require("abstraction/Construct")()
-local EngineGroup = require("flight/EngineGroup")
+local EngineGroup = require("abstraction/EngineGroup")
 local core = library:GetCoreUnit()
 local mass = construct.mass
 local world = construct.world
 
-LongitudinalEngines = EngineGroup("longitudal")
-lateralEngines = EngineGroup("lateral")
-longLatEngines = EngineGroup("longitudinal", "lateral")
-verticalEngines = EngineGroup("vertical")
-thrustEngines = EngineGroup("thrust")
+local longitudinalEngines = EngineGroup("longitudal")
+local lateralEngines = EngineGroup("lateral")
+local longLatEngines = EngineGroup("longitudinal", "lateral")
+local verticalEngines = EngineGroup("vertical")
+local thrustEngines = EngineGroup("thrust")
 
 local longitudalForce = core.getMaxKinematicsParametersAlongAxis(longitudinalEngines:Intersection(), { construct.orientation.localized.Forward():unpack() })
 local lateralForce = core.getMaxKinematicsParametersAlongAxis(lateralEngines:Intersection(), { construct.orientation.localized.Right():unpack() })
@@ -50,6 +50,11 @@ function engine:MaxAcceleration(engineGroup, axis, positive)
     return self:MaxForce(engineGroup, axis, positive) / mass.Total()
 end
 
+function engine:GetMaxAccelerationAlongAxis(axis)
+    -- Until we figure this one out, just return a large value
+    return 15
+end
+
 function engine:MaxForwardAcceleration()
     return getCurrent(longitudalForce, true)
 end
@@ -74,6 +79,8 @@ function engine:MaxDownwardAcceleration()
     return getCurrent(verticalForce, false)
 end
 
+local singleton
+
 -- The module
 return setmetatable(
         {
@@ -81,7 +88,10 @@ return setmetatable(
         },
         {
             __call = function(_, ...)
-                return new()
+                if singleton == nil then
+                    singleton = new()
+                end
+                return singleton
             end
         }
 )

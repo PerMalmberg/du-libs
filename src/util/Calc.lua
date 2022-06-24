@@ -38,6 +38,12 @@ local calc = {
         local localized = coordinate - Vec3(core.getConstructWorldPos())
         return Vec3(solve3(core.getConstructWorldRight(), core.getConstructWorldForward(), core.getConstructWorldUp(), { localized:unpack() }))
     end,
+    LocalToWorld = function(localCoord)
+        local xOffset = localCoord.x * Vec3(core.getConstructWorldOrientationForward())
+        local yOffset = localCoord.y * Vec3(core.getConstructWorldOrientationRight())
+        local zOffset = localCoord.z * Vec3(core.getConstructWorldOrientationUp())
+        return xOffset + yOffset + zOffset + Vec3(core.getConstructWorldPos())
+    end,
     SignedRotationAngle = function(normal, vecA, vecB)
         vecA = vecA:project_on_plane(normal)
         vecB = vecB:project_on_plane(normal)
@@ -53,9 +59,6 @@ local calc = {
         return kph / 3.6
     end,
     NearestPointOnLine = function(lineStart, lineDirection, pointAwayFromLine)
-        --local v = pointAwayFromLine - lineStart
-        --return v:project_on(lineDirection:normalize())
-
         -- https://forum.unity.com/threads/how-do-i-find-the-closest-point-on-a-line.340058/
         local lineDir = lineDirection:normalize()
         local v = pointAwayFromLine - lineStart
