@@ -31,6 +31,11 @@ function command:AsBoolean()
     return self
 end
 
+function command:AsEmpty()
+    self.type = argType.EMPTY
+    return self
+end
+
 function command:Mandatory()
     self.mandatory = true
     return self
@@ -52,7 +57,12 @@ function command:Parse(args)
         end
     end
 
-    data.commandValue = argType.parseValue(self.type, args[1])
+    local ok
+    ok, data.commandValue = argType.parseValue(self.type, args[1])
+
+    if not ok then
+        return nil
+    end
 
     if data.commandValue == nil and self.mandatory then
         log:Error("Missing mandatory value for command")

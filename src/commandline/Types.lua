@@ -2,21 +2,23 @@ local log = require("debug/Log")()
 local Enum = require("util/Enum")
 
 local argType = Enum {
+    "EMPTY",
     "BOOLEAN",
     "NUMBER",
     "STRING",
 }
 
+--- @return tuple of boolean,value, where the boolean indicates if the value was parsed.
 function argType.parseValue(wantedType, raw)
-    if raw == nil then
-        return nil
+    if wantedType == argType.EMPTY and raw == nil then
+        return true, ""
     end
 
     if wantedType == argType.BOOLEAN then
         if raw == "true" or raw == "1" then
-            return true
+            return true, true
         elseif raw == "false" or raw == "0" then
-            return false
+            return true, false
         else
             log:Error("Not a boolean", raw)
         end
@@ -24,12 +26,12 @@ function argType.parseValue(wantedType, raw)
         local match = string.match(raw, "([+-]?%d*%.?%d+)")
         if match == nil then
             log:Error("Not a number:", raw)
-            return nil
+            return false, nil
         else
-            return tonumber(match)
+            return true, tonumber(match)
         end
     else
-        return raw
+        return true, raw
     end
 end
 

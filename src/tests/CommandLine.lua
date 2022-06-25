@@ -35,11 +35,17 @@ function test.Parse1()
         log:Info("Sum: ", data.commandValue + data["+"])
     end
 
+    local empty = function(data)
+        log:Info("empty command executed")
+    end
+
     input:Accept("echo", echo):AsString():Mandatory()
     input:Accept("add", add):AsNumber():Mandatory():Option("+"):AsNumber():Mandatory()
+    input:Accept("empty", empty):AsEmpty()
 
     input:Exec("command -a 1 --boo abc --c true 'text with space' -f 123.456 -negative -123.456")
     input:Exec("command -f 123.456 'text with space' -a 1 --boo abc --c true -negative -123.456")
+    input:Exec("empty")
     log:Info("Try the 'echo' and 'add' commands")
 end
 

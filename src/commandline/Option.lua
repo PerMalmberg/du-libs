@@ -40,8 +40,6 @@ function option:Default(v)
     self.default = v
 end
 
-
-
 function option:Parse(args, target)
     -- Find the argument in the input data
     for i, key in ipairs(args) do
@@ -52,7 +50,11 @@ function option:Parse(args, target)
                 table.remove(args, i) -- Remove the arg itself
                 local v = table.remove(args, i) -- Remove and store the value
 
-                target[self.sanitizedName] = argType.parseValue(self.type, v)
+                local ok
+                ok, target[self.sanitizedName] = argType.parseValue(self.type, v)
+                if not ok then
+                    return false
+                end
             elseif self.mandatory then
                 log:Error("Missing value for mandatory option ", key)
                 return false
