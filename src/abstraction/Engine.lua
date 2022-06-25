@@ -52,7 +52,7 @@ end
 
 function engine:GetMaxAccelerationAlongAxis(axis)
     -- Until we figure this one out, just return a large value
-    return 15
+    return 150
 end
 
 function engine:MaxForwardAcceleration()
