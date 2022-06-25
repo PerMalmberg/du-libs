@@ -21,8 +21,8 @@ local sveaBaseSWSide = u:ParsePosition("::pos{0,2,7.5425,78.0995,47.6314}")
 local test = {}
 
 function test.testPosition()
-    local p = Position(u:CurrentGalaxy(), u:ClosestBody(), 1, 2, 3)
-    local p2 = Position(u:CurrentGalaxy(), u:ClosestBody(), 3, 4, 5)
+    local p = Position(u:CurrentGalaxy(), u:ClosestBody(positionOnAlioth:Coords()), 1, 2, 3)
+    local p2 = Position(u:CurrentGalaxy(), u:ClosestBody(positionOnAlioth:Coords()), 3, 4, 5)
     checks.Equals(p.Coords:len(), Vec3(1, 2, 3):len())
     checks.Equals(p.Body.Name, "Alioth")
     checks.Equals(p2.Coords:len(), Vec3(3, 4, 5):len())

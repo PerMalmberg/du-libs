@@ -96,9 +96,18 @@ end
 
 --- Gets the information for the closest stellar body
 ---@return table
-function universe:ClosestBody()
+function universe:ClosestBody(position)
+    -- When in space, getCurrentPlanetId() returns 0
     local closest = self.core.getCurrentPlanetId()
-    return self.galaxy[self:CurrentGalaxyId()]:BodyById(closest)
+    local body
+
+    if closest > 0 then
+        body = self.galaxy[self:CurrentGalaxyId()]:BodyById(closest)
+    else
+        body = self:ClosestBodyByDistance(self:CurrentGalaxyId(), position)
+    end
+
+    return body
 end
 
 function universe:ClosestBodyByDistance(galaxyId, position)

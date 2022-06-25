@@ -45,8 +45,13 @@ function body:Prepare(galaxy, data)
 
 end
 
+function body:__tostring()
+    return self.Name
+end
+
 function body:IsWithinAtmosphere(position)
-    return (position - self.Geography.Center):len() < self.Atmosphere.Radius
+    local distanceToCenter = (position - self.Geography.Center):len()
+    return distanceToCenter < self.Atmosphere.Radius
 end
 
 return setmetatable(
