@@ -110,6 +110,19 @@ function universe:ClosestBody(position)
     return body
 end
 
+--- @return Vec3 A unit vector pointing towards the center of the current 'gravity well', i.e. planet or space construct.
+function universe:VerticalReferenceVector()
+    local worldGrav = Vec3(self.core.getWorldGravity())
+
+    if worldGrav:len2() == 0 then
+        local position = Vec3(self.core.getConstructWorldPos())
+        local body = self:ClosestBody(position)
+        return (body.Geography.Center - position):normalize()
+    else
+        return worldGrav:normalize()
+    end
+end
+
 function universe:ClosestBodyByDistance(galaxyId, position)
     return self.galaxy[galaxyId]:GetBodyClosestToPosition(position)
 end
