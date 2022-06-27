@@ -5,7 +5,8 @@ local function new(...)
     local e = {
         tags = {},
         dirty = true,
-        intersection = ""
+        intersection = "",
+        union = ""
     }
     local t = setmetatable(e, engineGroup)
 
@@ -22,17 +23,17 @@ end
 function engineGroup:Add(name --[[string]])
     -- Append at the end of the list
     table.insert(self.tags, #self.tags + 1, name:lower())
-    self.dirty = true
+    self.intersection = table.concat(self.tags, " ")
+    self.union = table.concat(self.tags, ",")
 end
 
 ---@return string
 function engineGroup:Intersection()
-    if self.dirty then
-        self.intersection = table.concat(self.tags, ",")
-        self.dirty = false
-    end
-
     return self.intersection
+end
+
+function engineGroup:Union()
+    return self.union
 end
 
 function engineGroup:__tostring()
