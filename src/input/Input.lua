@@ -17,9 +17,9 @@ local function new()
         o.keyState[k] = false
     end
 
-    system:onEvent("actionStart", o.keyPress, o)
-    system:onEvent("actionStop", o.keyRelease, o)
-    system:onEvent("actionLoop", o.keyHold, o)
+    system:onEvent("onActionStart", o.keyPress, o)
+    system:onEvent("onActionStop", o.keyRelease, o)
+    system:onEvent("onActionLoop", o.keyHold, o)
 
     return o
 end
@@ -63,7 +63,7 @@ function input:Register(key, criteria, func)
         self.lookup[key] = l
     end
 
-    table.insert(l, { criteria = criteria, func = func})
+    table.insert(l, { criteria = criteria, func = func })
 end
 
 local singleton

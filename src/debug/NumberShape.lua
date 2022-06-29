@@ -30,7 +30,7 @@ local function new(core, number, worldPos)
     }
 
     setmetatable(instance, numberShape)
-    instance.updateHandler = system:onEvent("update", instance.Draw, instance)
+    instance.updateHandler = system:onEvent("onUpdate", instance.Draw, instance)
     return instance
 end
 

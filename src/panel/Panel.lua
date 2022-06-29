@@ -15,7 +15,7 @@ local function new(title)
 
     setmetatable(instance, panel)
 
-    instance.updateHandlerId = system:onEvent("update", instance.Update, instance)
+    instance.updateHandlerId = system:onEvent("onUpdate", instance.Update, instance)
 
     return instance
 end

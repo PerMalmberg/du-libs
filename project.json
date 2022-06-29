@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "fmtVersion": 2
+  },
   "name": "du-libs",
   "description": "Dual Universe Library by Yoarii",
   "sourcePath": "src",

@@ -12,7 +12,7 @@ local function new()
 
     setmetatable(o, commandLine)
 
-    system:onEvent("inputText", o.inputText, o)
+    system:onEvent("onInputText", o.inputText, o)
 
     return o
 end

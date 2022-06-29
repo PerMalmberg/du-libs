@@ -5,14 +5,13 @@ tick.__index = tick
 
 local singleton = nil
 
-
 local function new()
     local instance = {}
     instance.functions = {}
     setmetatable(instance, tick)
 
     -- Register with du-luac event handler
-    unit:onEvent("tick", function(system, id)
+    unit:onEvent("onTick", function(system, id)
         instance:run(id)
     end)
     return instance
