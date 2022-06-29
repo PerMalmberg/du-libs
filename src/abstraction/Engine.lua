@@ -1,9 +1,9 @@
 local library = require("abstraction/Library")()
-local construct = require("abstraction/Construct")()
+local vehicle = require("abstraction/Vehicle")()
 local EngineGroup = require("abstraction/EngineGroup")
 local core = library:GetCoreUnit()
-local mass = construct.mass
-local world = construct.world
+local mass = vehicle.mass
+local world = vehicle.world
 
 local longitudinalEngines = EngineGroup("longitudal")
 local lateralEngines = EngineGroup("lateral")
@@ -11,9 +11,9 @@ local longLatEngines = EngineGroup("longitudinal", "lateral")
 local verticalEngines = EngineGroup("vertical")
 local thrustEngines = EngineGroup("thrust")
 
-local longitudalForce = core.getMaxKinematicsParametersAlongAxis(longitudinalEngines:Intersection(), { construct.orientation.localized.Forward():unpack() })
-local lateralForce = core.getMaxKinematicsParametersAlongAxis(lateralEngines:Intersection(), { construct.orientation.localized.Right():unpack() })
-local verticalForce = core.getMaxKinematicsParametersAlongAxis(verticalEngines:Intersection(), { construct.orientation.localized.Up():unpack() })
+local longitudalForce = core.getMaxKinematicsParametersAlongAxis(longitudinalEngines:Intersection(), { vehicle.orientation.localized.Forward():unpack() })
+local lateralForce = core.getMaxKinematicsParametersAlongAxis(lateralEngines:Intersection(), { vehicle.orientation.localized.Right():unpack() })
+local verticalForce = core.getMaxKinematicsParametersAlongAxis(verticalEngines:Intersection(), { vehicle.orientation.localized.Up():unpack() })
 
 local engine = {}
 engine.__index = engine

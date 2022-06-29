@@ -3,8 +3,8 @@ local Vec3 = require("cpml/vec3")
 local core = library:GetCoreUnit()
 local ctrl = library:GetController()
 
-local construct = {}
-construct.__index = construct
+local vehicle = {}
+vehicle.__index = vehicle
 local singleton = nil
 
 local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
@@ -16,15 +16,15 @@ local function new()
     local instance = {
         orientation = {
             Up = function()
-                -- This points in the current up direction of the construct
+                -- This points in the current up direction of the vehicle
                 return Vec3(core.getConstructWorldOrientationUp())
             end,
             Right = function()
-                -- This points in the current right direction of the construct
+                -- This points in the current right direction of the vehicle
                 return Vec3(core.getConstructWorldOrientationRight())
             end,
             Forward = function()
-                -- This points in the current forward direction of the construct
+                -- This points in the current forward direction of the vehicle
                 return Vec3(core.getConstructWorldOrientationForward())
             end,
             AlongGravity = function()
@@ -144,7 +144,7 @@ local function new()
         }
     }
 
-    setmetatable(instance, construct)
+    setmetatable(instance, vehicle)
     return instance
 end
 

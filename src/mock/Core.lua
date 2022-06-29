@@ -6,7 +6,7 @@ core.__index = core
 
 local singelton = nil
 
-CoreVars = {
+local CoreVars = {
     worldPos = {-8.00, -8.00, -126303.00}, -- Alioth center
     currentPlanetId = 2, -- Alioth
     constructWorldOrientationForward = {0, 1, 0}
