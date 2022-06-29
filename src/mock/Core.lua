@@ -16,13 +16,13 @@ local function new()
     return setmetatable({}, core)
 end
 
-function core.getConstructWorldOrientationForward()
+function construct.getWorldOrientationForward()
     return CoreVars.constructWorldOrientationForward
 end
 
 ---Gets the center of the contruct in world coordinates
 ---@return vector {x, y, z}
-function core.getConstructWorldPos()
+function construct.getWorldPosition()
     return CoreVars.wordPos
 end
 

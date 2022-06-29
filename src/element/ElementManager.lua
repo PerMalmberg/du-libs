@@ -21,7 +21,7 @@ function ElementManager:Instance()
         instance.Databank = {}
         instance.Emitter = {}
 
-        instance.slots = {slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9, slot10}
+        instance.slots = { slot1, slot2, slot3, slot4, slot5, slot6, slot7, slot8, slot9, slot10 }
         instance.linked = false
     end
 
@@ -36,10 +36,10 @@ function ElementManager:link()
             local slot = self.slots[i]
             if slot ~= nil then
                 local elementClass = slot.getElementClass()
-                
+
                 if elementClass == 'CoreUnitStatic'
-                or elementClass == 'CoreUnitSpace'
-                or elementClass == 'CoreUnitDynamic' then
+                        or elementClass == 'CoreUnitSpace'
+                        or elementClass == 'CoreUnitDynamic' then
                     self.Core = slot
                 elseif (elementClass == 'ScreenUnit') then
                     table.insert(self.Screen, #self.Screen + 1, slot)
@@ -61,31 +61,31 @@ function ElementManager:link()
                     table.insert(self.Databank, #self.Databank + 1, slot)
                 elseif (elementClass == 'Emitter') then
                     table.insert(self.Emitter, #self.Emitter + 1, slot)
-                else                
+                else
                     system.print(elementClass)
                 end
             end
         end
 
---[[        system.print("Found elements:")        
-        system.print("Core:      " .. tostring(self.Core ~= nil))
-        system.print("Screen:    " .. #self.Screen)
-        system.print("Container: " .. #self.Container)
-        system.print("Switch:    " .. #self.Switch)
-        system.print("Button:    " .. #self.Button)
-        system.print("Emitter:   " .. #self.Emitter)
-        system.print("Receiver:  " .. #self.Receiver)
-        system.print("Light:     " .. #self.Light)
-        system.print("Industry:  " .. #self.Industry)
-        system.print("Databank:  " .. #self.Databank)
-]]
+        --[[        system.print("Found elements:")
+                system.print("Core:      " .. tostring(self.Core ~= nil))
+                system.print("Screen:    " .. #self.Screen)
+                system.print("Container: " .. #self.Container)
+                system.print("Switch:    " .. #self.Switch)
+                system.print("Button:    " .. #self.Button)
+                system.print("Emitter:   " .. #self.Emitter)
+                system.print("Receiver:  " .. #self.Receiver)
+                system.print("Light:     " .. #self.Light)
+                system.print("Industry:  " .. #self.Industry)
+                system.print("Databank:  " .. #self.Databank)
+        ]]
 
         linked = true
     end
 end
 
 function ElementManager:GetElementNameOfSlot(slot)
-    return self.Core.getElementNameById(slot.getId())
+    return self.Core.getElementNameById(slot.getLocalId())
 end
 
 -- Gets a linked element by the name
@@ -106,10 +106,10 @@ end
 
 function ElementManager:IsDatabank(slot)
     local elementClass = slot.getElementClass()
-    return elementClass == "DataBankUnit"   
+    return elementClass == "DataBankUnit"
 end
 
 function ElementManager:IsScreen(slot)
     local elementClass = slot.getElementClass()
-    return elementClass == "ScreenUnit"   
+    return elementClass == "ScreenUnit"
 end

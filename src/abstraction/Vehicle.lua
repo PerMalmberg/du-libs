@@ -17,15 +17,15 @@ local function new()
         orientation = {
             Up = function()
                 -- This points in the current up direction of the vehicle
-                return Vec3(core.getConstructWorldOrientationUp())
+                return Vec3(construct.getWorldOrientationUp())
             end,
             Right = function()
                 -- This points in the current right direction of the vehicle
-                return Vec3(core.getConstructWorldOrientationRight())
+                return Vec3(construct.getWorldOrientationRight())
             end,
             Forward = function()
                 -- This points in the current forward direction of the vehicle
-                return Vec3(core.getConstructWorldOrientationForward())
+                return Vec3(construct.getWorldOrientationForward())
             end,
             AlongGravity = function()
                 -- This points towards the center of the planet, i.e. downwards. Is zero when in space.
@@ -33,19 +33,19 @@ local function new()
             end,
             localized = {
                 Up = function()
-                    return Vec3(core.getConstructOrientationUp())
+                    return Vec3(construct.getOrientationUp())
                 end,
                 Right = function()
-                    return Vec3(core.getConstructOrientationRight())
+                    return Vec3(construct.getOrientationRight())
                 end,
                 Forward = function()
-                    return Vec3(core.getConstructOrientationForward())
+                    return Vec3(construct.getOrientationForward())
                 end
             }
         },
         mass = {
             Own = function()
-                return core.getConstructMass()
+                return construct.getMass()
             end,
             Total = function()
                 local m = singleton.mass
@@ -53,30 +53,30 @@ local function new()
             end,
             MassOfDockedConstructs = function()
                 local mass = 0
-                for _, id in ipairs(core.getDockedConstructs()) do
-                    mass = mass + core.getDockedConstructMass(id)
+                for _, id in ipairs(construct.getDockedConstructs()) do
+                    mass = mass + construct.getDockedConstructMass(id)
                 end
 
                 return mass
             end,
             MassOfPlayers = function()
                 local mass = 0
-                for _, id in ipairs(core.getPlayersOnBoard()) do
-                    mass = mass + core.getBoardedPlayerMass(id)
+                for _, id in ipairs(construct.getPlayersOnBoard()) do
+                    mass = mass + construct.getBoardedPlayerMass(id)
                 end
                 return mass
             end
         },
         velocity = {
             Angular = function()
-                return Vec3(core.getWorldAngularVelocity())
+                return Vec3(construct.getWorldAngularVelocity())
             end,
             Movement = function()
-                return Vec3(core.getWorldAbsoluteVelocity())
+                return Vec3(construct.getWorldAbsoluteVelocity())
             end,
             localized = {
                 Angular = function()
-                    return Vec3(core.getAngularVelocity())
+                    return Vec3(construct.getAngularVelocity())
                 end
             }
         },
@@ -85,17 +85,17 @@ local function new()
                 return Vec3(core.getWorldAngularAcceleration())
             end,
             Movement = function()
-                return Vec3(core.getWorldAcceleration())
+                return Vec3(construct.getWorldAcceleration())
             end,
             localized = {
                 Angular = function()
-                    return Vec3(core.getAngularAcceleration())
+                    return Vec3(construct.getAngularAcceleration())
                 end
             }
         },
         position = {
             Current = function()
-                return Vec3(core.getConstructWorldPos())
+                return Vec3(construct.getWorldPosition())
             end
         },
         world = {
@@ -106,7 +106,7 @@ local function new()
             IsInSpace = function()
                 return not singleton.world.IsInAtmo()
             end,
-            G = core.g,
+            G = core.getGravityIntensity,
             AngularAirFrictionAcceleration = function()
                 return Vec3(core.getWorldAirFrictionAcceleration())
             end

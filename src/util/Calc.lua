@@ -35,14 +35,14 @@ local calc = {
         return (outMax - outMin) / (inMax - inMin) * (value - inMin) + outMin
     end,
     WorldToLocal = function(coordinate)
-        local localized = coordinate - Vec3(core.getConstructWorldPos())
-        return Vec3(solve3(core.getConstructWorldRight(), core.getConstructWorldForward(), core.getConstructWorldUp(), { localized:unpack() }))
+        local localized = coordinate - Vec3(construct.getWorldPosition())
+        return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(), { localized:unpack() }))
     end,
     LocalToWorld = function(localCoord)
-        local xOffset = localCoord.x * Vec3(core.getConstructWorldOrientationForward())
-        local yOffset = localCoord.y * Vec3(core.getConstructWorldOrientationRight())
-        local zOffset = localCoord.z * Vec3(core.getConstructWorldOrientationUp())
-        return xOffset + yOffset + zOffset + Vec3(core.getConstructWorldPos())
+        local xOffset = localCoord.x * Vec3(construct.getWorldOrientationForward())
+        local yOffset = localCoord.y * Vec3(construct.getWorldOrientationRight())
+        local zOffset = localCoord.z * Vec3(construct.getWorldOrientationUp())
+        return xOffset + yOffset + zOffset + Vec3(construct.getWorldPosition())
     end,
     SignedRotationAngle = function(normal, vecA, vecB)
         vecA = vecA:project_on_plane(normal)

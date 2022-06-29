@@ -115,7 +115,7 @@ function universe:VerticalReferenceVector()
     local worldGrav = Vec3(self.core.getWorldGravity())
 
     if worldGrav:len2() == 0 then
-        local position = Vec3(self.core.getConstructWorldPos())
+        local position = Vec3(self.construct.getWorldPosition())
         local body = self:ClosestBody(position)
         return (body.Geography.Center - position):normalize()
     else
