@@ -20,6 +20,7 @@ function timer:Stop()
     self.stopTime = utc()
 end
 
+---@return number Elapsed time, in seconds with fractions.
 function timer:Elapsed()
     if self.startTime == nil then
         return 0
