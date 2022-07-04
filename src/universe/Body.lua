@@ -15,7 +15,7 @@ local function new()
 end
 
 function body:Prepare(galaxy, data)
-    checks.IsTable(galaxy, "galayx", "body:Prepare")
+    checks.IsTable(galaxy, "galaxy", "body:Prepare")
     checks.IsTable(data, "data", "body:Prepare")
 
     self.Galaxy = galaxy
