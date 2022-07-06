@@ -39,7 +39,7 @@ end
 function storage:load()
     self.coRunner:Execute(
             function()
-                local keys = self.db.getKeys()
+                local keys = self.db.getKeyList()
                 keys = json.decode(keys)
                 log:Debug("Loading from DB", self.name)
                 for i, k in ipairs(keys) do
