@@ -38,6 +38,20 @@ local calc = {
         local localized = coordinate - Vec3(construct.getWorldPosition())
         return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(), { localized:unpack() }))
     end,
+    --[[ This one does the same thing as the above one, except that it doesn't subtract the construct position to move the vector to origo.
+    WorldToLocal = function(worldPos)
+        local RGT = vec3(construct.getWorldRight())
+        local FWD = vec3(construct.getWorldForward())
+        local UP = vec3(construct.getWorldUp())
+
+        local localPos = vec3(
+                worldPos:dot(RGT),
+                worldPos:dot(FWD),
+                worldPos:dot(UP)
+        )
+
+        return localPos
+    end,]]--
     LocalToWorld = function(localCoord)
         local xOffset = localCoord.x * Vec3(construct.getWorldOrientationForward())
         local yOffset = localCoord.y * Vec3(construct.getWorldOrientationRight())
@@ -70,6 +84,13 @@ local calc = {
     end,
     AreAlmostEqual = function(a, b, margin)
         return abs(a - b) < margin
+    end,
+    Ternary = function(condition, a, b)
+        if condition then
+            return a
+        end
+
+        return b
     end
 }
 

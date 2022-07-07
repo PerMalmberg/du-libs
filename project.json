@@ -31,6 +31,11 @@
       "name": "tests/Input",
       "type": "control",
       "slots": {}
+    },
+    "tests/Engine": {
+      "name": "tests/Engine",
+      "type": "control",
+      "slots": {}
     }
   },
   "targets": {
