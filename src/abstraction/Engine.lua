@@ -4,9 +4,9 @@ local calc = require("util/Calc")
 local log = require("du-libs:debug/Log")()
 local mass = vehicle.mass
 local world = vehicle.world
-local localizedOrientation = vehicle.orientation
 local Ternary = calc.Ternary
 local abs = math.abs
+local min = math.min
 
 local longitudinalEngines = EngineGroup("longitudinal", "thrust")
 local lateralEngines = EngineGroup("lateral", "thrust")
@@ -59,50 +59,51 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
     -- Convert world direction to local (need to add position since the function subtracts that.
     direction = calc.WorldToLocal(direction + vehicle.position.Current())
 
-    direction = { direction:unpack() }
+    local directionParts = { direction:unpack() }
 
-    -- The 'negative' direction returns a negative value to abs() them.
+    -- The 'negative' direction returns a negative value so abs() them.
     local maxForces = {
-        abs(Ternary(direction[1] >= 0, self:MaxRightwardThrust(), self:MaxLeftwardThrust())),
-        abs(Ternary(direction[2] >= 0, self:MaxForwardThrust(), self:MaxBackwardThrust())),
-        abs(Ternary(direction[3] >= 0, self:MaxUpwardThrust(), self:MaxDownwardThrust()))
+        abs(Ternary(directionParts[1] >= 0, self:MaxRightwardThrust(), self:MaxLeftwardThrust())),
+        abs(Ternary(directionParts[2] >= 0, self:MaxForwardThrust(), self:MaxBackwardThrust())),
+        abs(Ternary(directionParts[3] >= 0, self:MaxUpwardThrust(), self:MaxDownwardThrust()))
     }
 
-    local requiredForces = {
-        direction[1] * maxForces[1],
-        direction[2] * maxForces[2],
-        direction[3] * maxForces[3]
-    }
-
-    ---- Find the index with the longest part, this is the main direction.
-    ---- If all are the same then we use the first one as the main direction
+    -- Find the index with the longest part, this is the main direction.
+    -- If all are the same then we use the first one as the main direction
 
     local main = 1
-    local longest = direction[main]
-    for i, v in ipairs(direction) do
+    local longest = abs(directionParts[main])
+    for i, v in ipairs(directionParts) do
         v = abs(v)
-        if longest < v then
+        if v > longest then
             longest = v
             main = i
         end
     end
 
-    local maxThrust = maxForces[main]
+    log:Info("Main ", main)
 
-    ---- Now check if any of the axes can give less than what is required,
-    ---- if one is found to, the one with the least thrust is the limiter.
+    -- Create a vector that represents the max force of the main direction, unpack it to
+    -- get the required forces for each axis, in absolute values
+    local maxVec = maxForces[main] * direction
+    local requiredForces = { abs(maxVec.x), abs(maxVec.y), abs(maxVec.z) }
+
+    log:Info("req", requiredForces[1], requiredForces[2], requiredForces[3])
+
+    -- Start with the known largest force
+    local maxThrust = requiredForces[main]
+
+    -- Now check if any of the axes can give less than what is required,
+    -- if any is found to be too weak, the one with the least thrust is the limiter.
     for i, required in ipairs(requiredForces) do
         if required > maxForces[i] then
             -- This engine can't deliver the required force
-            if required < maxThrust then
-                -- Weakest found so far
-                maxThrust = required
-            end
+            maxThrust = min(maxThrust, maxForces[i])
         end
     end
 
     -- Return the minimum of the forces divided by the mass to get acceleration.
-    -- Remember that this value is the acceleration, not how many 'g':s we can give. To get that, divide by the current world gravity
+    -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
     return maxThrust / mass.Total()
 
     -- QQQ How do we handle downwards direction? Do we the gravity? Can we fill in with gravity in the maxForces above?
