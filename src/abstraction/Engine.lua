@@ -83,7 +83,6 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
     maxForces[1] = maxForces[1] + Ternary(isRight, 1, -1) * gravityForce:dot(localizedOrientation.Right())
     maxForces[2] = maxForces[2] + Ternary(isForward, 1, -1) * gravityForce:dot(localizedOrientation.Forward())
     maxForces[3] = maxForces[3] + Ternary(isUp, 1, -1) * gravityForce:dot(localizedOrientation.Up())
-    log:Info("maxForce ", maxForces[1], maxForces[2], maxForces[3])
 
     -- Find the index with the longest part, this is the main direction.
     -- If all are the same then we use the first one as the main direction
