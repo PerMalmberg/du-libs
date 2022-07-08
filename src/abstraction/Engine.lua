@@ -1,7 +1,6 @@
 local vehicle = require("abstraction/Vehicle")()
 local EngineGroup = require("abstraction/EngineGroup")
 local calc = require("util/Calc")
-local log = require("debug/Log")()
 local universe = require("universe/Universe")()
 local mass = vehicle.mass
 local world = vehicle.world
@@ -57,7 +56,7 @@ function engine:MaxAcceleration(engineGroup, axis, positive)
     return self:MaxForce(engineGroup, axis, positive) / mass.Total()
 end
 
----@return acceleration vec3 The maximum acceleration the construct can give without pushing
+---@return vec3 The maximum acceleration the construct can give without pushing
 --- itself more in one direction than the others.
 function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction)
     -- Convert world direction to local (need to add position since the function subtracts that.
@@ -116,7 +115,7 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
 
     -- Return the minimum of the forces divided by the mass to get acceleration.
     -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-    return maxThrust / totalMass
+    return maxThrust * world.AtmoDensity() / totalMass
 end
 
 function engine:MaxForwardThrust()
