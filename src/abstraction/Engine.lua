@@ -1,10 +1,12 @@
 local vehicle = require("abstraction/Vehicle")()
 local EngineGroup = require("abstraction/EngineGroup")
 local calc = require("util/Calc")
-local log = require("du-libs:debug/Log")()
+local log = require("debug/Log")()
+local universe = require("universe/Universe")()
 local mass = vehicle.mass
 local world = vehicle.world
 local Ternary = calc.Ternary
+local localizedOrientation = vehicle.orientation.localized
 local abs = math.abs
 local min = math.min
 
@@ -14,9 +16,9 @@ local longLatEngines = EngineGroup("longitudinal", "lateral", "thrust")
 local verticalEngines = EngineGroup("vertical", "thrust")
 local thrustEngines = EngineGroup("thrust")
 
-local longitudalForce = construct.getMaxThrustAlongAxis(longitudinalEngines:Intersection(), { vehicle.orientation.localized.Forward():unpack() })
-local lateralForce = construct.getMaxThrustAlongAxis(lateralEngines:Intersection(), { vehicle.orientation.localized.Right():unpack() })
-local verticalForce = construct.getMaxThrustAlongAxis(verticalEngines:Intersection(), { vehicle.orientation.localized.Up():unpack() })
+local longitudalForce = construct.getMaxThrustAlongAxis(longitudinalEngines:Intersection(), { localizedOrientation.Forward():unpack() })
+local lateralForce = construct.getMaxThrustAlongAxis(lateralEngines:Intersection(), { localizedOrientation.Right():unpack() })
+local verticalForce = construct.getMaxThrustAlongAxis(verticalEngines:Intersection(), { localizedOrientation.Up():unpack() })
 
 local atmoRangeFMaxPlus = 1
 local atmoRangeFMaxMinus = 2
@@ -57,16 +59,29 @@ end
 
 function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction)
     -- Convert world direction to local (need to add position since the function subtracts that.
-    direction = calc.WorldToLocal(direction + vehicle.position.Current())
+    direction = calc.WorldDirectionToLocal(direction)
 
     local directionParts = { direction:unpack() }
 
+    local isRight = directionParts[1] >= 0
+    local isForward = directionParts[2] >= 0
+    local isUp = directionParts[3] >= 0
+
     -- The 'negative' direction returns a negative value so abs() them.
     local maxForces = {
-        abs(Ternary(directionParts[1] >= 0, self:MaxRightwardThrust(), self:MaxLeftwardThrust())),
-        abs(Ternary(directionParts[2] >= 0, self:MaxForwardThrust(), self:MaxBackwardThrust())),
-        abs(Ternary(directionParts[3] >= 0, self:MaxUpwardThrust(), self:MaxDownwardThrust()))
+        abs(Ternary(isRight, self:MaxRightwardThrust(), self:MaxLeftwardThrust())),
+        abs(Ternary(isForward, self:MaxForwardThrust(), self:MaxBackwardThrust())),
+        abs(Ternary(isUp, self:MaxUpwardThrust(), self:MaxDownwardThrust()))
     }
+
+    local totalMass = mass.Total()
+
+    -- Add current gravity influence as force in Newtons, with the correct direction
+    local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * vehicle.world.G() * totalMass
+    maxForces[1] = maxForces[1] + Ternary(isRight, 1, -1) * gravityForce:dot(localizedOrientation.Right())
+    maxForces[2] = maxForces[2] + Ternary(isForward, 1, -1) * gravityForce:dot(localizedOrientation.Forward())
+    maxForces[3] = maxForces[3] + Ternary(isUp >= 0, 1, -1) * gravityForce:dot(localizedOrientation.Up())
+    log:Info("maxForce ", maxForces[1], maxForces[2], maxForces[3])
 
     -- Find the index with the longest part, this is the main direction.
     -- If all are the same then we use the first one as the main direction
@@ -104,7 +119,7 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
 
     -- Return the minimum of the forces divided by the mass to get acceleration.
     -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-    return maxThrust / mass.Total()
+    return maxThrust / totalMass
 
     -- QQQ How do we handle downwards direction? Do we the gravity? Can we fill in with gravity in the maxForces above?
 end

@@ -34,9 +34,14 @@ local calc = {
     Scale = function(value, inMin, inMax, outMin, outMax)
         return (outMax - outMin) / (inMax - inMin) * (value - inMin) + outMin
     end,
+    --- @param coordinate vec3 A position in in world coordinates to convert to local coordinates
     WorldToLocal = function(coordinate)
         local localized = coordinate - Vec3(construct.getWorldPosition())
         return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(), { localized:unpack() }))
+    end,
+    --- @param direction vec3 A unit vector, in world coordinates to convert to a local unit vector
+    WorldDirectionToLocal = function(direction)
+        return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(), { direction:unpack() }))
     end,
     --[[ This one does the same thing as the above one, except that it doesn't subtract the construct position to move the vector to origo.
     WorldToLocal = function(worldPos)
