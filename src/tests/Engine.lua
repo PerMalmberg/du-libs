@@ -11,6 +11,7 @@ function test.TestEngine()
     system.print("Back " .. engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(-vehicle.orientation.Forward()))
     system.print("Left " .. engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(-vehicle.orientation.Right()))
     system.print("Down " .. engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(-vehicle.orientation.Up()))
+    system.print("Up and right " .. engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow((vehicle.orientation.Up() + vehicle.orientation.Right() * 0.3):normalize()))
 
 end
 

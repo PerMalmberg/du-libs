@@ -57,6 +57,8 @@ function engine:MaxAcceleration(engineGroup, axis, positive)
     return self:MaxForce(engineGroup, axis, positive) / mass.Total()
 end
 
+---@return acceleration vec3 The maximum acceleration the construct can give without pushing
+--- itself more in one direction than the others.
 function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction)
     -- Convert world direction to local (need to add position since the function subtracts that.
     direction = calc.WorldDirectionToLocal(direction)
@@ -80,7 +82,7 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
     local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * vehicle.world.G() * totalMass
     maxForces[1] = maxForces[1] + Ternary(isRight, 1, -1) * gravityForce:dot(localizedOrientation.Right())
     maxForces[2] = maxForces[2] + Ternary(isForward, 1, -1) * gravityForce:dot(localizedOrientation.Forward())
-    maxForces[3] = maxForces[3] + Ternary(isUp >= 0, 1, -1) * gravityForce:dot(localizedOrientation.Up())
+    maxForces[3] = maxForces[3] + Ternary(isUp, 1, -1) * gravityForce:dot(localizedOrientation.Up())
     log:Info("maxForce ", maxForces[1], maxForces[2], maxForces[3])
 
     -- Find the index with the longest part, this is the main direction.
@@ -96,14 +98,10 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
         end
     end
 
-    log:Info("Main ", main)
-
     -- Create a vector that represents the max force of the main direction, unpack it to
     -- get the required forces for each axis, in absolute values
     local maxVec = maxForces[main] * direction
     local requiredForces = { abs(maxVec.x), abs(maxVec.y), abs(maxVec.z) }
-
-    log:Info("req", requiredForces[1], requiredForces[2], requiredForces[3])
 
     -- Start with the known largest force
     local maxThrust = requiredForces[main]
@@ -120,8 +118,6 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
     -- Return the minimum of the forces divided by the mass to get acceleration.
     -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
     return maxThrust / totalMass
-
-    -- QQQ How do we handle downwards direction? Do we the gravity? Can we fill in with gravity in the maxForces above?
 end
 
 function engine:MaxForwardThrust()
