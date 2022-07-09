@@ -1,5 +1,5 @@
-local tick = require("system/Tick")()
-local Timer = require("system/Timer")
+local timer = require("system/Timer")()
+local Stopwatch = require("system/Stopwatch")
 
 local runner = {}
 runner.__index = runner
@@ -12,7 +12,7 @@ local function newRunner(func, callback)
         end
     end
 
-    o = {
+    local o = {
         co = coroutine.create(runnerFunction),
         callback = callback
     }
@@ -45,7 +45,7 @@ local function new(interval)
 
     setmetatable(instance, coRunner)
 
-    tick:Add("CoRunnerTick" .. idCount,
+    timer:Add("CoRunner" .. idCount,
             function()
                 instance:run()
             end,
@@ -102,10 +102,10 @@ end
 function coRunner:Delay(func, timeout)
     self:Execute(
             function()
-                local timer = Timer()
-                timer:Start()
+                local stop = Stopwatch()
+                stop:Start()
                 -- Yield until time has passed
-                while timer:Elapsed() < timeout do
+                while stop:Elapsed() < timeout do
                     coroutine.yield()
                 end
             end,

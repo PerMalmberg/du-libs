@@ -1,38 +1,42 @@
-local utc = system.getUtcTime
+-- Handles function registration/deregistration of tick functions
 
 local timer = {}
 timer.__index = timer
 
+local singleton
+
 local function new()
-    local t = {
-        startTime = nil,
-        stopTime = nil
-    }
-    return setmetatable(t, timer)
+    local instance = {}
+    instance.functions = {}
+    setmetatable(instance, timer)
+
+    -- Register with du-luac event handler
+    unit:onEvent("onTimer", function(unit, id)
+        instance:run(id)
+    end)
+    return instance
 end
 
-function timer:Start()
-    self.startTime = utc()
-    self.stopTime = nil
+function timer:Add(id, func, interval)
+    self:Remove(id)
+
+    self.functions[id] = func
+    unit.setTimer(id, interval)
 end
 
-function timer:Stop()
-    self.stopTime = utc()
-end
-
----@return number Elapsed time, in seconds with fractions.
-function timer:Elapsed()
-    if self.startTime == nil then
-        return 0
-    elseif self.stopTime == nil then
-        return utc() - self.startTime
-    else
-        return self.stopTime - self.startTime
+function timer:Remove(id)
+    if self.functions[id] ~= nil then
+        unit.stopTimer(id)
+        self.functions[id] = nil
     end
 end
 
-function timer:IsRunning()
-    return self.startTime ~= nil and self.endTime == nil
+---@param tickId any
+function timer:run(tickId)
+    local f = self.functions[tickId]
+    if f ~= nil then
+        f()
+    end
 end
 
 return setmetatable(
@@ -41,7 +45,10 @@ return setmetatable(
         },
         {
             __call = function(_, ...)
-                return new()
+                if singleton == nil then
+                    singleton = new()
+                end
+                return singleton
             end
         }
 )

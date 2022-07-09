@@ -1,6 +1,6 @@
 local log = require("debug/Log")()
 local co = require("system/CoRunner")(0.01)
-local Timer = require("system/Timer")
+local Stopwatch = require("system/Stopwatch")
 
 log:SetLevel(log.LogLevel.DEBUG)
 
@@ -11,20 +11,20 @@ local done = false
 function test.CoRunner()
     co:Execute(function()
         log:Info("Test started")
-        local timer = Timer()
-        timer:Start()
+        local stopwatch = Stopwatch()
+        stopwatch:Start()
 
-        while not done and timer:Elapsed() < 6 do
-            log:Info("Not yet", timer:Elapsed())
+        while not done and stopwatch:Elapsed() < 6 do
+            log:Info("Not yet", stopwatch:Elapsed())
             count = count + 1
             coroutine.yield()
         end
 
         log:Info("Test complete")
-        end,
-    function()
-        unit.exit()
-    end)
+    end,
+            function()
+                unit.exit()
+            end)
 
     co:Delay(function()
         done = true

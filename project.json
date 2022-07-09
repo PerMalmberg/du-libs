@@ -17,6 +17,11 @@
       "type": "control",
       "slots": {}
     },
+    "tests/Timer": {
+      "name": "tests/Timer",
+      "type": "control",
+      "slots": {}
+    },
     "tests/CoRunner": {
       "name": "tests/CoRunner",
       "type": "control",
