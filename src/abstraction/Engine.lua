@@ -2,6 +2,7 @@ local vehicle = require("abstraction/Vehicle")()
 local EngineGroup = require("abstraction/EngineGroup")
 local calc = require("util/Calc")
 local universe = require("universe/Universe")()
+local constants = require("du-libs:abstraction/Constants")
 local mass = vehicle.mass
 local world = vehicle.world
 local Ternary = calc.Ternary
@@ -114,8 +115,11 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
     end
 
     -- Return the minimum of the forces divided by the mass to get acceleration.
+    -- When space engines kick in, don't consider atmospheric density.
+    local density = world.AtmoDensity()
+
     -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-    return maxThrust * world.AtmoDensity() / totalMass
+    return Ternary(density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF, density, 1) * maxThrust / totalMass
 end
 
 function engine:MaxForwardThrust()
