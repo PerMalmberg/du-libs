@@ -81,22 +81,24 @@ function universe:ParsePosition(pos)
         end
     end
 
-    log:Error("Invalid position string", pos)
+    log:Error("Invalid position string: ", pos)
 
     return nil
 end
 
 ---comment Creates a ::pos string from the given position, within the current galaxy.
----@param position Vec3 The positon to create the position for
-function universe:CreatePos(position)
-    checks.IsVec3(position, "coordinate", "universe:CreatePos")
-    local closestBody = self:ClosestBodyByDistance(self:CurrentGalaxyId(), position)
-    return Position(self:CurrentGalaxy(), closestBody, position.x, position.y, position.z)
+---@param coordinate Vec3 The coordinate to create the position for
+function universe:CreatePos(coordinate)
+    checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
+    local closestBody = self:ClosestBodyByDistance(self:CurrentGalaxyId(), coordinate)
+    return Position(self:CurrentGalaxy(), closestBody, coordinate.x, coordinate.y, coordinate.z)
 end
 
 --- Gets the information for the closest stellar body
 ---@return table
-function universe:ClosestBody(position)
+function universe:ClosestBody(coordinate)
+    checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
+
     -- When in space, getCurrentPlanetId() returns 0
     local closest = self.core.getCurrentPlanetId()
     local body
@@ -104,7 +106,7 @@ function universe:ClosestBody(position)
     if closest > 0 then
         body = self.galaxy[self:CurrentGalaxyId()]:BodyById(closest)
     else
-        body = self:ClosestBodyByDistance(self:CurrentGalaxyId(), position)
+        body = self:ClosestBodyByDistance(self:CurrentGalaxyId(), coordinate)
     end
 
     return body
