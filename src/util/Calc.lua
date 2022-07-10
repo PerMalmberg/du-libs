@@ -8,6 +8,7 @@ local atan = math.atan
 local max = math.max
 local min = math.min
 local abs = math.abs
+local deg2rad = math.rad
 
 local calc = {
     ---Returns the absolute difference between a and b
@@ -96,6 +97,9 @@ local calc = {
         end
 
         return b
+    end,
+    RotateAroundAxis = function(vector, rotationPoint, degrees, axis)
+        return (vector - rotationPoint):rotate(deg2rad(degrees), axis:normalize_inplace()) + rotationPoint
     end
 }
 
