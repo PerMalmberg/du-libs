@@ -17,7 +17,8 @@ local function new(storageName)
     }
 
     if o.db == nil then
-        log:Error("Databank not found", storageName)
+        log:Error("No linked databank with name '", storageName, "' found")
+        unit.exit()
     end
 
     setmetatable(o, storage)
@@ -32,8 +33,6 @@ function storage:BeginLoad()
 
     self.coRunner = CoRunner(0.1)
     self:load()
-
-    return true
 end
 
 function storage:load()
