@@ -4,7 +4,8 @@ local checks = require("debug/Checks")
 local Vec3 = require("cpml/vec3")
 local stringFormat = string.format
 
-local position = Vec3()
+local position = {}
+position.__index = position
 
 local function new(galaxy, bodyRef, x, y, z)
     checks.IsTable(galaxy, "galaxy", "Position:new")
@@ -22,6 +23,14 @@ local function new(galaxy, bodyRef, x, y, z)
     setmetatable(instance, position)
 
     return instance
+end
+
+function position:AsPosString()
+    return tostring(self)
+end
+
+function position:Coordinates()
+    return self.Coords
 end
 
 function position:__tostring()
