@@ -33,13 +33,13 @@ function storage:BeginLoad()
 
     self.coRunner = CoRunner(0.1)
     self:load()
+    return true
 end
 
 function storage:load()
     self.coRunner:Execute(
             function()
                 local keys = self.db.getKeyList()
-                keys = json.decode(keys)
                 log:Debug("Loading from DB", self.name)
                 for i, k in ipairs(keys) do
                     local data = json.decode(self.db.getStringValue(k))
