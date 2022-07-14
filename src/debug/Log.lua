@@ -1,5 +1,6 @@
 require("util/Enum")
 local typeComp = require("debug/TypeComp")
+require("util/Table")
 local json = require("dkjson")
 
 local log = {}
@@ -38,7 +39,7 @@ local function formatValues(...)
     local parts = {}
     local args = { ... }
 
-    for i = 1, #args, 1 do
+    for i = 1, TableLen(args), 1 do
         local v = args[i] or ""
         local s = {}
         if typeComp.IsString(v) then
@@ -49,6 +50,14 @@ local function formatValues(...)
             s = string.format("Vec3(%s, %s, %s)", v.x, v.y, v.z)
         elseif typeComp.IsBoolean(v) then
             s = tostring(v)
+        elseif typeComp.IsFunction(v) then
+            s = tostring(v)
+        elseif typeComp.IsTable(v) then
+            s = "{"
+            for key, data in pairs(v) do
+                s = s .. formatValues(key, ": ", data, ",")
+            end
+            s = s .. "}"
         else
             s = json.encode(v)
         end

@@ -66,7 +66,7 @@ function storage:load()
                 end
             end,
             function()
-                log:Info(TableLen(self.buffer) .. " keys loaded from", self.name)
+                log:Info(TableLen(self.buffer) .. " keys loaded from data bank '", self.name, "'")
                 self.loaded = true
                 self.coRunner:Execute(function()
                     self:persist()
