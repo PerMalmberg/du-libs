@@ -36,8 +36,10 @@ end
 
 local function formatValues(...)
     local parts = {}
+    local args = { ... }
 
-    for _, v in ipairs({ ... }) do
+    for i = 1, #args, 1 do
+        local v = args[i] or ""
         local s = {}
         if typeComp.IsString(v) then
             s = string.format("%s", v)
