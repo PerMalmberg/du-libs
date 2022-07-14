@@ -39,7 +39,7 @@ local function formatValues(...)
     local parts = {}
     local args = { ... }
 
-    for i = 1, TableLen(args), 1 do
+    for i = 1, #args, 1 do
         local v = args[i] or ""
         local s = {}
         if typeComp.IsString(v) then
