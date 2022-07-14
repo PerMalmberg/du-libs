@@ -2,6 +2,7 @@ local json = require("dkjson")
 local library = require("abstraction/Library")()
 local CoRunner = require("system/CoRunner")
 local log = require("debug/Log")()
+require("util/Table")
 
 local storage = {}
 storage.__index = storage
@@ -65,7 +66,7 @@ function storage:load()
                 end
             end,
             function()
-                log:Info(#self.buffer .. " keys loaded from", self.name)
+                log:Info(TableLen(self.buffer) .. " keys loaded from", self.name)
                 self.loaded = true
                 self.coRunner:Execute(function()
                     self:persist()
