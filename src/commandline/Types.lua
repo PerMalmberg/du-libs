@@ -12,6 +12,8 @@ local argType = Enum {
 function argType.parseValue(wantedType, raw)
     if wantedType == argType.EMPTY and raw == nil then
         return true, ""
+    elseif raw == nil then
+        return true, raw
     end
 
     if wantedType == argType.BOOLEAN then
@@ -20,12 +22,12 @@ function argType.parseValue(wantedType, raw)
         elseif raw == "false" or raw == "0" then
             return true, false
         else
-            log:Error("Not a boolean", raw)
+            log:Error("Not a boolean: ", raw)
         end
     elseif wantedType == argType.NUMBER then
         local match = string.match(raw, "([+-]?%d*%.?%d+)")
         if match == nil then
-            log:Error("Not a number:", raw)
+            log:Error("Not a number: ", raw)
             return false, nil
         else
             return true, tonumber(match)
