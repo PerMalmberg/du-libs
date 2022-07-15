@@ -31,7 +31,7 @@ function panel:Close()
 end
 
 function panel:CreateValue(title, unit)
-    local w = ValueWidget(self.panelId, title, unit)
+    local w = ValueWidget(self.panelId, title or "", unit or "")
     self.widgets[w.widgetId] = w
     return w
 end
