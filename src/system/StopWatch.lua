@@ -32,7 +32,7 @@ function stopwatch:Elapsed()
 end
 
 function stopwatch:IsRunning()
-    return self.startTime ~= nil and self.endTime == nil
+    return self.startTime ~= nil and self.stopTime == nil
 end
 
 return setmetatable(
