@@ -132,4 +132,31 @@ calc.SignLargestAxis = function(vector)
     return calc.Sign(arr[ix])
 end
 
+-- https://github.com/GregLukosek/3DMath/blob/master/Math3D.cs
+
+-- Get the shortest distance between a point and a plane. The output is signed so it holds information
+-- as to which side of the plane normal the point is.
+calc.SignedDistancePlanePoint = function(planeNormal, planePoint, point)
+    return planeNormal:dot(point - planePoint);
+end
+
+calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
+    -- First calculate the distance from the point to the plane:
+    local distance = calc.SignedDistancePlanePoint(planeNormal, planePoint, point)
+
+    -- Reverse the sign of the distance
+    distance = distance * -1;
+
+    -- Get a translation vector
+    local translationVector = planeNormal * distance
+
+    -- Translate the point to form a projection
+    return point + translationVector
+end
+
+-- Projects a vector onto a plane. The output is not normalized.
+calc.ProjectVectorOnPlane = function(planeNormal, vector)
+    return vector - vector:dot(planeNormal) * planeNormal
+end
+
 return calc
