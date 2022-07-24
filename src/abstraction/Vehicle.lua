@@ -27,10 +27,6 @@ local function new()
                 -- This points in the current forward direction of the vehicle
                 return Vec3(construct.getWorldOrientationForward())
             end,
-            AlongGravity = function()
-                -- This points towards the center of the planet, i.e. downwards. Is zero when in space.
-                return Vec3(core.getWorldVertical())
-            end,
             localized = {
                 Up = function()
                     return Vec3(construct.getOrientationUp())
