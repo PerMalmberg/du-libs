@@ -1,12 +1,10 @@
 local ValueWidget = require("panel/ValueWidget")
-local library = require("abstraction/Library")()
 
 local panel = {}
 panel.__index = panel
 
 local function new(title)
     local instance = {
-        core = library:GetCoreUnit(),
         title = title,
         panelId = system.createWidgetPanel(title),
         widgets = {},
@@ -23,11 +21,16 @@ end
 function panel:Close()
     system:clearEvent("update", self.updateHandlerId)
 
+    self:Clear()
+
+    system.destroyWidgetPanel(self.panelId)
+end
+
+function panel:Clear()
     for _, widget in pairs(self.widgets) do
         widget:Close()
     end
-
-    system.destroyWidgetPanel(self.panelId)
+    self.widgets = {}
 end
 
 function panel:CreateValue(title, unit)

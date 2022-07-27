@@ -11,6 +11,11 @@ local function new(panelId, title, unit)
         newValue = nil
     }
 
+    if instance.widgetId == nil then
+        system.print("Could not create widget!")
+        unit.exit()
+    end
+
     setmetatable(instance, widget)
     return instance
 end
