@@ -40,16 +40,15 @@ coRunner.__index = coRunner
 local function new(interval)
     local instance = {
         runner = {},
-        main = nil
+        main = nil,
+        id = idCount
     }
 
     setmetatable(instance, coRunner)
 
-    timer:Add("CoRunner" .. idCount,
-            function()
-                instance:run()
-            end,
-            interval)
+    timer:Add("CoRunner" .. idCount, function()
+        instance:run()
+    end, interval)
 
     idCount = idCount + 1
 
@@ -89,6 +88,10 @@ function coRunner:work()
         end
         coroutine.yield()
     end
+end
+
+function coRunner:Terminate()
+    timer:Remove(self.id)
 end
 
 --- Executes a coroutine, calling the callback when the routine dies.
