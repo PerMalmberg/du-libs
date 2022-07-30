@@ -54,13 +54,18 @@ function commandLine:Exec(command)
     end
 end
 
+local singleton
+
 return setmetatable(
         {
             new = new
         },
         {
             __call = function(_, ...)
-                return new()
+                if not singleton then
+                    singleton = new()
+                end
+                return singleton
             end
         }
 )
