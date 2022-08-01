@@ -6,7 +6,7 @@
 local libraryProxy = {}
 libraryProxy.__index = libraryProxy
 
-local singleton = nil
+local singleton
 
 local function new()
     return setmetatable({}, libraryProxy)
@@ -37,11 +37,31 @@ function libraryProxy:GetSolver3()
     return nil
 end
 
-function libraryProxy:GetLinkByName(name)
+function libraryProxy:GetLinks(filter, noLinkName)
     if library then
-        return library.getLinkByName(name)
+        return library.getLinks(filter, noLinkName)
     end
     return nil
+end
+
+function libraryProxy:GetLinkByName(name, noLinkName)
+    if library then
+        return library.getLinkByName(name, noLinkName)
+    end
+    return nil
+end
+
+function libraryProxy:GetLinkByClass(class, noLinkName)
+    if library then
+        return library.getLinkByClass(class, noLinkName)
+    end
+    return nil
+end
+
+function libraryProxy:AddEventHandlers(obj)
+    if library then
+        library.addEventHandlers(obj)
+    end
 end
 
 -- The module
