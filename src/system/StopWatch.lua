@@ -20,6 +20,11 @@ function stopwatch:Stop()
     self.stopTime = utc()
 end
 
+function stopwatch:Reset()
+    self.startTime = nil
+    self.stopTime = nil
+end
+
 ---@return number Elapsed time, in seconds with fractions.
 function stopwatch:Elapsed()
     if self.startTime == nil then
