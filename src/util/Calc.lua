@@ -132,6 +132,15 @@ calc.SignLargestAxis = function(vector)
     return calc.Sign(arr[ix])
 end
 
+calc.CalcBrakeDistance = function(speed, acceleration)
+    return (speed ^ 2) / (2 * acceleration)
+end
+
+calc.CalcAcceleration = function(speed, remainingDistance)
+    return (speed ^ 2) / (2 * remainingDistance)
+end
+
+
 -- https://github.com/GregLukosek/3DMath/blob/master/Math3D.cs
 
 -- Get the shortest distance between a point and a plane. The output is signed so it holds information
