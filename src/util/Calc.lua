@@ -136,7 +136,7 @@ calc.CalcBrakeDistance = function(speed, acceleration)
     return (speed ^ 2) / (2 * acceleration)
 end
 
-calc.CalcAcceleration = function(speed, remainingDistance)
+calc.CalcBrakeAcceleration = function(speed, remainingDistance)
     return (speed ^ 2) / (2 * remainingDistance)
 end
 
