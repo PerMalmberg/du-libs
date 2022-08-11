@@ -35,6 +35,16 @@ calc.Sign = function(v)
     end
 end
 
+calc.SetSign = function(value, sign)
+    value = abs(value)
+
+    if sign ~= 0 then
+        return value * sign
+    end
+
+    return value
+end
+
 calc.Scale = function(value, inMin, inMax, outMin, outMax)
     return (outMax - outMin) / (inMax - inMin) * (value - inMin) + outMin
 end
