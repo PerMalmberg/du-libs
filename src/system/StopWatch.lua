@@ -12,8 +12,10 @@ local function new()
 end
 
 function stopwatch:Start()
-    self.startTime = utc()
-    self.stopTime = nil
+    if not self:IsRunning() then
+        self.startTime = utc()
+        self.stopTime = nil
+    end
 end
 
 function stopwatch:Stop()
