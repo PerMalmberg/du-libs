@@ -104,7 +104,7 @@ local function new()
             end,
             G = core.getGravityIntensity,
             AngularAirFrictionAcceleration = function()
-                return Vec3(core.getWorldAirFrictionAcceleration())
+                return Vec3(construct.getWorldAirFrictionAcceleration())
             end
         },
         player = {
