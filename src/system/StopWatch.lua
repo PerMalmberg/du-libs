@@ -18,6 +18,11 @@ function stopwatch:Start()
     end
 end
 
+function stopwatch:Restart()
+    self:Stop()
+    self:Start()
+end
+
 function stopwatch:Stop()
     self.stopTime = utc()
 end
