@@ -143,11 +143,22 @@ calc.SignLargestAxis = function(vector)
 end
 
 calc.CalcBrakeDistance = function(speed, acceleration)
-    return (speed ^ 2) / (2 * acceleration)
+    local d = (speed ^ 2) / (2 * acceleration)
+    if calc.IsNaN(d) or acceleration == 0 then
+        return 0
+    end
+
+    return d
 end
 
 calc.CalcBrakeAcceleration = function(speed, remainingDistance)
-    return (speed ^ 2) / (2 * remainingDistance)
+    local d = (speed ^ 2) / (2 * remainingDistance)
+
+    if calc.IsNaN(d) or remainingDistance == 0 then
+        return 0
+    end
+
+    return d
 end
 
 
