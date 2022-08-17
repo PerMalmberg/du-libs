@@ -6,19 +6,29 @@ local constants = require("du-libs:abstraction/Constants")
 local mass = vehicle.mass
 local world = vehicle.world
 local Ternary = calc.Ternary
+local IsInAtmo = world.IsInAtmo
 local localizedOrientation = vehicle.orientation.localized
 local abs = math.abs
 local min = math.min
 
-local longitudinalEngines = EngineGroup("longitudinal", "thrust")
-local lateralEngines = EngineGroup("lateral", "thrust")
-local longLatEngines = EngineGroup("longitudinal", "lateral", "thrust")
-local verticalEngines = EngineGroup("vertical", "thrust")
-local thrustEngines = EngineGroup("thrust")
+local longitudinalAtmoEngines = EngineGroup("longitudinal", "atmospheric_engine")
+local longitudinalSpaceEngines = EngineGroup("longitudinal", "space_engine")
+local lateralAtmoEngines = EngineGroup("lateral", "atmospheric_engine")
+local lateralSpaceEngines = EngineGroup("lateral", "space_engine")
+local verticalAtmoEngines = EngineGroup("vertical", "atmospheric_engine")
+local verticalSpaceEngines = EngineGroup("vertical", "space_engine")
 
-local longitudalForce = construct.getMaxThrustAlongAxis(longitudinalEngines:Intersection(), { localizedOrientation.Forward():unpack() })
-local lateralForce = construct.getMaxThrustAlongAxis(lateralEngines:Intersection(), { localizedOrientation.Right():unpack() })
-local verticalForce = construct.getMaxThrustAlongAxis(verticalEngines:Intersection(), { localizedOrientation.Up():unpack() })
+local function getLongitudinalForce()
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines):Intersection(), { localizedOrientation.Forward():unpack() })
+end
+
+local function getLateralForce()
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines):Intersection(), { localizedOrientation.Right():unpack() })
+end
+
+local function getVerticalForce()
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines):Intersection(), { localizedOrientation.Up():unpack() })
+end
 
 local atmoRangeFMaxPlus = 1
 local atmoRangeFMaxMinus = 2
@@ -123,27 +133,27 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
 end
 
 function engine:MaxForwardThrust()
-    return getCurrent(longitudalForce, true)
+    return getCurrent(getLongitudinalForce(), true)
 end
 
 function engine:MaxBackwardThrust()
-    return getCurrent(longitudalForce, false)
+    return getCurrent(getLongitudinalForce(), false)
 end
 
 function engine:MaxRightwardThrust()
-    return getCurrent(lateralForce, true)
+    return getCurrent(getLateralForce(), true)
 end
 
 function engine:MaxLeftwardThrust()
-    return getCurrent(lateralForce, false)
+    return getCurrent(getLateralForce(), false)
 end
 
 function engine:MaxUpwardThrust()
-    return getCurrent(verticalForce, true)
+    return getCurrent(getVerticalForce(), true)
 end
 
 function engine:MaxDownwardThrust()
-    return getCurrent(verticalForce, false)
+    return getCurrent(getVerticalForce(), false)
 end
 
 local singleton
