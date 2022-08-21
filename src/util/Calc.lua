@@ -1,7 +1,6 @@
-local library = require("abstraction/Library")()
 local Vec3 = require("cpml/vec3")
 
-local solve3 = library:GetSolver3()
+local solve3 = library.systemResolution3
 
 local atan = math.atan
 local max = math.max

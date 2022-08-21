@@ -1,19 +1,20 @@
-local library = require("abstraction/Library")()
 local Vec3 = require("cpml/vec3")
-local core = library:GetCoreUnit()
-local ctrl = library:GetController()
+local core = library.getCoreUnit()
 
-local vehicle = {}
-vehicle.__index = vehicle
-local singleton = nil
+local Vehicle = {}
+Vehicle.__index = Vehicle
+local singleton
 
 local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
 
-
 ---Creates a new Core
 ---@return table A new AxisControl
-local function new()
-    local instance = {
+function Vehicle:New()
+    if singleton ~= nil then
+        return singleton
+    end
+    
+    singleton = {
         orientation = {
             Up = function()
                 -- This points in the current up direction of the vehicle
@@ -95,9 +96,9 @@ local function new()
             end
         },
         world = {
-            AtmoDensity = ctrl.getAtmosphereDensity,
+            AtmoDensity = unit.getAtmosphereDensity,
             IsInAtmo = function()
-                return ctrl.getAtmosphereDensity() > atmoToSpaceDensityLimit
+                return unit.getAtmosphereDensity() > atmoToSpaceDensityLimit
             end,
             IsInSpace = function()
                 return not singleton.world.IsInAtmo()
@@ -110,12 +111,12 @@ local function new()
         player = {
             position = {
                 Current = function()
-                    return Vec3(ctrl.getMasterPlayerWorldPosition())
+                    return Vec3(unit.getMasterPlayerWorldPosition())
                 end
             },
             orientation = {
                 Up = function()
-                    return Vec3(ctrl.getMasterPlayerWorldUp())
+                    return Vec3(unit.getMasterPlayerWorldUp())
                 end
             },
             camera = {
@@ -140,20 +141,7 @@ local function new()
         }
     }
 
-    setmetatable(instance, vehicle)
-    return instance
+    return setmetatable(singleton, Vehicle)
 end
 
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if singleton == nil then
-                    singleton = new()
-                end
-                return singleton
-            end
-        }
-)
+return Vehicle
