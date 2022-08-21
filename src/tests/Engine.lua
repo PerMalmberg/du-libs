@@ -1,5 +1,5 @@
 local engine = require("abstraction/Engine")()
-local vehicle = require("abstraction/Vehicle")()
+local vehicle = require("abstraction/Vehicle"):New()
 local log = require("debug/Log")()
 
 local test = {}

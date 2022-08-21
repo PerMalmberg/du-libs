@@ -141,7 +141,7 @@ function Vehicle:New()
         }
     }
 
-    return setmetatable(singleton, Vehicle)
+    return singleton
 end
 
 return Vehicle
