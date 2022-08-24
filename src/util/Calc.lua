@@ -105,6 +105,26 @@ calc.NearestPointOnLine = function(lineStart, lineDirection, pointAwayFromLine)
     return lineStart + lineDir * d
 end
 
+calc.NearestOnLineBetweenPoints = function(startPoint, endPoint, currentPos, ahead)
+    local totalDiff = endPoint - startPoint
+    local dir = totalDiff:normalize()
+    local nearestPoint = calc.NearestPointOnLine(startPoint, dir, currentPos)
+
+    ahead = (ahead or 0)
+    local startDiff = nearestPoint - startPoint
+    local distanceFromStart = startDiff:len()
+    local rabbitDistance = min(distanceFromStart + ahead, totalDiff:len())
+    local rabbit = startPoint + dir * rabbitDistance
+
+    if startDiff:normalize():dot(dir) < 0 then
+        return { nearest = startPoint, rabbit = rabbit }
+    elseif startDiff:len() >= totalDiff:len() then
+        return { nearest = endPoint, rabbit = rabbit }
+    else
+        return { nearest = nearestPoint, rabbit = rabbit }
+    end
+end
+
 calc.IsNaN = function(value)
     return value ~= value
 end
