@@ -88,11 +88,12 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
 
     local totalMass = mass.Total()
 
-    -- Add current gravity influence as force in Newtons, with the correct direction
+    -- Add current gravity influence as force in Newtons, with the correct direction. As the force has a direction
+    -- this works for knowing both available acceleration force as well as brake force.
     local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * vehicle.world.G() * totalMass
-    maxForces[1] = maxForces[1] + Ternary(isRight, 1, -1) * gravityForce:dot(localizedOrientation.Right())
-    maxForces[2] = maxForces[2] + Ternary(isForward, 1, -1) * gravityForce:dot(localizedOrientation.Forward())
-    maxForces[3] = maxForces[3] + Ternary(isUp, 1, -1) * gravityForce:dot(localizedOrientation.Up())
+    maxForces[1] = maxForces[1] + gravityForce:dot(calc.Ternary(isRight, 1, -1) * localizedOrientation.Right())
+    maxForces[2] = maxForces[2] + gravityForce:dot(calc.Ternary(isForward, 1, -1) * localizedOrientation.Forward())
+    maxForces[3] = maxForces[3] + gravityForce:dot(calc.Ternary(isUp, 1, -1) * localizedOrientation.Up())
 
     -- Find the index with the longest part, this is the main direction.
     -- If all are the same then we use the first one as the main direction
