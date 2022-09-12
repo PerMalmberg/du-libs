@@ -95,7 +95,8 @@ function universe:CreatePos(coordinate)
 end
 
 --- Gets the information for the closest stellar body
----@return table
+---@param coordinate Vec3 The coordinate to get the closest body for
+---@return table The Body
 function universe:ClosestBody(coordinate)
     checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
 

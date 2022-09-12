@@ -7,6 +7,7 @@ local max = math.max
 local min = math.min
 local abs = math.abs
 local deg2rad = math.rad
+local sqrt = math.sqrt
 
 local calc = {}
 
@@ -123,6 +124,34 @@ calc.NearestOnLineBetweenPoints = function(startPoint, endPoint, currentPos, ahe
     else
         return { nearest = nearestPoint, rabbit = rabbit }
     end
+end
+
+-- https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
+-- https://github.com/excessive/cpml/blob/master/modules/intersect.lua#L152
+calc.LineIntersectSphere = function(lineStart, lineDirection, sphereCenter, sphereRadius)
+    local offset = lineStart - sphereCenter
+    local b = offset:dot(lineDirection)
+    local c = offset:dot(offset) - sphereRadius * sphereRadius
+
+    -- ray's position outside sphere (c > 0)
+    -- ray's direction pointing away from sphere (b > 0)
+    if c > 0 and b > 0 then
+        return false, nil, nil
+    end
+
+    local discr = b * b - c
+
+    -- negative discriminant
+    if discr < 0 then
+        return false, nil, nil
+    end
+
+    -- Clamp t to 0
+    local t = -b - sqrt(discr)
+    t = t < 0 and 0 or t
+
+    -- Return collision point and distance from ray origin
+    return true, lineStart + lineDirection * t, t
 end
 
 calc.IsNaN = function(value)
