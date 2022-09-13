@@ -22,8 +22,16 @@ function check.IsNumber(n, parameterName, functionName)
     assert(typeComp.IsNumber(n), formatTypeMessage(parameterName, n, "number", functionName))
 end
 
+function check.IsBoolean(n, parameterName, functionName)
+    assert(typeComp.IsBoolean(n), formatTypeMessage(parameterName, n, "boolean", functionName))
+end
+
 function check.IsFunction(f, parameterName, functionName)
     assert(typeComp.IsFunction(f), formatTypeMessage(parameterName, f, "function", functionName))
+end
+
+function check.IsRay(r, parameterName, functionName)
+    assert(typeComp.IsRay(r), formatTypeMessage(parameterName, r, "Ray", functionName))
 end
 
 function check.Equals(a, b)

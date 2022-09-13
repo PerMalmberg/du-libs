@@ -60,7 +60,7 @@ function universe:ParsePosition(pos)
             x = tonumber(latitude)
             y = tonumber(longitude)
             z = tonumber(altitude)
-            bodyRef = self:ClosestBodyByDistance(galaxyId, Vec3(x, y, z))
+            bodyRef = self:CurrentGalaxy():GetBodyClosestToPosition(Vec3(x, y, z))
             return Position(self.galaxy[galaxyId], bodyRef, x, y, z)
         else
             -- https://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
@@ -90,7 +90,7 @@ end
 ---@param coordinate Vec3 The coordinate to create the position for
 function universe:CreatePos(coordinate)
     checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
-    local closestBody = self:ClosestBodyByDistance(self:CurrentGalaxyId(), coordinate)
+    local closestBody = self:CurrentGalaxy():GetBodyClosestToPosition(coordinate)
     return Position(self:CurrentGalaxy(), closestBody, coordinate.x, coordinate.y, coordinate.z)
 end
 
@@ -98,19 +98,18 @@ end
 ---@param coordinate Vec3 The coordinate to get the closest body for
 ---@return table The Body
 function universe:ClosestBody(coordinate)
-    checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
+    checks.IsVec3(coordinate, "coordinate", "universe:ClosestBody")
 
     -- When in space, getCurrentPlanetId() returns 0
     local closest = self.core.getCurrentPlanetId()
-    local body
+
+    local galaxy = self:CurrentGalaxy()
 
     if closest > 0 then
-        body = self.galaxy[self:CurrentGalaxyId()]:BodyById(closest)
+        return galaxy:BodyById(closest)
     else
-        body = self:ClosestBodyByDistance(self:CurrentGalaxyId(), coordinate)
+        return galaxy:GetBodyClosestToPosition(coordinate)
     end
-
-    return body
 end
 
 --- @return Vec3 A unit vector pointing towards the center of the current 'gravity well', i.e. planet or space construct.
@@ -126,13 +125,9 @@ function universe:VerticalReferenceVector()
     end
 end
 
-function universe:ClosestBodyByDistance(galaxyId, position)
-    return self.galaxy[galaxyId]:GetBodyClosestToPosition(position)
-end
-
 function universe:Prepare()
     local duAtlas = require("atlas")
-    checks.IsTable(duAtlas, "ga", "Universe:Prepare")
+    checks.IsTable(duAtlas, "duAtlas", "Universe:Prepare")
 
     for galaxyId, galaxy in pairs(duAtlas) do
         self.galaxy[galaxyId] = Galaxy(galaxyId, duAtlas[galaxyId])

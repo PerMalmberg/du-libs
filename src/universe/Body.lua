@@ -2,6 +2,7 @@
 
 local checks = require("debug/Checks")
 local Vec3 = require("cpml/vec3")
+local max = math.max
 local ENGLISH = 1
 
 local body = {}
@@ -49,9 +50,8 @@ function body:__tostring()
     return self.Name
 end
 
-function body:IsWithinAtmosphere(position)
-    local distanceToCenter = (position - self.Geography.Center):len()
-    return distanceToCenter < self.Atmosphere.Radius
+function body:DistanceToAtmo(from)
+    return max(0, (from - self.Geography.Center):len() - self.Atmosphere.Radius)
 end
 
 return setmetatable(

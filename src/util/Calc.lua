@@ -128,9 +128,9 @@ end
 
 -- https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
 -- https://github.com/excessive/cpml/blob/master/modules/intersect.lua#L152
-calc.LineIntersectSphere = function(lineStart, lineDirection, sphereCenter, sphereRadius)
-    local offset = lineStart - sphereCenter
-    local b = offset:dot(lineDirection)
+calc.LineIntersectSphere = function(ray, sphereCenter, sphereRadius)
+    local offset = ray.Start - sphereCenter
+    local b = offset:dot(ray.Dir)
     local c = offset:dot(offset) - sphereRadius * sphereRadius
 
     -- ray's position outside sphere (c > 0)
@@ -151,7 +151,7 @@ calc.LineIntersectSphere = function(lineStart, lineDirection, sphereCenter, sphe
     t = t < 0 and 0 or t
 
     -- Return collision point and distance from ray origin
-    return true, lineStart + lineDirection * t, t
+    return true, ray.Start + ray.Dir * t, t
 end
 
 calc.IsNaN = function(value)
