@@ -54,6 +54,10 @@ function body:DistanceToAtmo(from)
     return max(0, (from - self.Geography.Center):len() - self.Atmosphere.Radius)
 end
 
+function body:IsInAtmo(point)
+    return self:DistanceToAtmo(point) == 0
+end
+
 return setmetatable(
         {
             new = new

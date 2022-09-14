@@ -1,4 +1,5 @@
 local vehicle = require("abstraction/Vehicle"):New()
+local G = vehicle.world.G
 local EngineGroup = require("abstraction/EngineGroup")
 local calc = require("util/Calc")
 local universe = require("universe/Universe")()
@@ -69,7 +70,9 @@ end
 
 ---@return vec3 The maximum acceleration the construct can give without pushing
 --- itself more in one direction than the others.
-function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction)
+function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
+    considerAtmoDensity = Ternary(considerAtmoDensity == nil, false, considerAtmoDensity)
+
     -- Convert world direction to local (need to add position since the function subtracts that.
     direction = calc.WorldDirectionToLocal(direction)
 
@@ -79,18 +82,20 @@ function engine:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(directio
     local isForward = directionParts[2] >= 0
     local isUp = directionParts[3] >= 0
 
+    local atmoInfluence = Ternary(world.IsInAtmo() and considerAtmoDensity, world.AtmoDensity(), 1)
+
     -- The 'negative' direction returns a negative value so abs() them.
     local maxForces = {
-        abs(Ternary(isRight, self:MaxRightwardThrust(), self:MaxLeftwardThrust())),
-        abs(Ternary(isForward, self:MaxForwardThrust(), self:MaxBackwardThrust())),
-        abs(Ternary(isUp, self:MaxUpwardThrust(), self:MaxDownwardThrust()))
+        abs(Ternary(isRight, self:MaxRightwardThrust(), self:MaxLeftwardThrust())) * atmoInfluence,
+        abs(Ternary(isForward, self:MaxForwardThrust(), self:MaxBackwardThrust())) * atmoInfluence,
+        abs(Ternary(isUp, self:MaxUpwardThrust(), self:MaxDownwardThrust())) * atmoInfluence
     }
 
     local totalMass = mass.Total()
 
     -- Add current gravity influence as force in Newtons, with the correct direction. As the force has a direction
     -- this works for knowing both available acceleration force as well as brake force.
-    local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * vehicle.world.G() * totalMass
+    local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * G() * totalMass
     maxForces[1] = maxForces[1] + gravityForce:dot(calc.Ternary(isRight, 1, -1) * localizedOrientation.Right())
     maxForces[2] = maxForces[2] + gravityForce:dot(calc.Ternary(isForward, 1, -1) * localizedOrientation.Forward())
     maxForces[3] = maxForces[3] + gravityForce:dot(calc.Ternary(isUp, 1, -1) * localizedOrientation.Up())
