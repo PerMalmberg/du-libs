@@ -1,54 +1,54 @@
--- Handles function registration/deregistration of tick functions
 
-local timer = {}
-timer.__index = timer
+--- Handles function registration/deregistration of tick functions
+---@class Timer
+---@field Add fun(self:table, id:string, func:function, interval:number) Adds a new timer
+---@field Remove fun(self:table, id:string) Remove an existing timer
 
-local singleton
+local Timer = {}
+Timer.__index = Timer
 
-local function new()
-    local instance = {}
-    instance.functions = {}
-    setmetatable(instance, timer)
+local singleton ---@type Timer
+
+---Returns a Timer instance
+---@return Timer
+function Timer.Instance()
+    if singleton then
+        return singleton
+    end
+    
+    local s = {}
+    local functions = {}
+
+    function s:Add(id, func, interval)
+        s:Remove(id)
+    
+        functions[id] = func
+        unit.setTimer(id, interval)
+    end
+    
+    function s:Remove(id)
+        if functions[id] ~= nil then
+            unit.stopTimer(id)
+            functions[id] = nil
+        end
+    end
+    
+    ---@param tickId any
+    local function run(tickId)
+        local f = functions[tickId]
+        if f ~= nil then
+            f()
+        end
+    end
 
     -- Register with du-luac event handler
     unit:onEvent("onTimer", function(unit, id)
-        instance:run(id)
+        run(id)
     end)
-    return instance
+
+    singleton = setmetatable(s, Timer)
+    return singleton
 end
 
-function timer:Add(id, func, interval)
-    self:Remove(id)
 
-    self.functions[id] = func
-    unit.setTimer(id, interval)
-end
-
-function timer:Remove(id)
-    if self.functions[id] ~= nil then
-        unit.stopTimer(id)
-        self.functions[id] = nil
-    end
-end
-
----@param tickId any
-function timer:run(tickId)
-    local f = self.functions[tickId]
-    if f ~= nil then
-        f()
-    end
-end
-
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if singleton == nil then
-                    singleton = new()
-                end
-                return singleton
-            end
-        }
-)
+return Timer

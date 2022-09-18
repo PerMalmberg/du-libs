@@ -1,5 +1,5 @@
 local log = require("debug/Log")()
-local timer = require("system/Timer")()
+local timer = require("system/Timer").Instance()
 
 log:SetLevel(log.LogLevel.DEBUG)
 

@@ -1,0 +1,9 @@
+reporter = "html"
+include = {
+  "src$",
+  "src%/.+$"
+}
+
+exclude = {
+  "external%/.+$"
+}

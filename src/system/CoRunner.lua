@@ -1,4 +1,4 @@
-local timer = require("system/Timer")()
+local timer = require("system/Timer").Instance()
 local Stopwatch = require("system/Stopwatch")
 
 local runner = {}
