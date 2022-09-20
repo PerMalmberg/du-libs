@@ -12,7 +12,7 @@ jobs:
     - name: Install tools
       run: |
         set -e -o pipefail
-        sudo apt install npm sudo apt lua5.3 liblua5.3-dev luarocks -y
+        sudo apt install sudo apt lua5.3 liblua5.3-dev luarocks -y
         # Install rocks system wide as in a local installation busted can't find luacov
         sudo luarocks install busted
         sudo luarocks install luacov
