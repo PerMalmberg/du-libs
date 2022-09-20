@@ -1,9 +1,13 @@
 
---- Handles function registration/deregistration of tick functions
+--- 
 ---@class Timer
 ---@field Add fun(self:table, id:string, func:function, interval:number) Adds a new timer
 ---@field Remove fun(self:table, id:string) Remove an existing timer
 
+---@class Timer Handles function registration/deregistration of tick functions
+---@field Instance fun():Timer Returns the singleton instance
+---@field Add fun(id:string, func:function, interval:number) Adds a timer with the given interval and callback function.
+---@field Remove fun(id:string) Removes a timer with the given id.
 local Timer = {}
 Timer.__index = Timer
 
