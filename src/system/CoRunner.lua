@@ -1,6 +1,7 @@
 local timer = require("system/Timer").Instance()
 local Stopwatch = require("system/Stopwatch")
 
+---@class CoRunner
 local runner = {}
 runner.__index = runner
 

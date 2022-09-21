@@ -4,139 +4,154 @@ local CoRunner = require("system/CoRunner")
 local log = require("debug/Log")()
 require("util/Table")
 
-local storage = {}
-storage.__index = storage
+---@class BufferedDB
+---@field BeginLoad fun() Starts loading keys into memory
+---@field Clear fun() Clears the databank
+---@field IsLoaded fun():boolean Returns true when all keys have been loaded.
+---@field IsDirty fun():boolean Returns true when a key has not yet been persisted
+---@field Get fun(key:string, default):number|string|table Returns the value of the key, or the default value
+---@field Put fun(key:string, data:number|string|table) Stores the data in key. data can be string, number or (plain data) table.
 
-local function new(storageName)
+local BufferedDB = {}
+BufferedDB.__index = BufferedDB
 
-    local o = {
-        name = storageName,
-        buffer = {},
-        db = library:GetLinkByName(storageName),
-        loaded = false,
-        dirtyCount = 0
-    }
+---Creates a new BufferedDB
+---@param storageName string The name of the databank element we're expecting to be connected to. 
+---@return BufferedDB
+function BufferedDB.New(storageName)
+
+    local s = {}
+
+    local name = storageName
+    local buffer = {} ---@type {[string]:number|string|table}
+    local db = library:GetLinkByName(storageName)
+    local loaded = false
+    local dirtyCount = 0
+    local coRunner ---@type CoRunner
 
     if o.db == nil then
         log:Error("No linked databank with name '", storageName, "' found")
         unit.exit()
     end
 
-    setmetatable(o, storage)
+    setmetatable(o, BufferedDB)
 
-    return o
-end
+    ---Begins loading keys
+    function BufferedDB:BeginLoad()
+        if db == nil then
+            return false
+        end
 
-function storage:BeginLoad()
-    if self.db == nil then
-        return false
+        coRunner = CoRunner(0.1)
+        s:load()
     end
 
-    self.coRunner = CoRunner(0.1)
-    self:load()
-    return true
-end
+    function BufferedDB:load()
+        coRunner:Execute(
+                function()
+                    local keys = db.getKeyList()
+                    log:Debug("Loading from DB", name)
+                    for i, k in ipairs(keys) do
+                        local data = json.decode(db.getStringValue(k))
+                        -- We always expect a table here, if we don't get that, then the data isn't written by this class
+                        if data ~= nil and type(data) == "table" and data.t and data.d then
+                            local o = { dirty = false }
 
-function storage:load()
-    self.coRunner:Execute(
-            function()
-                local keys = self.db.getKeyList()
-                log:Debug("Loading from DB", self.name)
-                for i, k in ipairs(keys) do
-                    local data = json.decode(self.db.getStringValue(k))
-                    -- We always expect a table here, if we don't get that, then the data isn't written by this class
-                    if data ~= nil and type(data) == "table" and data.t and data.d then
-                        local o = { dirty = false }
+                            if data.t == "number" then
+                                o.value = tonumber(data.d)
+                            elseif data.t == "string" then
+                                o.value = data.d
+                            else
+                                -- table
+                                o.value = data.d
+                            end
 
-                        if data.t == "number" then
-                            o.value = tonumber(data.d)
-                        elseif data.t == "string" then
-                            o.value = data.d
-                        else
-                            -- table
-                            o.value = data.d
+                            buffer[k] = o
                         end
-
-                        self.buffer[k] = o
+                        -- Load X keys at a time
+                        if i % 10 == 0 then
+                            coroutine.yield()
+                        end
                     end
-                    -- Load X keys at a time
-                    if i % 10 == 0 then
+                end,
+                function()
+                    log:Info(TableLen(buffer) .. " keys loaded from data bank '", name, "'")
+                    loaded = true
+                    coRunner:Execute(function()
+                        self:persist()
+                    end)
+                end)
+    end
+
+    function BufferedDB:Clear()
+        buffer = {}
+        dirtyCount = 0
+        if db ~= nil then
+            db:clear()
+        end
+    end
+
+    function BufferedDB:persist()
+        while true do
+            coroutine.yield()
+            if self:IsDirty() then
+                local i = 0
+                for key, data in pairs(buffer) do
+                    if i % 5 == 0 then
                         coroutine.yield()
                     end
-                end
-            end,
-            function()
-                log:Info(TableLen(self.buffer) .. " keys loaded from data bank '", self.name, "'")
-                self.loaded = true
-                self.coRunner:Execute(function()
-                    self:persist()
-                end)
-            end)
-end
 
-function storage:Clear()
-    self.buffer = {}
-    self.dirtyCount = 0
-    if self.db ~= nil then
-        self.db:clear()
-    end
-end
-
-function storage:persist()
-    while true do
-        coroutine.yield()
-        if self:IsDirty() then
-            local i = 0
-            for key, data in pairs(self.buffer) do
-                if i % 5 == 0 then
-                    coroutine.yield()
+                    if data.dirty then
+                        local v = data.value
+                        local s = json.encode({ t = type(v), d = v })
+                        db.setStringValue(key, s)
+                        buffer[key].dirty = false
+                        dirtyCount = dirtyCount - 1
+                    end
+                    i = i + 1
                 end
-
-                if data.dirty then
-                    local v = data.value
-                    local s = json.encode({ t = type(v), d = v })
-                    self.db.setStringValue(key, s)
-                    self.buffer[key].dirty = false
-                    self.dirtyCount = self.dirtyCount - 1
-                end
-                i = i + 1
             end
         end
     end
-end
 
-function storage:IsLoaded()
-    return self.loaded
-end
-
-function storage:IsDirty()
-    return self.dirtyCount > 0
-end
-
-function storage:Get(key, default)
-    local entry = self.buffer[key]
-    if entry == nil then
-        return default
-    else
-        return entry.value
+    ---Checks if all keys are loaded
+    ---@return boolean
+    function BufferedDB:IsLoaded()
+        return loaded
     end
-end
 
-function storage:Put(key, data)
-    self.buffer[key] = {
-        dirty = true,
-        value = data
-    }
-    self.dirtyCount = self.dirtyCount + 1
-end
+    ---Checks if all data has been persisted
+    ---@return boolean
+    function BufferedDB:IsDirty()
+        return dirtyCount > 0
+    end
 
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                return new(...)
-            end
+    ---Gets data from keym or default
+    ---@param key string
+    ---@param default number|string|table
+    ---@return number|string|table
+    function BufferedDB:Get(key, default)
+        local entry = buffer[key]
+        if entry == nil then
+            return default
+        else
+            return entry.value
+        end
+    end
+
+    ---Puts data in key
+    ---@param key string
+    ---@param data number|string|table
+    function BufferedDB:Put(key, data)
+        buffer[key] = {
+            dirty = true,
+            value = data
         }
-)
+        dirtyCount = dirtyCount + 1
+    end
+
+
+    return setmetatable(s, BufferedDB)
+end
+
+return BufferedDB
