@@ -1,5 +1,5 @@
 local env = require("environment")
-local Stopwatch = require("system/StopWatch")
+local Stopwatch = require("system/Stopwatch")
 
 describe("Stopwatch", function ()
     env.Prepare()
