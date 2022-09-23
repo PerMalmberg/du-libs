@@ -1,7 +1,6 @@
 local timer = require("system/Timer").Instance()
 local Stopwatch = require("system/Stopwatch")
 
----@class CoRunner
 local runner = {}
 runner.__index = runner
 
@@ -12,7 +11,7 @@ local function newRunner(func, callback)
             system.print(ret)
         end
     end
-
+    
     local o = {
         co = coroutine.create(runnerFunction),
         callback = callback
@@ -35,6 +34,8 @@ function runner:Run()
 end
 
 local idCount = 0
+
+---@class CoRunner
 local coRunner = {}
 coRunner.__index = coRunner
 

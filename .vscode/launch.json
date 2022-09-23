@@ -1,0 +1,17 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lua",
+            "request": "launch",
+            "name": "Debug",
+            "luaVersion": "5.3",
+            "program": "${workspaceFolder}/src/storage/BufferedDB_spec.lua",
+            "path": "/usr/local/share/lua/5.3/?.lua;/usr/local/share/lua/5.3/?/init.lua;${workspaceFolder}/external/du-unit-testing/external/du-lua-examples/?.lua;${workspaceFolder}/external/du-unit-testing/external/du-lua-examples/api-mockup/?.lua;${workspaceFolder}/src/?.lua;${workspaceFolder}/external/du-unit-testing/external/du-luac/lua/?.lua;${workspaceFolder}/external/du-unit-testing/src/?.lua",
+            "cpath": "/usr/local/lib/lua/5.3/?.so"
+        }
+    ]
+}

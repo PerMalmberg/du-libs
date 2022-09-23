@@ -1,5 +1,3 @@
-
---- 
 ---@class Timer
 ---@field Add fun(self:table, id:string, func:function, interval:number) Adds a new timer
 ---@field Remove fun(self:table, id:string) Remove an existing timer
@@ -19,24 +17,24 @@ function Timer.Instance()
     if singleton then
         return singleton
     end
-    
+
     local s = {}
     local functions = {}
 
     function s:Add(id, func, interval)
         s:Remove(id)
-    
+
         functions[id] = func
         unit.setTimer(id, interval)
     end
-    
+
     function s:Remove(id)
         if functions[id] ~= nil then
             unit.stopTimer(id)
             functions[id] = nil
         end
     end
-    
+
     ---@param tickId any
     local function run(tickId)
         local f = functions[tickId]
