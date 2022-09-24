@@ -74,10 +74,11 @@ end
 ---@param readData string
 ---@return DBStoredData|nil
 function DBStoredData.NewFromDB(readData)
-    local decoded = json.decode(readData)
-
-    if decoded ~= nil and type(decoded) == "table" and decoded.t and decoded.v then
-        return DBStoredData.New(decoded.v)
+    if readData ~= nil then
+        local decoded = json.decode(readData)
+        if decoded ~= nil and type(decoded) == "table" and decoded.t and decoded.v then
+            return DBStoredData.New(decoded.v)
+        end
     end
 
     return nil
