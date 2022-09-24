@@ -40,6 +40,7 @@ describe("BufferedDB", function()
             runTicks()
         end
         assert.is_true(db:IsLoaded())
+        assert.are_equal(3, db:Size())
         assert.are_equal("aValue", db:Get("a"))
         assert.are_equal(1, db:Get("b"))
         assert.are_equal("value", db:Get("table").key)
