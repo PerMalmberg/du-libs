@@ -7,16 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-      with: 
+      with:
         submodules: recursive
     - name: Install tools
       run: |
         set -e -o pipefail
-        sudo apt install sudo apt lua5.3 liblua5.3-dev luarocks -y
-        # Install rocks system wide as in a local installation busted can't find luacov
-        sudo luarocks install busted
-        sudo luarocks install luacov
-        sudo luarocks install luacov-html
+        ./external/du-unit-testing/install_tools.sh
     - name: Run CI Tests
       run: |
         make test
