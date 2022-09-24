@@ -24,6 +24,7 @@ clean: clean_cov clean_report
 	@rm -rf out
 
 test: clean
+	clear
 	@LUA_PATH="$(LUA_PATH)" busted .
 	@luacov
 	@$(CLEAN_COV)

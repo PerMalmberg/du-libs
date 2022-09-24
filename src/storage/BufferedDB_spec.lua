@@ -9,7 +9,7 @@ local function runTicks()
     end
 end
 
-describe("BufferedDB", function ()
+describe("BufferedDB", function()
     env.Prepare()
     require("api-mockup/databank")
 
@@ -18,13 +18,13 @@ describe("BufferedDB", function ()
 
     stub(dataBank, "getKeyList")
     stub(dataBank, "getStringValue")
-    dataBank.getKeyList.on_call_with().returns({"a", "b", "table"})
-    dataBank.getStringValue.on_call_with("a").returns(json.encode({t = "string", d = "aValue"}))
-    dataBank.getStringValue.on_call_with("b").returns(json.encode({t = "string", d = "bValue"}))
-    dataBank.getStringValue.on_call_with("table").returns(json.encode({ t = "table", d = {key = "value"}}))
+    dataBank.getKeyList.on_call_with().returns({ "a", "b", "table" })
+    dataBank.getStringValue.on_call_with("a").returns(json.encode({ t = "string", v = "aValue" }))
+    dataBank.getStringValue.on_call_with("b").returns(json.encode({ t = "number", v = 1 }))
+    dataBank.getStringValue.on_call_with("table").returns(json.encode({ t = "table", v = { key = "value" } }))
 
     local db
-    
+
     db = BufferedDB.New(dataBank)
 
     it("Has guard against writing before load", function()
@@ -34,17 +34,20 @@ describe("BufferedDB", function ()
         end, "Call to Put before loading is completed")
     end)
 
-    it("Can load data", function ()
+    it("Can load data", function()
         db:BeginLoad()
         while not db:IsLoaded() do
             runTicks()
         end
         assert.is_true(db:IsLoaded())
+        assert.are_equal("aValue", db:Get("a"))
+        assert.are_equal(1, db:Get("b"))
+        assert.are_equal("value", db:Get("table").key)
     end)
 
-    it("Doesn't allow to save functions", function ()
+    it("Doesn't allow to save functions", function()
         assert.has_error(function()
-            db:Put("abc", {key = function() end})
+            db:Put("abc", { key = function() end })
         end, "Cannot store tables with functions")
     end)
 
@@ -54,6 +57,8 @@ describe("BufferedDB", function ()
         assert.is_true(db:IsDirty())
         runTicks()
         assert.is_false(db:IsDirty())
+
+        assert.are_equal(123, db:Get("myNumber", 0))
     end)
 
     it("Can store strings", function()
@@ -66,11 +71,11 @@ describe("BufferedDB", function ()
 
     it("Can store tables", function()
         assert.is_false(db:IsDirty())
-        db:Put("myKey", {key="value"})
+        db:Put("myKey", { key = "value" })
         assert.is_true(db:IsDirty())
         runTicks()
         assert.is_false(db:IsDirty())
     end)
-    
+
 
 end)
