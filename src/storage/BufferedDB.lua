@@ -19,7 +19,7 @@ BufferedDB.__index = BufferedDB
 ---@param databank table The link to the the databank element we're expecting to be connected to.
 ---@return BufferedDB
 function BufferedDB.New(databank)
-    if type(databank) ~= "table" or databank.getStringValue == nil then
+    if type(databank) ~= "table" or not databank.getStringValue then
         error("databank parameter of BufferedDB.New must be a link to a databank")
     end
 
@@ -86,9 +86,7 @@ function BufferedDB.New(databank)
 
         buffer = {}
         dirtyCount = 0
-        if db ~= nil then
-            db:clear()
-        end
+        db.clear()
     end
 
     ---Checks if all keys are loaded
