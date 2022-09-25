@@ -11,7 +11,7 @@ local function newRunner(func, callback)
             system.print(ret)
         end
     end
-    
+
     local o = {
         co = coroutine.create(runnerFunction),
         callback = callback
@@ -36,78 +36,71 @@ end
 local idCount = 0
 
 ---@class CoRunner
-local coRunner = {}
-coRunner.__index = coRunner
+---@field Execute fun(func:function, callback:function) Executes the function in a coroutine and when it returns, calls callback, also in a coroutne.
+---@field Delay fun(func:function, timeout:number) Executes the function after the given timeout.
 
-local function new(interval)
-    local instance = {
+local CoRunner = {}
+CoRunner.__index = CoRunner
+
+function CoRunner.New(interval)
+
+    local s = {
         runner = {},
         main = nil,
-        id = idCount
+        id = "CoRunner" .. idCount
     }
 
-    setmetatable(instance, coRunner)
+    -- The main routine, of the coRunner
+    function s:work()
+        while true do
+            for i, r in ipairs(s.runner) do
+                local done = r:Run()
+                if done then
+                    table.remove(s.runner, i)
 
-    timer:Add("CoRunner" .. idCount, function()
-        instance:run()
-    end, interval)
-
-    idCount = idCount + 1
-
-    return instance
-end
-
--- Runs the corunner, called from a tick
-function coRunner:run()
-    if #self.runner > 0 then
-        if self.main == nil or coroutine.status(self.main) == "dead" then
-            self.main = coroutine.create(function()
-                self:work()
-            end)
-        end
-
-        if coroutine.status(self.main) == "suspended" then
-            coroutine.resume(self.main, self)
-        end
-    end
-end
-
--- The main routine, of the coRunner
-function coRunner:work()
-    while true do
-        for i, r in ipairs(self.runner) do
-            local done = r:Run()
-            if done then
-                table.remove(self.runner, i)
-
-                --[[if #self.runner == 0 then
+                    --[[if #self.runner == 0 then
                     system.print("All coroutines have finished")
-                end]]--
+                end]] --
 
-                break
+                    break
+                end
+                coroutine.yield()
             end
             coroutine.yield()
         end
-        coroutine.yield()
     end
-end
 
-function coRunner:Terminate()
-    timer:Remove(self.id)
-end
+    -- Runs the corunner, called from a tick
+    function s:run()
+        if #s.runner > 0 then
+            if s.main == nil or coroutine.status(s.main) == "dead" then
+                s.main = coroutine.create(function()
+                    s:work()
+                end)
+            end
 
---- Executes a coroutine, calling the callback when the routine dies.
-function coRunner:Execute(func, callback)
-    local r = newRunner(func, callback)
-    table.insert(self.runner, #self.runner + 1, r)
-    return self -- Allow chaining calls.
-end
+            if coroutine.status(s.main) == "suspended" then
+                coroutine.resume(s.main)
+            end
+        end
+    end
 
---- Delays the execution of func by timeout
-function coRunner:Delay(func, timeout)
-    self:Execute(
+    function s:Terminate()
+        timer:Remove(s.id)
+    end
+
+    --- Executes a coroutine, calling the callback when the routine dies.
+    function s:Execute(func, callback)
+        local r = newRunner(func, callback)
+        table.insert(s.runner, #s.runner + 1, r)
+        return self -- Allow chaining calls.
+    end
+
+    --- Delays the execution of func by timeout
+    function s:Delay(func, timeout)
+        s:Execute(
             function()
-                local stop = Stopwatch()
+                local stop = Stopwatch.New()
                 stop:Start()
                 -- Yield until time has passed
                 while stop:Elapsed() < timeout do
@@ -117,17 +110,19 @@ function coRunner:Delay(func, timeout)
             function()
                 func()
             end
-    )
-    return self -- Allow chaining calls
+        )
+        return self -- Allow chaining calls
+    end
+
+    local instance = setmetatable(s, CoRunner)
+
+    timer:Add(s.id, function()
+        s:run()
+    end, interval)
+
+    idCount = idCount + 1 -- Do this after adding the timer
+
+    return instance
 end
 
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                return new(...)
-            end
-        }
-)
+return CoRunner

@@ -29,7 +29,7 @@ function BufferedDB.New(databank)
     local db = databank
     local loaded = false
     local dirtyCount = 0
-    local coRunner = CoRunner(0.1)
+    local coRunner = CoRunner.New(0.1)
 
     local function persist()
         while true do
