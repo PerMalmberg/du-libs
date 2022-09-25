@@ -33,22 +33,24 @@ function runner:Run()
     return done
 end
 
-local idCount = 0
-
 ---@class CoRunner
----@field Execute fun(func:function, callback:function) Executes the function in a coroutine and when it returns, calls callback, also in a coroutne.
----@field Delay fun(func:function, timeout:number) Executes the function after the given timeout.
+---@field Execute fun(self:table, func:function, callback:function) Executes the function in a coroutine and when it returns, calls callback, also in a coroutne.
+---@field Delay fun(self:table, func:function, timeout:number) Executes the function after the given timeout.
+---@field Terminate fun(self:table) Terminates the corunner and any runners.
 
 local CoRunner = {}
 CoRunner.__index = CoRunner
+local idCount = 0
 
 function CoRunner.New(interval)
 
     local s = {
         runner = {},
-        main = nil,
+        main = nil, ---@type thread
         id = "CoRunner" .. idCount
     }
+
+    idCount = idCount + 1
 
     -- The main routine, of the coRunner
     function s:work()
@@ -87,6 +89,8 @@ function CoRunner.New(interval)
 
     function s:Terminate()
         timer:Remove(s.id)
+        s.runner = {}
+        s.main = nil
     end
 
     --- Executes a coroutine, calling the callback when the routine dies.
@@ -119,8 +123,6 @@ function CoRunner.New(interval)
     timer:Add(s.id, function()
         s:run()
     end, interval)
-
-    idCount = idCount + 1 -- Do this after adding the timer
 
     return instance
 end
