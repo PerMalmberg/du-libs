@@ -37,7 +37,7 @@ describe("Task", function()
     end)
 
     it("Can do await", function()
-        local result = 111
+        local result = 0
 
         Task.New(function()
             local t = createTask()
@@ -47,4 +47,41 @@ describe("Task", function()
         runUpdate(100)
         assert.are_equal(55, result)
     end)
+
+    it("Can handle errors", function()
+        local errorMsg = ""
+        local final = ""
+
+        Task.New(function()
+            error("Opsie!")
+        end):Catch(function(task)
+            errorMsg = task:Result()
+        end):Finally(function(task)
+            final = "the end!"
+        end)
+
+        runUpdate(100)
+
+        assert.has_match("Opsie!", errorMsg)
+        assert.are_equal("the end!", final)
+    end)
+
+    it("Catch not called on success", function()
+        local errorMsg = ""
+        local final = ""
+
+        Task.New(function()
+            -- Do nothing
+        end):Catch(function(task)
+            errorMsg = "should not see me"
+        end):Finally(function(task)
+            final = "the end!"
+        end)
+
+        runUpdate(100)
+
+        assert.are_equal("", errorMsg)
+        assert.are_equal("the end!", final)
+    end)
+
 end)

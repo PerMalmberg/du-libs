@@ -11,15 +11,21 @@ TaskState = {
 ---@class Task
 ---@field Run fun(self:Task):TaskState The status of the task
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
----@field Result fun(self:Task):any Returns the return value of the task
+---@field Result fun(self:Task):any Returns the return value of the task, or the error if an error is raised.
 ---@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
-
+---@field Catch fun(self:Task, f:fun(t:Task)) Sets an error handler, called if the task raises an error
+---@field Finally fun(self:Task, f:fun(t:Task)) Sets a finalizer, always called before the task is removed from the task manager.
+---@field catcher fun(t:Task)
+---@field finalizer fun(t:Task)
 
 local Task = {}
 Task.__index = Task
 
 function Task.New(func)
-    local s = {}
+    local s = {
+        catcher = nil, ---@type function
+        finalizer = nil, ---@type function
+    }
 
     local f = coroutine.create(func)
     local resultValue ---@type any
@@ -32,10 +38,31 @@ function Task.New(func)
             return TaskState.Dead
         else
             success, resultValue = resume(f)
-
             -- Coroutine potentially died here, but we handle that next round
             return TaskState.Running
         end
+    end
+
+    ---Sets an error handler
+    ---@param catcher function
+    function s:Catch(catcher)
+        if type(catcher) ~= "function" then
+            error("Can only add function as catchers")
+        end
+
+        s.catcher = catcher
+        return s
+    end
+
+    ---Sets a finalizer
+    ---@param finalizer function
+    function s:Finally(finalizer)
+        if type(finalizer) ~= "function" then
+            error("Can only add function as catchers")
+        end
+
+        s.finalizer = finalizer
+        return s
     end
 
     ---Indicates success of failure
@@ -83,36 +110,3 @@ function Task.Await(task)
 end
 
 return Task
-
-
-
-
---[[ function Task(func)
-    local self = {}
-    self.LastReturn = nil
-    self.Error = nil
-    self.Finished = false
-    if type(func) ~= "function" then error("[Task] Not a function.") end
-    self.Coroutine = coroutine.create(func)
-
-    function self.Then(func)
-        if type(func) ~= "function" then error("[Task] Then callback not a function.") end
-        self._Then = func
-        return self
-    end
-
-    function self.Finally(func)
-        if type(func) ~= "function" then error("[Task] Finally callback not a function.") end
-        self._Finally = func
-        return self
-    end
-
-    function self.Catch(func)
-        if type(func) ~= "function" then error("[Task] Catch callback not a function.") end
-        self._Catch = func
-        return self
-    end
-
-    TaskManager.Register(self)
-    return self
-end ]]
