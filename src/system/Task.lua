@@ -42,19 +42,20 @@ function Task.New(toRun)
         local t = funcs[1]
         local dead = status(t) == "dead"
 
-        -- Move to next?
-        if dead and #funcs > 1 then
-            table.remove(funcs, 1)
-            t = funcs[1]
-            success, resultValue = resume(t)
-        elseif dead then
-            exited = true
-            return TaskState.Dead
-        else
-            success, resultValue = resume(t)
-            -- Coroutine potentially died here, but we handle that next round
-            return TaskState.Running
+        if dead then
+            -- Move to next, or are we done?
+            if #funcs > 1 then
+                table.remove(funcs, 1)
+                t = funcs[1]
+            else
+                exited = true
+                return TaskState.Dead
+            end
         end
+
+        success, resultValue = resume(t)
+        -- Coroutine potentially died here, but we handle that next round
+        return TaskState.Running
     end
 
     ---Chain another function to run after the previous one is completed
