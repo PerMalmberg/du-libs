@@ -1,14 +1,15 @@
 local DB = require("storage/BufferedDB")
 local log = require("debug/Log")()
 local typeComp = require("debug/TypeComp")
-local co = require("system/CoRunner")(0.1)
+local Task = require("system/Task")
+local Stopwatch = require("system/Stopwatch")
 
 log:SetLevel(log.LogLevel.DEBUG)
 
 local test = {}
 
 function test.InitDB()
-    co:Execute(function()
+    local t = Task.New(function()
         local db = DB("TestDB")
         db:Clear()
         assert(db:BeginLoad(), "Failed to initialize DB")
@@ -41,23 +42,19 @@ function test.InitDB()
         end
 
         db:Clear()
-        a = db:Get("a", {foo = "boo"})
+        a = db:Get("a", { foo = "boo" })
         assert(a.foo == "boo")
 
         log:Info("Test complete")
         unit.exit()
     end)
 
-    co:Delay(function()
+    Task.Await(Task.New(function()
+        local sw = Stopwatch.New()
+        while sw:Elapsed() < 10 do
+            coroutine.yield()
+        end
         log:Error("Test failed")
         unit.exit()
-    end, 10)
-end
-
-local status, err, _ = xpcall(function()
-    test.InitDB()
-end, traceback)
-
-if not status then
-    system.print(err)
+    end))
 end
