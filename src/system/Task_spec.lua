@@ -24,11 +24,10 @@ local function createTask()
 end
 
 describe("Task", function()
-
     it("Can run tasks", function()
         createTask()
         assert.are_equal(1, taskmanger:Count())
-        runUpdate(100)
+        runUpdate(11)
         assert.are_equal(0, taskmanger:Count())
     end)
 
@@ -67,8 +66,25 @@ describe("Task", function()
             result = Task.Await(t)
         end)
 
-        runUpdate(100)
+        runUpdate(13)
         assert.are_equal(55, result)
+    end)
+
+    it("Can do await with chained calls", function()
+        local result = 0
+
+        Task.New(function()
+            local t = Task.New(function()
+                coroutine.yield()
+            end):Then(function()
+                coroutine.yield()
+                result = 123
+            end)
+            result = Task.Await(t)
+        end)
+
+        runUpdate(5)
+        assert.are_equal(123, result)
     end)
 
     it("Can handle errors", function()
@@ -83,7 +99,7 @@ describe("Task", function()
             final = "the end!"
         end)
 
-        runUpdate(100)
+        runUpdate(2)
 
         assert.has_match("Opsie!", errorMsg)
         assert.are_equal("the end!", final)

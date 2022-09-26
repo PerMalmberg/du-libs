@@ -14,9 +14,9 @@ TaskState = {
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
 ---@field Result fun(self:Task):any Returns the return value of the task, or the error if an error is raised.
 ---@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
----@field Then fun(self:Task, f:fun(f:Task):any):Task Chains another call to be run when the previous one has completed.
----@field Catch fun(self:Task, f:fun(f:Task)):Task Sets an error handler, called if the task raises an error
----@field Finally fun(self:Task, f:fun(f:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
+---@field Then fun(self:Task, f:fun(t:Task):any):Task Chains another call to be run when the previous one has completed.
+---@field Catch fun(self:Task, f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
+---@field Finally fun(self:Task, f:fun(t:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
 ---@field catcher fun(t:Task)
 ---@field finalizer fun(t:Task)
 
@@ -38,24 +38,28 @@ function Task.New(toRun)
     local success = true
     local exited = false
 
-    function s:Run()
-        local t = funcs[1]
-        local dead = status(t) == "dead"
+    ---Moves to next call when needed
+    local function next()
+        local dead = status(funcs[1]) == "dead"
 
         if dead then
             -- Move to next, or are we done?
             if #funcs > 1 then
                 table.remove(funcs, 1)
-                t = funcs[1]
             else
                 exited = true
                 return TaskState.Dead
             end
         end
 
-        success, resultValue = resume(t)
-        -- Coroutine potentially died here, but we handle that next round
         return TaskState.Running
+    end
+
+    function s:Run()
+        if next() == TaskState.Running then
+            success, resultValue = resume(funcs[1])
+        end
+        return next()
     end
 
     ---Chain another function to run after the previous one is completed
