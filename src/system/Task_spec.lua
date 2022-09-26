@@ -24,16 +24,39 @@ local function createTask()
 end
 
 describe("Task", function()
-    it("Can create Task", function()
-        createTask()
-
-        assert.are_equal(1, taskmanger:Count())
-    end)
 
     it("Can run tasks", function()
+        createTask()
         assert.are_equal(1, taskmanger:Count())
         runUpdate(100)
         assert.are_equal(0, taskmanger:Count())
+    end)
+
+    it("Can run multiple Then", function()
+        local first
+        local a
+        local b
+
+        local t = Task.New(function()
+            coroutine.yield()
+            first = "first message"
+        end):Then(function()
+            coroutine.yield()
+            a = "A"
+        end):Then(function()
+            coroutine.yield()
+            b = "B"
+        end):Then(function()
+            coroutine.yield()
+            return "last value"
+        end)
+
+        assert.are_equal(1, taskmanger:Count())
+        runUpdate(8)
+        assert.are_equal("first message", first)
+        assert.are_equal("A", a)
+        assert.are_equal("B", b)
+        assert.are_equal("last value", t:Result())
     end)
 
     it("Can do await", function()
@@ -53,6 +76,26 @@ describe("Task", function()
         local final = ""
 
         Task.New(function()
+            error("Opsie!")
+        end):Catch(function(task)
+            errorMsg = task:Result()
+        end):Finally(function(task)
+            final = "the end!"
+        end)
+
+        runUpdate(100)
+
+        assert.has_match("Opsie!", errorMsg)
+        assert.are_equal("the end!", final)
+    end)
+
+    it("Can handle errors in chained calls", function()
+        local errorMsg = ""
+        local final = ""
+
+        Task.New(function()
+            coroutine.yield()
+        end):Then(function(task)
             error("Opsie!")
         end):Catch(function(task)
             errorMsg = task:Result()

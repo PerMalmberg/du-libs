@@ -9,42 +9,63 @@ TaskState = {
 }
 
 ---@class Task
+---@field New fun(f:fun():any):Task Creates a new Task and runs the function ansync.
 ---@field Run fun(self:Task):TaskState The status of the task
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
 ---@field Result fun(self:Task):any Returns the return value of the task, or the error if an error is raised.
 ---@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
----@field Catch fun(self:Task, f:fun(t:Task)) Sets an error handler, called if the task raises an error
----@field Finally fun(self:Task, f:fun(t:Task)) Sets a finalizer, always called before the task is removed from the task manager.
+---@field Then fun(self:Task, f:fun(f:Task):any):Task Chains another call to be run when the previous one has completed.
+---@field Catch fun(self:Task, f:fun(f:Task)):Task Sets an error handler, called if the task raises an error
+---@field Finally fun(self:Task, f:fun(f:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
 ---@field catcher fun(t:Task)
 ---@field finalizer fun(t:Task)
 
 local Task = {}
 Task.__index = Task
 
-function Task.New(func)
+---Create a new task
+---@param toRun fun():any
+---@return Task
+function Task.New(toRun)
     local s = {
-        catcher = nil, ---@type function
-        finalizer = nil, ---@type function
+        catcher = nil, ---@type fun(f:Task):Task
+        finalizer = nil, ---@type fun(f:Task):Task
     }
 
-    local f = coroutine.create(func)
+    local funcs = {} --- @type thread[]
+    table.insert(funcs, coroutine.create(toRun))
     local resultValue ---@type any
     local success = true
     local exited = false
 
     function s:Run()
-        if status(f) == "dead" then
+        local t = funcs[1]
+        local dead = status(t) == "dead"
+
+        -- Move to next?
+        if dead and #funcs > 1 then
+            table.remove(funcs, 1)
+            t = funcs[1]
+            success, resultValue = resume(t)
+        elseif dead then
             exited = true
             return TaskState.Dead
         else
-            success, resultValue = resume(f)
+            success, resultValue = resume(t)
             -- Coroutine potentially died here, but we handle that next round
             return TaskState.Running
         end
     end
 
+    ---Chain another function to run after the previous one is completed
+    ---@param thenfunc fun(self:Task, f:fun(thenFunc:Task))
+    function s:Then(thenfunc)
+        table.insert(funcs, coroutine.create(thenfunc))
+        return s
+    end
+
     ---Sets an error handler
-    ---@param catcher function
+    ---@param catcher fun(t:Task)
     function s:Catch(catcher)
         if type(catcher) ~= "function" then
             error("Can only add function as catchers")
