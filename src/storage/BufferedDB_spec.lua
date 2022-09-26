@@ -5,7 +5,7 @@ local json = require("dkjson")
 
 local function runTicks()
     for i = 1, 1000, 1 do
-        unit:triggerEvent("onTimer", "CoRunner0")
+        unit:triggerEvent("onUpdate")
     end
 end
 

@@ -18,25 +18,6 @@ local function findAnyFunction(o)
     return found
 end
 
---[[ local function convert(value)
-    local t = type(value)
-
-    if t == "number" then
-        return t, tonumber(value)
-    elseif t == "string" then
-        -- Leave as is
-    elseif t == "table" then
-        -- Leave as is, but check for functions
-        if findAnyFunction(value) then
-            error("Cannot store tables with functions")
-        end
-    else
-        error("Can't store values of type " .. t)
-    end
-
-    return t, value
-end ]]
-
 ---@class DBStoredData
 ---@field value string|number|table The data to save
 ---@field valueType string The type of data held

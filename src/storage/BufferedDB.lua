@@ -1,4 +1,4 @@
-local CoRunner = require("system/CoRunner")
+local Task = require("system/Task")
 local log = require("debug/Log")()
 require("util/Table")
 local DBStoredData = require("storage/DBStoredData")
@@ -29,54 +29,46 @@ function BufferedDB.New(databank)
     local db = databank
     local loaded = false
     local dirtyCount = 0
-    local coRunner = CoRunner.New(0.1)
+    local task
 
     local function persist()
+        loaded = true
         while true do
-            coroutine.yield()
             if s:IsDirty() then
                 local i = 0
                 for key, data in pairs(buffer) do
-                    if i % 5 == 0 then
-                        coroutine.yield()
-                    end
+                    coroutine.yield()
 
                     if data.dirty then
                         db.setStringValue(key, data:Persist())
                         dirtyCount = dirtyCount - 1
                     end
-                    i = i + 1
                 end
             end
+            coroutine.yield()
         end
     end
 
     ---Begins loading keys
     function BufferedDB:BeginLoad()
-        coRunner:Execute(
-            function()
-                local keys = db.getKeyList()
-                for i, k in ipairs(keys) do
-                    local d = DBStoredData.NewFromDB(db.getStringValue(k))
+        if task then
+            return
+        end
 
-                    if d then
-                        buffer[k] = d
-                    else
-                        log:Error("Could not load key '", k, "'")
-                    end
+        task = Task.New(function()
+            local keys = db.getKeyList()
+            for i, k in ipairs(keys) do
+                local d = DBStoredData.NewFromDB(db.getStringValue(k))
 
-                    -- Load X keys at a time
-                    if i % 10 == 0 then
-                        coroutine.yield()
-                    end
+                if d then
+                    buffer[k] = d
+                else
+                    log:Error("Could not load key '", k, "'")
                 end
-            end,
-            function()
-                loaded = true
-                coRunner:Execute(function()
-                    persist()
-                end)
-            end)
+
+                coroutine.yield()
+            end
+        end):Then(persist)
     end
 
     function BufferedDB:Clear()
