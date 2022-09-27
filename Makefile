@@ -8,6 +8,7 @@ LUA_PATH := $(LUA_PATH);$(PWD)/external/du-unit-testing/external/du-luac/lua/?.l
 LUA_PATH := $(LUA_PATH);$(PWD)/external/du-unit-testing/external/du-lua-examples/?.lua
 LUA_PATH := $(LUA_PATH);$(PWD)/external/du-unit-testing/external/du-lua-examples/api-mockup/?.lua
 LUA_PATH := $(LUA_PATH);$(PWD)/external/du-unit-testing/external/du-lua-examples/api-mockup/utils/?.lua
+LUA_PATH := $(LUA_PATH);$(PWD)/src/builtin/du_provided/?.lua
 
 all: release
 

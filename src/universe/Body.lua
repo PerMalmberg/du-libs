@@ -1,72 +1,73 @@
--- Body - stellar bodies
+-- Body - stellar body
 
+require("system/locale")
 local checks = require("debug/Checks")
 local Vec3 = require("cpml/vec3")
+
 local max = math.max
-local ENGLISH = 1
+local language = LocaleIndex()
 
-local body = {}
-body.__index = body
+---@module "Galaxy"
 
-local function new()
-    local instance = {}
-    setmetatable(instance, body)
+---@class Body
+---@field Galaxy Galaxy The galaxy the body resides in
+---@field Id number The body ID
+---@field Name string The name of the body
+---@field Type string The type of the body
+---@field Physics table Physics properties
+---@field Geography table Geography properties
+---@field Atmosphere table Atmosphere properties
+---@field Surface table Surface properties
+---@field PvP table Pvp properties
+---@field DistanceToAtmo fun(point:Vec3):number Returns the distance to atmo, or 0 if already in atmo.
+---@field IsInAtmo fun(point:Vec3):boolean Returns true if the point is within the atmosphere of the body.
 
-    return instance
-end
+local Body = {}
+Body.__index = Body
 
-function body:Prepare(galaxy, data)
+function Body.New(galaxy, bodyData)
     checks.IsTable(galaxy, "galaxy", "body:Prepare")
-    checks.IsTable(data, "data", "body:Prepare")
+    checks.IsTable(bodyData, "data", "body:Prepare")
 
-    self.Galaxy = galaxy
-    self.Id = data.id
-    self.Name = data.name[ENGLISH]
-    self.Type = data.type[ENGLISH]
-
-    self.Physics = {
-        Gravity = data.gravity
-    }
-    self.Geography = {
-        Center = Vec3(data.center),
-        Radius = data.radius
-    }
-    self.Atmosphere = {
-        Present = data.hasAtmosphere,
-        Thickness = data.atmosphereThickness,
-        Radius = data.atmosphereRadius
-    }
-    self.Surface = {
-        MaxAltitude = data.surfaceMaxAltitude,
-        MinAltitude = data.surfaceMinAltitude
-    }
-    self.Pvp = {
-        LocatedInSafeZone = data.isInSafeZone
-    }
-
-end
-
-function body:__tostring()
-    return self.Name
-end
-
-function body:DistanceToAtmo(from)
-    return max(0, (from - self.Geography.Center):len() - self.Atmosphere.Radius)
-end
-
-function body:IsInAtmo(point)
-    return self:DistanceToAtmo(point) == 0
-end
-
-return setmetatable(
-        {
-            new = new
+    local s = {
+        Galaxy = galaxy,
+        Id = bodyData.id,
+        Name = bodyData.name[language],
+        Type = bodyData.type[language],
+        Physics = {
+            Gravity = bodyData.gravity
         },
-        {
-            __call = function(_, ...)
-                local b = new()
-                b:Prepare(...)
-                return b
-            end
+        Geography = {
+            Center = Vec3(bodyData.center),
+            Radius = bodyData.radius
+        },
+        Atmosphere = {
+            Present = bodyData.hasAtmosphere,
+            Thickness = bodyData.atmosphereThickness,
+            Radius = bodyData.atmosphereRadius
+        },
+        Surface = {
+            MaxAltitude = bodyData.surfaceMaxAltitude,
+            MinAltitude = bodyData.surfaceMinAltitude
+        },
+        Pvp = {
+            LocatedInSafeZone = bodyData.isInSafeZone
         }
-)
+    }
+
+    function Body:__tostring()
+        return s.Name
+    end
+
+    function Body:DistanceToAtmo(from)
+        return max(0, (from - s.Geography.Center):len() - s.Atmosphere.Radius)
+    end
+
+    function Body:IsInAtmo(point)
+        return s:DistanceToAtmo(point) == 0
+    end
+
+    return setmetatable(s, Body)
+end
+
+return Body
