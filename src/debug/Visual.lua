@@ -1,5 +1,4 @@
 local Number = require("debug/NumberShape")
-local library = require("abstraction/Library")()
 
 local visual = {}
 visual.__index = visual
@@ -19,7 +18,7 @@ function visual:DrawNumber(number, worldPos)
     if s ~= nil then
         s.worldPos = worldPos
     else
-        self.shapes[number] = Number(library:GetCoreUnit(), number, worldPos)
+        self.shapes[number] = Number(library.getCoreUnit(), number, worldPos)
     end
 end
 
@@ -34,16 +33,16 @@ end
 local singleton = nil
 
 return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if singleton == nil then
-                    singleton = new()
-                end
-
-                return singleton
+    {
+        new = new
+    },
+    {
+        __call = function(_, ...)
+            if singleton == nil then
+                singleton = new()
             end
-        }
+
+            return singleton
+        end
+    }
 )

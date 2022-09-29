@@ -1,6 +1,5 @@
 -- Universe - utility class to manage the in-game atlas
 
-local library = require("abstraction/Library")()
 local checks = require("debug/Checks")
 local log = require("debug/Log")
 local Galaxy = require("universe/Galaxy")
@@ -32,7 +31,7 @@ function Universe.Instance()
     end
 
     local galaxy = {} -- Galaxies by id
-    local core = library.GetCoreUnit()
+    local core = library.getCoreUnit()
 
     local s = {}
 
@@ -75,8 +74,9 @@ function Universe.Instance()
                 x = tonumber(latitude)
                 y = tonumber(longitude)
                 z = tonumber(altitude)
-                bodyRef = s:CurrentGalaxy():GetBodyClosestToPosition(Vec3(x, y, z))
-                return Position(s.galaxy[galaxyId], bodyRef, x, y, z)
+                local coordinate = Vec3(x, y, z)
+                bodyRef = s:CurrentGalaxy():GetBodyClosestToPosition(coordinate)
+                return Position.New(galaxy[galaxyId], bodyRef, coordinate)
             else
                 -- https://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
                 -- The x-axis goes through long,lat (0,0), so longitude 0 meets the equator
@@ -85,7 +85,7 @@ function Universe.Instance()
                 -- Positions on a body have lat, long in degrees and altitude in meters
                 latitude = math.rad(latitude)
                 longitude = math.rad(longitude)
-                local body = s.galaxy[galaxyId]:BodyById(bodyId)
+                local body = galaxy[galaxyId]:BodyById(bodyId)
 
                 local radius = body.Geography.Radius + altitude
                 local cosLat = cos(latitude)
@@ -93,7 +93,7 @@ function Universe.Instance()
                     radius * sin(latitude))
                 position = position + body.Geography.Center
 
-                return Position(s.galaxy[galaxyId], body, position.x, position.y, position.z)
+                return Position.New(galaxy[galaxyId], body, position)
             end
         end
 
@@ -108,7 +108,7 @@ function Universe.Instance()
     function s:CreatePos(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
         local closestBody = s:CurrentGalaxy():GetBodyClosestToPosition(coordinate)
-        return Position(s:CurrentGalaxy(), closestBody, coordinate.x, coordinate.y, coordinate.z)
+        return Position.New(s:CurrentGalaxy(), closestBody, coordinate)
     end
 
     --- Gets the information for the closest stellar body

@@ -1,7 +1,6 @@
 ---Represents a position in the universe.
 
 local checks = require("debug/Checks")
-local Vec3 = require("cpml/vec3")
 local stringFormat = string.format
 
 ---@class Position
@@ -15,21 +14,17 @@ Position.__index = Position
 ---Creates a new position from the galaxy, body and x,y and z coordinates
 ---@param galaxy Galaxy The Galaxy the position belongs in
 ---@param bodyRef Body The closest body
----@param x number World X coordinate
----@param y number World Y coordinate
----@param z number World Z coordinate
+---@param coordinate Vec3 World coordinates
 ---@return Position
-function Position.New(galaxy, bodyRef, x, y, z)
+function Position.New(galaxy, bodyRef, coordinate)
     checks.IsTable(galaxy, "galaxy", "Position:new")
     checks.IsTable(bodyRef, "bodyRef", "Position:new")
-    checks.IsNumber(x, "X", "Position:new")
-    checks.IsNumber(y, "Y", "Position:new")
-    checks.IsNumber(z, "Z", "Position:new")
+    checks.IsVec3(coordinate, "coordinate", "Position:new")
 
     local s = {
         Body = bodyRef,
         Galaxy = galaxy,
-        Coords = Vec3(x, y, z)
+        Coords = coordinate
     }
 
     function s:AsPosString()
@@ -38,32 +33,34 @@ function Position.New(galaxy, bodyRef, x, y, z)
 
     ---Returns the coordinates of the position
     ---@return Vec3
-    function Position:Coordinates()
+    function s:Coordinates()
         return s.Coords
     end
 
-    function s:__tostring()
+    function Position.__tostring(p) -- __tostring must be in the metatable, not the instance
         -- The game starts giving space coordinates at an altitude of 70km above
         -- the planets radius on Alioth so we're mimicing that behaviour.
-        local altitude = (s.Coords - s.Body.Geography.Center):len() - s.Body.Geography.Radius
-        if altitude < s.Body.Geography.Radius + 70000 then
+        local altitude = (p.Coords - p.Body.Geography.Center):len() - p.Body.Geography.Radius
+        if altitude < p.Body.Geography.Radius + 70000 then
             -- Use a radius that includes the altitude
-            local radius = s.Body.Geography.Radius + altitude
+            local radius = p.Body.Geography.Radius + altitude
             -- Calculate around origo; planet center is added in Universe:ParsePosition
             -- and we're reversing that calculation.
-            local calcPos = s.Coords - s.Body.Geography.Center
+            local calcPos = p.Coords - p.Body.Geography.Center
             local lat = math.asin(calcPos.z / radius)
             local lon = math.atan(calcPos.y, calcPos.x)
 
-            return stringFormat("::pos{%d,%d,%.4f,%.4f,%.4f}", s.Galaxy.Id, s.Body.Id, math.deg(lat), math.deg(lon),
+            return stringFormat("::pos{%d,%d,%.4f,%.4f,%.4f}", p.Galaxy.Id, p.Body.Id, math.deg(lat), math.deg(lon),
                 altitude)
         else
-            return stringFormat("::pos{%d,0,%.4f,%.4f,%.4f}", s.Galaxy.Id, s.Coords.x, s.Coords.y, s.Coords.z)
+            return stringFormat("::pos{%d,0,%.4f,%.4f,%.4f}", p.Galaxy.Id, p.Coords.x, p.Coords.y, p.Coords.z)
         end
     end
 
     return setmetatable(s, Position)
 end
+
+return Position
 
 --[[
 ---Calculates the distance 'as the crow flies' to the other position

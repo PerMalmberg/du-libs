@@ -3,17 +3,57 @@ require("environment"):Prepare()
 local Universe = require("universe/Universe")
 local Position = require("universe/Position")
 local Vec3 = require("cpml/vec3")
-local library = require("abstraction/Library")()
-local checks = require("debug/Checks")
-local log = require("debug/Log")()
-local core = library.GetCoreUnit()
+
+local u
+local positionOnAlioth
+local positionAboveMarket6
+local positionNearJago
+local positionNearTalemai
+local positionNearThades
+local positionAboveIon
+local market6Pad
+local sveaBaseSWSide
+
+setup(function()
+    u = Universe.Instance()
+    positionOnAlioth = u:ParsePosition("::pos{0,2,7.7093,78.0806,34.7991}")
+    positionAboveMarket6 = u:ParsePosition("::pos{0,2,35.9160,101.2832,132000.2500}")
+    positionNearJago = u:ParsePosition("::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}")
+    positionNearTalemai = u:ParsePosition("::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}")
+    positionNearThades = u:ParsePosition("::pos{0,0,37979880.0000,17169778.0000,-2641396.2500}")
+    positionAboveIon = u:ParsePosition("::pos{0,0,2970018.8563,-98961141.3186,-787105.8790}")
+    market6Pad = u:ParsePosition("::pos{0,2,36.0242,101.2872,231.3857}")
+    sveaBaseSWSide = u:ParsePosition("::pos{0,2,7.5425,78.0995,47.6314}")
+end)
 
 
 describe("Universe", function()
-    it("Can create a Universe", function()
-        assert.has_no_error(function()
-            Universe.Instance()
-        end)
+    it("Can create a Position", function()
+        local p = Position.New(u:CurrentGalaxy(), u:ClosestBody(positionOnAlioth:Coordinates()), Vec3(1, 2, 3))
+        local p2 = Position.New(u:CurrentGalaxy(), u:ClosestBody(positionOnAlioth:Coordinates()), Vec3(3, 4, 5))
+        assert.are_equal(Vec3(1, 2, 3):len(), p:Coordinates():len())
+        assert.are_equal("Alioth", p.Body.Name)
+        assert.are_equal(Vec3(3, 4, 5):len(), p2.Coords:len())
+    end)
+
+    it("Can parse positions", function()
+        assert.are_equal("::pos{0,2,7.7093,78.0806,34.7991}", tostring(positionOnAlioth))
+        assert.are_equal("::pos{0,2,35.9160,101.2832,132000.2500}", tostring(positionAboveMarket6))
+        assert.are_equal("::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}", tostring(positionNearJago))
+        assert.are_equal("::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}", tostring(positionNearTalemai))
+        assert.are_equal("::pos{0,0,37979880.0000,17169778.0000,-2641396.2500}", tostring(positionNearThades))
+        assert.are_equal("::pos{0,0,2970018.8563,-98961141.3186,-787105.8790}", tostring(positionAboveIon))
+        assert.are_equal("::pos{0,2,36.0242,101.2872,231.3857}", tostring(market6Pad))
+        assert.are_equal("::pos{0,2,7.5425,78.0995,47.6314}", tostring(sveaBaseSWSide))
+
+        assert.are_equal((positionOnAlioth.Coords - positionOnAlioth.Coords):len(), 0)
+        assert.are_equal(math.floor((sveaBaseSWSide.Coords - market6Pad.Coords):len()), 76934)
+    end)
+
+    it("Can reconstruct a position", function()
+        local coordinate = positionOnAlioth.Coords
+        local reconstructed = u:CreatePos(coordinate)
+        assert.are_equal(tostring(reconstructed), tostring(positionOnAlioth))
     end)
 end)
 
@@ -24,43 +64,20 @@ end)
 
 
 
-local positionOnAlioth = u:ParsePosition("::pos{0,2,7.7093,78.0806,34.7991}")
-local positionAboveMarket6 = u:ParsePosition("::pos{0,2,35.9160,101.2832,132000.2500}")
-local positionNearJago = u:ParsePosition("::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}")
-local positionNearTalemai = u:ParsePosition("::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}")
-local positionNearThades = u:ParsePosition("::pos{0,0,37979880.0000,17169778.0000,-2641396.2500}")
-local positionAboveIon = u:ParsePosition("::pos{0,0,2970018.8563,-98961141.3186,-787105.8790}")
-local market6Pad = u:ParsePosition("::pos{0,2,36.0242,101.2872,231.3857}")
-local sveaBaseSWSide = u:ParsePosition("::pos{0,2,7.5425,78.0995,47.6314}")
+
 
 local test = {}
 
 function test.testPosition()
-    local p = Position(u:CurrentGalaxy(), u:ClosestBody(positionOnAlioth:Coords()), 1, 2, 3)
-    local p2 = Position(u:CurrentGalaxy(), u:ClosestBody(positionOnAlioth:Coords()), 3, 4, 5)
-    checks.Equals(p.Coords:len(), Vec3(1, 2, 3):len())
-    checks.Equals(p.Body.Name, "Alioth")
-    checks.Equals(p2.Coords:len(), Vec3(3, 4, 5):len())
+
 end
 
 function test.testParsePosition()
-    checks.Equals(tostring(positionOnAlioth), "::pos{0,2,7.7093,78.0806,34.7991}")
-    checks.Equals(tostring(positionAboveMarket6), "::pos{0,2,35.9160,101.2832,132000.2500}")
-    checks.Equals(tostring(positionNearJago), "::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}")
-    checks.Equals(tostring(positionNearTalemai), "::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}")
-    checks.Equals(tostring(positionNearThades), "::pos{0,0,37979880.0000,17169778.0000,-2641396.2500}")
-    checks.Equals(tostring(positionAboveIon), "::pos{0,0,2970018.8563,-98961141.3186,-787105.8790}")
-    checks.Equals(tostring(market6Pad), "::pos{0,2,36.0242,101.2872,231.3857}")
-    checks.Equals(tostring(sveaBaseSWSide), "::pos{0,2,7.5425,78.0995,47.6314}")
 
-    checks.Equals((positionOnAlioth.Coords - positionOnAlioth.Coords):len(), 0)
-    checks.Equals(math.floor((sveaBaseSWSide.Coords - market6Pad.Coords):len()), 76934)
 end
 
 function test.testCreatePos()
-    local coordinate = positionOnAlioth.Coords
-    local reconstructed = u:CreatePos(coordinate)
-    checks.Equals(tostring(reconstructed), tostring(positionOnAlioth))
+
 end
 
 local status, err, _ = xpcall(function()
