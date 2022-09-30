@@ -63,6 +63,17 @@ describe("BufferedDB", function()
         while not db:IsLoaded() do
             runTicks()
         end
+
+        local i = 0
+        db:BeginLoad()
+        while not db:IsLoaded() do
+            runTicks()
+            i = i + 1
+        end
+
+        -- Loading a second time doesn't do anything
+        assert.are_equal(0, i)
+
         assert.is_true(db:IsLoaded())
         assert.are_equal(13, db:Size())
         assert.are_equal("aValue", db:Get("a"))
