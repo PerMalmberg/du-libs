@@ -14,6 +14,7 @@ local posPattern = "::pos{" ..
     numberPattern .. "," .. numberPattern .. "," .. numberPattern .. "," .. numberPattern .. "," .. numberPattern .. "}"
 
 ---@class Universe
+---@field Instance fun():Universe
 ---@field CurrentGalaxyId fun(self:Universe):integer Gets the current galaxy id
 ---@field CurrentGalaxy fun(self:Universe):Galaxy Gets the current galaxy
 ---@field ParsePosition fun(self:Universe, pos:string):Position|nil Parses the ::pos{} string and returns a Position or nil.
@@ -107,7 +108,7 @@ function Universe.Instance()
     ---@return Position
     function s:CreatePos(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
-        local closestBody = s:CurrentGalaxy():GetBodyClosestToPosition(coordinate)
+        local closestBody = s:ClosestBody(coordinate)
         return Position.New(s:CurrentGalaxy(), closestBody, coordinate)
     end
 
@@ -117,16 +118,8 @@ function Universe.Instance()
     function s:ClosestBody(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:ClosestBody")
 
-        -- When in space, getCurrentPlanetId() returns 0
-        local closest = core.getCurrentPlanetId()
-
         local galaxy = s:CurrentGalaxy()
-
-        if closest > 0 then
-            return galaxy:BodyById(closest)
-        else
-            return galaxy:GetBodyClosestToPosition(coordinate)
-        end
+        return galaxy:GetBodyClosestToPosition(coordinate)
     end
 
     ---Returns a unit vector pointing towards the center of the current 'gravity well', i.e. planet or space construct.

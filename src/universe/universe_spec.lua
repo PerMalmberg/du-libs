@@ -1,18 +1,20 @@
+---@diagnostic disable: need-check-nil
 require("environment"):Prepare()
 
 local Universe = require("universe/Universe")
 local Position = require("universe/Position")
 local Vec3 = require("cpml/vec3")
+local Ray = require("util/Ray")
 
-local u
-local positionOnAlioth
-local positionAboveMarket6
-local positionNearJago
-local positionNearTalemai
-local positionNearThades
-local positionAboveIon
-local market6Pad
-local sveaBaseSWSide
+local u ---@type Universe
+local positionOnAlioth ---@type Position|nil
+local positionAboveMarket6 ---@type Position|nil
+local positionNearJago ---@type Position|nil
+local positionNearTalemai ---@type Position|nil
+local positionNearThades ---@type Position|nil
+local positionAboveIon ---@type Position|nil
+local market6Pad ---@type Position|nil
+local sveaBaseSWSide ---@type Position|nil
 
 setup(function()
     u = Universe.Instance()
@@ -26,6 +28,11 @@ setup(function()
     sveaBaseSWSide = u:ParsePosition("::pos{0,2,7.5425,78.0995,47.6314}")
 end)
 
+describe("Singelton", function()
+    it("Are the same instance", function()
+        assert.are_equal(Universe.Instance(), Universe.Instance())
+    end)
+end)
 
 describe("Universe", function()
     it("Can create a Position", function()
@@ -38,6 +45,7 @@ describe("Universe", function()
 
     it("Can parse positions", function()
         assert.are_equal("::pos{0,2,7.7093,78.0806,34.7991}", tostring(positionOnAlioth))
+        assert.are_equal("::pos{0,2,7.7093,78.0806,34.7991}", positionOnAlioth:AsPosString())
         assert.are_equal("::pos{0,2,35.9160,101.2832,132000.2500}", tostring(positionAboveMarket6))
         assert.are_equal("::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}", tostring(positionNearJago))
         assert.are_equal("::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}", tostring(positionNearTalemai))
@@ -57,41 +65,38 @@ describe("Universe", function()
     end)
 end)
 
+describe("Body", function()
+    it("Can calculate distance to atmo", function()
+        local aliCenter = Vec3(-8.00, -8.00, -126303.00)
+        local b = u:ClosestBody(aliCenter)
+        assert.are_equal("Alioth", tostring(b))
+        local point10kmOutsideAtmo = aliCenter + Vec3.unit_x * (b.Atmosphere.Radius + 10000)
+        assert.are_equal(10000, b:DistanceToAtmo(point10kmOutsideAtmo))
+    end)
 
+    it("Can detect if a point is in atmo", function()
+        local aliCenter = Vec3(-8.00, -8.00, -126303.00)
+        local b = u:ClosestBody(aliCenter)
+        assert.are_equal("Alioth", tostring(b))
+        local pointInsideAtmo = aliCenter + Vec3.unit_y * (b.Atmosphere.Radius / 2)
+        assert.is_true(b:IsInAtmo(pointInsideAtmo))
+    end)
+end)
 
---[[
+describe("Detect bodies in flight path", function()
+    local aliCenter = Vec3(-8.00, -8.00, -126303.00)
+    local b = u:ClosestBody(aliCenter)
 
+    local g = u:CurrentGalaxy()
+    local point10kmOutsideAlioth = aliCenter + Vec3.unit_x * (b.Atmosphere.Radius + 10000)
+    local ray = Ray.New(point10kmOutsideAlioth, (aliCenter - point10kmOutsideAlioth):normalize())
+    local bodies = g:BodiesInPath(ray)
+    assert.are_equal(1, #bodies)
+    assert.are_equal("Alioth", bodies[1].Name)
 
-
-
-
-
-local test = {}
-
-function test.testPosition()
-
-end
-
-function test.testParsePosition()
-
-end
-
-function test.testCreatePos()
-
-end
-
-local status, err, _ = xpcall(function()
-    test.testPosition()
-    test.testParsePosition()
-    test.testCreatePos()
-    log:Info("Test complete")
-end, traceback)
-
-if not status then
-    system.print(err)
-end
-
-unit.exit()
-
-
-]]
+    local madisCenter = Vec3(17465536.00, 22665536.00, -34464.00)
+    local ray = Ray.New(point10kmOutsideAlioth, (madisCenter - point10kmOutsideAlioth):normalize())
+    local bodies = g:BodiesInPath(ray)
+    assert.are_equal(1, #bodies)
+    assert.are_equal("Madis", bodies[1].Name)
+end)

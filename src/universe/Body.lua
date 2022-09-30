@@ -19,8 +19,8 @@ local language = LocaleIndex()
 ---@field Atmosphere table Atmosphere properties
 ---@field Surface table Surface properties
 ---@field PvP table Pvp properties
----@field DistanceToAtmo fun(point:Vec3):number Returns the distance to atmo, or 0 if already in atmo.
----@field IsInAtmo fun(point:Vec3):boolean Returns true if the point is within the atmosphere of the body.
+---@field DistanceToAtmo fun(self:Body, point:Vec3):number Returns the distance to atmo, or 0 if already in atmo.
+---@field IsInAtmo fun(self:Body, point:Vec3):boolean Returns true if the point is within the atmosphere of the body.
 
 local Body = {}
 Body.__index = Body
@@ -55,15 +55,15 @@ function Body.New(galaxy, bodyData)
         }
     }
 
-    function Body:__tostring()
-        return s.Name
+    function Body.__tostring(instance)
+        return instance.Name
     end
 
-    function Body:DistanceToAtmo(from)
+    function s:DistanceToAtmo(from)
         return max(0, (from - s.Geography.Center):len() - s.Atmosphere.Radius)
     end
 
-    function Body:IsInAtmo(point)
+    function s:IsInAtmo(point)
         return s:DistanceToAtmo(point) == 0
     end
 

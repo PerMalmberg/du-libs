@@ -1,3 +1,5 @@
+local Vec3 = require("cpml/vec3")
+
 ---@class Ray
 ---@field New fun(start:Vec3, direction:Vec3):Ray
 ---@field Start Vec3 The start point of the ray
@@ -5,7 +7,7 @@
 
 local Ray = {}
 Ray.__index = Ray
-function Ray:New(start, direction)
+function Ray.New(start, direction)
     local s = {
         Start = start,
         Dir = direction
