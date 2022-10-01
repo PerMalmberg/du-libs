@@ -60,6 +60,10 @@ describe("Universe", function()
         assert.are_equal(math.floor((sveaBaseSWSide.Coords - market6Pad.Coords):len()), 76934)
     end)
 
+    it("Handles invalid position strings", function()
+        assert.is_nil(u:ParsePosition("foo"))
+    end)
+
     it("Can reconstruct a position", function()
         local coordinate = positionOnAlioth.Coords
         local reconstructed = u:CreatePos(coordinate)

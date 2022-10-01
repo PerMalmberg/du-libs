@@ -1,7 +1,7 @@
 -- Universe - utility class to manage the in-game atlas
 
 local checks = require("debug/Checks")
-local log = require("debug/Log")
+local log = require("debug/Log")()
 local Galaxy = require("universe/Galaxy")
 local Position = require("universe/Position")
 local Vec3 = require("cpml/vec3")
