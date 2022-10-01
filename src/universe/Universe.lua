@@ -122,13 +122,12 @@ function Universe.Instance()
         return galaxy:GetBodyClosestToPosition(coordinate)
     end
 
-    ---Returns a unit vector pointing towards the center of the current 'gravity well', i.e. planet or space construct.
+    ---Returns a unit vector pointing towards the center of the closest 'gravity well', i.e. planet or space construct.
     --- @return Vec3
     function s:VerticalReferenceVector()
         local worldGrav = Vec3(core.getWorldGravity())
-
         if worldGrav:len2() == 0 then
-            local position = Vec3(s.construct.getWorldPosition())
+            local position = Vec3(construct.getWorldPosition())
             local body = s:ClosestBody(position)
             return (body.Geography.Center - position):normalize()
         else

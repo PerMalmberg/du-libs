@@ -5,7 +5,6 @@ local checks = require("debug/Checks")
 local Vec3 = require("cpml/vec3")
 
 local max = math.max
-local language = LocaleIndex()
 
 ---@module "Galaxy"
 
@@ -28,6 +27,8 @@ Body.__index = Body
 function Body.New(galaxy, bodyData)
     checks.IsTable(galaxy, "galaxy", "body:Prepare")
     checks.IsTable(bodyData, "data", "body:Prepare")
+
+    local language = LocaleIndex()
 
     local s = {
         Galaxy = galaxy,

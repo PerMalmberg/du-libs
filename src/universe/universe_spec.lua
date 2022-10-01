@@ -1,6 +1,6 @@
 ---@diagnostic disable: need-check-nil
 require("environment"):Prepare()
-
+local CoreMock = require("mocks/CoreMock")
 local Universe = require("universe/Universe")
 local Position = require("universe/Position")
 local Vec3 = require("cpml/vec3")
@@ -16,7 +16,9 @@ local positionAboveIon ---@type Position|nil
 local market6Pad ---@type Position|nil
 local sveaBaseSWSide ---@type Position|nil
 
-setup(function()
+
+
+before_each(function()
     u = Universe.Instance()
     positionOnAlioth = u:ParsePosition("::pos{0,2,7.7093,78.0806,34.7991}")
     positionAboveMarket6 = u:ParsePosition("::pos{0,2,35.9160,101.2832,132000.2500}")
@@ -70,7 +72,7 @@ describe("Body", function()
         local aliCenter = Vec3(-8.00, -8.00, -126303.00)
         local b = u:ClosestBody(aliCenter)
         assert.are_equal("Alioth", tostring(b))
-        local point10kmOutsideAtmo = aliCenter + Vec3.unit_x * (b.Atmosphere.Radius + 10000)
+        local point10kmOutsideAtmo = aliCenter + Vec3.unit_x * (b.Atmosphere.Radius + 10000) ---@type Vec3
         assert.are_equal(10000, b:DistanceToAtmo(point10kmOutsideAtmo))
     end)
 
@@ -78,7 +80,7 @@ describe("Body", function()
         local aliCenter = Vec3(-8.00, -8.00, -126303.00)
         local b = u:ClosestBody(aliCenter)
         assert.are_equal("Alioth", tostring(b))
-        local pointInsideAtmo = aliCenter + Vec3.unit_y * (b.Atmosphere.Radius / 2)
+        local pointInsideAtmo = aliCenter + Vec3.unit_y * (b.Atmosphere.Radius / 2) ---@type Vec3
         assert.is_true(b:IsInAtmo(pointInsideAtmo))
     end)
 end)
@@ -99,4 +101,23 @@ describe("Detect bodies in flight path", function()
     local bodies = g:BodiesInPath(ray)
     assert.are_equal(1, #bodies)
     assert.are_equal("Madis", bodies[1].Name)
+end)
+
+describe("Veritcal reference vector", function()
+    it("Can get the vertical reference vector", function()
+        local vRef = u:VerticalReferenceVector()
+        assert.is_not_nil(vRef.x)
+        assert.is_not_nil(vRef.y)
+        assert.is_not_nil(vRef.z)
+
+        CoreMock.Instance().SetWorldGravity(Vec3(0, 0, 0))
+        local vRef = u:VerticalReferenceVector()
+        assert.is_not_nil(vRef.x)
+        assert.is_not_nil(vRef.y)
+        assert.is_not_nil(vRef.z)
+        assert.are_equal(0, vRef.x)
+        assert.are_equal(0, vRef.y)
+        assert.are_equal(0, vRef.z)
+    end)
+
 end)
