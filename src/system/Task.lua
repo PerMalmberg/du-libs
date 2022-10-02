@@ -59,7 +59,12 @@ function Task.New(toRun)
         if next() == TaskState.Running then
             success, resultValue = resume(funcs[1])
         end
-        return next()
+
+        if success then
+            return next()
+        end
+
+        return TaskState.Dead
     end
 
     ---Chain another function to run after the previous one is completed

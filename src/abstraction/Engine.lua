@@ -2,7 +2,7 @@ local vehicle = require("abstraction/Vehicle"):New()
 local G = vehicle.world.G
 local EngineGroup = require("abstraction/EngineGroup")
 local calc = require("util/Calc")
-local universe = require("universe/Universe")()
+local universe = require("universe/Universe").Instance()
 local constants = require("abstraction/Constants")
 local mass = vehicle.mass
 local world = vehicle.world
@@ -20,15 +20,18 @@ local verticalAtmoEngines = EngineGroup("vertical", "atmospheric_engine")
 local verticalSpaceEngines = EngineGroup("vertical", "space_engine")
 
 local function getLongitudinalForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines):Intersection(), { localizedOrientation.Forward():unpack() })
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines):
+        Intersection(), { localizedOrientation.Forward():unpack() })
 end
 
 local function getLateralForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines):Intersection(), { localizedOrientation.Right():unpack() })
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines):Intersection(),
+        { localizedOrientation.Right():unpack() })
 end
 
 local function getVerticalForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines):Intersection(), { localizedOrientation.Up():unpack() })
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines):Intersection()
+        , { localizedOrientation.Up():unpack() })
 end
 
 local atmoRangeFMaxPlus = 1
@@ -166,15 +169,15 @@ local singleton
 
 -- The module
 return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if singleton == nil then
-                    singleton = new()
-                end
-                return singleton
+    {
+        new = new
+    },
+    {
+        __call = function(_, ...)
+            if singleton == nil then
+                singleton = new()
             end
-        }
+            return singleton
+        end
+    }
 )

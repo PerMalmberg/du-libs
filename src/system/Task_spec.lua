@@ -4,7 +4,7 @@ local taskmanger = require("system/Taskmanager"):Instance()
 
 local function runUpdate(count)
     for i = 1, count do
-        unit:triggerEvent("onUpdate")
+        system:triggerEvent("onUpdate")
     end
 end
 

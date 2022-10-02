@@ -11,7 +11,7 @@ local done = false
 function test.CoRunner()
     co:Execute(function()
         log:Info("Test started")
-        local stopwatch = Stopwatch()
+        local stopwatch = Stopwatch.New()
         stopwatch:Start()
 
         while not done and stopwatch:Elapsed() < 6 do
@@ -22,9 +22,9 @@ function test.CoRunner()
 
         log:Info("Test complete")
     end,
-            function()
-                unit.exit()
-            end)
+        function()
+            unit.exit()
+        end)
 
     co:Delay(function()
         done = true

@@ -51,7 +51,7 @@ function Taskmanager.Instance()
 
     instance = setmetatable(s, Taskmanager)
 
-    unit:onEvent("onUpdate", update)
+    system:onEvent("onUpdate", update)
 
     return instance
 end
