@@ -9,7 +9,7 @@ local function runUpdate(count)
 end
 
 local function createTask()
-    local t = Task.New(function()
+    local t = Task.New("TestTask", function()
         local sum = 0
 
         for i = 1, 10, 1 do
@@ -36,7 +36,7 @@ describe("Task", function()
         local a
         local b
 
-        local t = Task.New(function()
+        local t = Task.New("TestTask", function()
             coroutine.yield()
             first = "first message"
         end):Then(function()
@@ -61,7 +61,7 @@ describe("Task", function()
     it("Can do await", function()
         local result = 0
 
-        Task.New(function()
+        Task.New("TestTask", function()
             local t = createTask()
             result = Task.Await(t)
         end)
@@ -73,8 +73,8 @@ describe("Task", function()
     it("Can do await with chained calls", function()
         local result = 0
 
-        Task.New(function()
-            local t = Task.New(function()
+        Task.New("TestTask", function()
+            local t = Task.New("TestTask2", function()
                 coroutine.yield()
             end):Then(function()
                 coroutine.yield()
@@ -92,7 +92,7 @@ describe("Task", function()
         local final = ""
         local shouldBeNil
 
-        Task.New(function()
+        Task.New("TestTask", function()
             error("Opsie!")
         end):Then(function()
             shouldBeNil = "this is not nil"
@@ -114,7 +114,7 @@ describe("Task", function()
         local errorMsg = ""
         local final = ""
 
-        Task.New(function()
+        Task.New("TestTask", function()
             coroutine.yield()
         end):Then(function(task)
             error("Opsie!")
@@ -136,7 +136,7 @@ describe("Task", function()
         local errorMsg = ""
         local final = ""
 
-        Task.New(function()
+        Task.New("TestTask", function()
             -- Do nothing
         end):Catch(function(task)
             errorMsg = "should not see me"

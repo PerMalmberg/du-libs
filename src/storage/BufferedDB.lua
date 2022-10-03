@@ -55,7 +55,7 @@ function BufferedDB.New(databank)
             return
         end
 
-        task = Task.New(function()
+        task = Task.New("BufferedDB", function()
             local keys = db.getKeyList()
             for i, k in ipairs(keys) do
                 local d = DBStoredData.NewFromDB(db.getStringValue(k))

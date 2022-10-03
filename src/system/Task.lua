@@ -9,7 +9,7 @@ TaskState = {
 }
 
 ---@class Task
----@field New fun(f:fun():any):Task Creates a new Task and runs the function ansync.
+---@field New fun(taskName:string, f:fun():any):Task Creates a new Task and runs the function ansync.
 ---@field Run fun(self:Task):TaskState The status of the task
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
 ---@field Result fun(self:Task):any|nil Returns the return value of the task.
@@ -25,9 +25,10 @@ local Task = {}
 Task.__index = Task
 
 ---Create a new task
+---@param taskName string The name of the task
 ---@param toRun fun():any
 ---@return Task
-function Task.New(toRun)
+function Task.New(taskName, toRun)
     local s = {
         catcher = nil, ---@type fun(f:Task):Task
         finalizer = nil, ---@type fun(f:Task):Task
@@ -39,6 +40,7 @@ function Task.New(toRun)
     local errorMessage ---@type string|nil
     local success = true
     local exited = false
+    local name = taskName
 
     ---Moves to next call when needed
     local function next()
@@ -123,6 +125,12 @@ function Task.New(toRun)
     ---@return boolean
     function s:Exited()
         return exited
+    end
+
+    ---Gets the task name
+    ---@return string
+    function s:Name()
+        return name
     end
 
     setmetatable(s, Task)
