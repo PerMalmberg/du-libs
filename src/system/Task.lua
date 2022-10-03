@@ -9,13 +9,13 @@ TaskState = {
 }
 
 ---@class Task
----@field New fun(taskName:string, f:fun():any):Task Creates a new Task and runs the function ansync.
+---@field New fun(taskName:string, f:fun(...:any[]?):any, arg1:any?, ...:any[]?):Task Creates a new Task and runs the function ansync.
 ---@field Run fun(self:Task):TaskState The status of the task
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
 ---@field Result fun(self:Task):any|nil Returns the return value of the task.
 ---@field Error fun(self:Task):any|nil Returns the error message value of the task, if an error is raised.
 ---@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
----@field Then fun(self:Task, f:fun(t:Task):any):Task Chains another call to be run when the previous one has completed.
+---@field Then fun(self:Task, f:fun(...:any?):any, arg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
 ---@field Catch fun(self:Task, f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
 ---@field Finally fun(self:Task, f:fun(t:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
 ---@field catcher fun(t:Task)
@@ -27,15 +27,21 @@ Task.__index = Task
 ---Create a new task
 ---@param taskName string The name of the task
 ---@param toRun fun():any
+---@param arg1 any? First argument to function to be run
+---@param ... any?[] Other arguments to be passed to the function to be run
 ---@return Task
-function Task.New(taskName, toRun)
+function Task.New(taskName, toRun, arg1, ...)
     local s = {
         catcher = nil, ---@type fun(f:Task):Task
         finalizer = nil, ---@type fun(f:Task):Task
     }
 
-    local thenFunc = {} --- @type thread[]
-    table.insert(thenFunc, coroutine.create(toRun))
+    local thenFunc = {} --- @type { co:thread, args:any[] }[]
+
+    local function newThen(fun, ...)
+        table.insert(thenFunc, { co = coroutine.create(fun), args = { ... } })
+    end
+
     local resultValue ---@type any|nil
     local errorMessage ---@type string|nil
     local success = true
@@ -44,7 +50,7 @@ function Task.New(taskName, toRun)
 
     ---Moves to next call when needed
     local function next()
-        local dead = status(thenFunc[1]) == "dead"
+        local dead = status(thenFunc[1].co) == "dead"
 
         if dead then
             -- Move to next, or are we done?
@@ -62,7 +68,8 @@ function Task.New(taskName, toRun)
     function s:Run()
         local result
         if next() == TaskState.Running then
-            success, result = resume(thenFunc[1])
+            local t = thenFunc[1]
+            success, result = resume(t.co, table.unpack(t.args))
         end
 
         if success then
@@ -75,9 +82,11 @@ function Task.New(taskName, toRun)
     end
 
     ---Chain another function to run after the previous one is completed
-    ---@param thenfunc fun(self:Task, f:fun(thenFunc:Task))
-    function s:Then(thenfunc)
-        table.insert(thenFunc, coroutine.create(thenfunc))
+    ---@param thenfunc fun(...:any[]?)
+    ---@param arg1 any? First argument to function to be run
+    ---@param ... any? Other arguments to be passed to the function to be run
+    function s:Then(thenfunc, arg1, ...)
+        newThen(thenfunc, arg1, ...)
         return s
     end
 
@@ -133,6 +142,7 @@ function Task.New(taskName, toRun)
         return name
     end
 
+    newThen(toRun, arg1, ...)
     setmetatable(s, Task)
 
     taskmanager:Add(s)

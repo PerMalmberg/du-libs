@@ -61,6 +61,7 @@ describe("Task", function()
     it("Can do await", function()
         local result = 0
 
+        -- Only another Task/coroutine can do Await
         Task.New("TestTask", function()
             local t = createTask()
             result = Task.Await(t)
@@ -148,6 +149,31 @@ describe("Task", function()
 
         assert.are_equal("", errorMsg)
         assert.are_equal("the end!", final)
+    end)
+
+    it("Can handle arguments", function()
+        local sum = 0
+        local t = Task.New("Summizer", function(...)
+            local arg1, arg2 = table.unpack({ ... })
+            local s = 0
+            for i = arg1, arg2 do
+                s = s + i
+                coroutine.yield()
+            end
+            sum = s
+        end, 5, 10):Then(function(arg1, arg2)
+            local s = 0
+            for i = arg1, arg2 do
+                s = s + i
+                coroutine.yield()
+            end
+            return s
+        end, 1, 5)
+
+        runUpdate(20)
+
+        assert.are_equal(45, sum)
+        assert.are_equal(15, t:Result())
     end)
 
 end)
