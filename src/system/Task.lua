@@ -8,14 +8,16 @@ TaskState = {
     Running = 1
 }
 
+---@alias thenFunc fun(...:any): any
+
 ---@class Task
----@field New fun(taskName:string, f:fun(...:any[]?):any, arg1:any?, ...:any[]?):Task Creates a new Task and runs the function ansync.
+---@field New fun(taskName:string, f:thenFunc, arg1:any?, ...:any[]?):Task Creates a new Task and runs the function ansync.
 ---@field Run fun(self:Task):TaskState The status of the task
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
 ---@field Result fun(self:Task):any|nil Returns the return value of the task.
 ---@field Error fun(self:Task):any|nil Returns the error message value of the task, if an error is raised.
 ---@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
----@field Then fun(self:Task, f:fun(...:any?):any, arg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
+---@field Then fun(self:Task, f:thenFunc, arg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
 ---@field Catch fun(self:Task, f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
 ---@field Finally fun(self:Task, f:fun(t:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
 ---@field catcher fun(t:Task)
