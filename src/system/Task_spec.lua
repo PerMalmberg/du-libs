@@ -90,22 +90,27 @@ describe("Task", function()
     it("Can handle errors", function()
         local errorMsg = ""
         local final = ""
+        local shouldBeNil
 
         Task.New(function()
             error("Opsie!")
+        end):Then(function()
+            shouldBeNil = "this is not nil"
         end):Catch(function(task)
-            errorMsg = task:Result()
+            errorMsg = task:Error()
         end):Finally(function(task)
             final = "the end!"
         end)
 
         runUpdate(2)
 
+        assert.is_nil(shouldBeNil)
         assert.has_match("Opsie!", errorMsg)
         assert.are_equal("the end!", final)
     end)
 
     it("Can handle errors in chained calls", function()
+        local result = ""
         local errorMsg = ""
         local final = ""
 
@@ -114,13 +119,15 @@ describe("Task", function()
         end):Then(function(task)
             error("Opsie!")
         end):Catch(function(task)
-            errorMsg = task:Result()
+            result = task:Result()
+            errorMsg = task:Error()
         end):Finally(function(task)
             final = "the end!"
         end)
 
         runUpdate(100)
 
+        assert.is_nil(result)
         assert.has_match("Opsie!", errorMsg)
         assert.are_equal("the end!", final)
     end)

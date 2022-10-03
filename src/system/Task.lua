@@ -12,7 +12,8 @@ TaskState = {
 ---@field New fun(f:fun():any):Task Creates a new Task and runs the function ansync.
 ---@field Run fun(self:Task):TaskState The status of the task
 ---@field Success fun(self:Task):boolean Returns true if the task succeeded
----@field Result fun(self:Task):any Returns the return value of the task, or the error if an error is raised.
+---@field Result fun(self:Task):any|nil Returns the return value of the task.
+---@field Error fun(self:Task):any|nil Returns the error message value of the task, if an error is raised.
 ---@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
 ---@field Then fun(self:Task, f:fun(t:Task):any):Task Chains another call to be run when the previous one has completed.
 ---@field Catch fun(self:Task, f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
@@ -32,20 +33,21 @@ function Task.New(toRun)
         finalizer = nil, ---@type fun(f:Task):Task
     }
 
-    local funcs = {} --- @type thread[]
-    table.insert(funcs, coroutine.create(toRun))
-    local resultValue ---@type any
+    local thenFunc = {} --- @type thread[]
+    table.insert(thenFunc, coroutine.create(toRun))
+    local resultValue ---@type any|nil
+    local errorMessage ---@type string|nil
     local success = true
     local exited = false
 
     ---Moves to next call when needed
     local function next()
-        local dead = status(funcs[1]) == "dead"
+        local dead = status(thenFunc[1]) == "dead"
 
         if dead then
             -- Move to next, or are we done?
-            if #funcs > 1 then
-                table.remove(funcs, 1)
+            if #thenFunc > 1 then
+                table.remove(thenFunc, 1)
             else
                 exited = true
                 return TaskState.Dead
@@ -56,21 +58,24 @@ function Task.New(toRun)
     end
 
     function s:Run()
+        local result
         if next() == TaskState.Running then
-            success, resultValue = resume(funcs[1])
+            success, result = resume(thenFunc[1])
         end
 
         if success then
+            resultValue = result
             return next()
         end
 
+        errorMessage = result
         return TaskState.Dead
     end
 
     ---Chain another function to run after the previous one is completed
     ---@param thenfunc fun(self:Task, f:fun(thenFunc:Task))
     function s:Then(thenfunc)
-        table.insert(funcs, coroutine.create(thenfunc))
+        table.insert(thenFunc, coroutine.create(thenfunc))
         return s
     end
 
@@ -106,6 +111,12 @@ function Task.New(toRun)
     ---@return any|nil
     function s:Result()
         return resultValue
+    end
+
+    ---The error of the task
+    ---@return any|nil
+    function s:Error()
+        return errorMessage
     end
 
     ---Indicates if the task has completed its run
