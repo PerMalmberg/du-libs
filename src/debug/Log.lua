@@ -41,7 +41,7 @@ local function formatValues(...)
 
     for i = 1, #args, 1 do
         local v = args[i] or ""
-        local s = {}
+        local s = ""
         if typeComp.IsString(v) then
             s = string.format("%s", v)
         elseif typeComp.IsNumber(v) then
@@ -97,15 +97,15 @@ end
 local singleton
 
 return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if singleton == nil then
-                    singleton = new()
-                end
-                return singleton
+    {
+        new = new
+    },
+    {
+        __call = function(_, ...)
+            if singleton == nil then
+                singleton = new()
             end
-        }
+            return singleton
+        end
+    }
 )

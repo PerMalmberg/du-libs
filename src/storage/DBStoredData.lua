@@ -1,18 +1,24 @@
 local json = require("dkjson")
 
 local function findAnyFunction(o)
-    local found = false
+    if type(o) ~= "table" then
+        return nil
+    end
 
-    for _, value in pairs(o) do
+    local found = nil
+
+    for key, value in pairs(o) do
         local t = type(value)
 
         if t == "function" then
-            found = true
-        elseif t == "table" then
+            return key
+        else
             found = findAnyFunction(value)
         end
 
-        if found then break end
+        if found then
+            return found
+        end
     end
 
     return found
@@ -28,8 +34,9 @@ DBStoredData.__index = DBStoredData
 
 function DBStoredData.New(value, dirty)
     local t = type(value)
-    if t == "table" and findAnyFunction(value) then
-        error("Cannot store tables with functions")
+    local foundFunctionName = findAnyFunction(value)
+    if foundFunctionName then
+        error(string.format("Functions not allowed in PODs: '%s'", foundFunctionName))
     end
 
     local s = {

@@ -84,11 +84,11 @@ describe("BufferedDB", function()
     it("Doesn't allow to save functions", function()
         assert.has_error(function()
             db:Put("abc", { key = function() end })
-        end, "Cannot store tables with functions")
+        end, "Functions not allowed in PODs: 'key'")
 
         assert.has_error(function()
             db:Put("abc", { key = { subKey = function() end } })
-        end, "Cannot store tables with functions")
+        end, "Functions not allowed in PODs: 'subKey'")
     end)
 
     it("Can store numbers", function()
