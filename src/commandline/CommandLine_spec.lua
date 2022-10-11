@@ -76,7 +76,7 @@ describe("Command line tests", function()
         assert.are_equal(1, v)
     end)
 
-    it("Can handle boolean arguments", function()
+    it("Can handle mandatory boolean arguments", function()
         local v
 
         local c = cmd.Accept("bool", function(data)
@@ -86,6 +86,23 @@ describe("Command line tests", function()
         test("bool")
         assert.is_nil(v)
         test("bool true")
+        assert.is_true(v)
+    end)
+
+    it("Can handle mandatory boolean option", function()
+        local v
+
+        local c = cmd.Accept("bool", function(data)
+            v = data.opt1
+        end)
+
+        c.Option("opt1").AsBoolean().Mandatory()
+
+        test("bool")
+        assert.is_nil(v)
+        test("bool -opt1 false")
+        assert.is_false(v)
+        test("bool -opt1 true")
         assert.is_true(v)
     end)
 end)

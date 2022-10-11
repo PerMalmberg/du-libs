@@ -21,7 +21,7 @@ Command.__index = Command
 
 function Command.New()
     local s = {} ---@type Command
-    local type = nil ---@type ArgTypes
+    local type = argType.EMPTY
     local option = {} ---@type table<string,Option>
     local mandatory = false
 
