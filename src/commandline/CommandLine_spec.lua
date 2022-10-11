@@ -100,6 +100,10 @@ describe("Command line tests", function()
 
         test("bool")
         assert.is_nil(v)
+
+        test("bool -opt1")
+        assert.is_nil(v)
+
         test("bool -opt1 false")
         assert.is_false(v)
         test("bool -opt1 true")
