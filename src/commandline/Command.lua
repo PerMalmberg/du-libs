@@ -2,83 +2,100 @@ local log = require("debug/Log")()
 local Option = require("commandline/Option")
 local argType = require("commandline/Types")
 
-local command = {}
-command.__index = command
+---@alias CommandResult table<string, ArgumentValueTypes>
 
-local function new()
-    local o = {
-        type = nil,
-        mandatory = false,
-        option = {},
-        mandatory = false
-    }
+---@class Command
+---@field New fun():Command
+---@field AsString fun():Command
+---@field AsNumber fun():Command
+---@field AsBoolean fun():Command
+---@field AsEmpty fun():Command
+---@field Mandatory fun():Command
+---@field Option fun():Option
+---@field Parse fun(args:string):CommandResult
 
-    return setmetatable(o, command)
-end
+local Command = {}
+Command.__index = Command
 
-function command:AsString()
-    self.type = argType.STRING
-    return self
-end
+function Command.New()
+    local s = {} ---@type Command
+    local type = nil ---@type ArgTypes
+    local option = {} ---@type table<string,Option>
+    local mandatory = false
 
-function command:AsNumber()
-    self.type = argType.NUMBER
-    return self
-end
+    ---Marks command as string
+    ---@return Command
+    function s.AsString()
+        type = argType.STRING
+        return s
+    end
 
-function command:AsBoolean()
-    self.type = argType.BOOLEAN
-    return self
-end
+    ---Marks command as number
+    ---@return Command
+    function s.AsNumber()
+        type = argType.NUMBER
+        return s
+    end
 
-function command:AsEmpty()
-    self.type = argType.EMPTY
-    return self
-end
+    ---Marks command as boolean
+    ---@return Command
+    function s.AsBoolean()
+        type = argType.BOOLEAN
+        return s
+    end
 
-function command:Mandatory()
-    self.mandatory = true
-    return self
-end
+    ---Marks command as emtpy
+    ---@return Command
+    function s.AsEmpty()
+        type = argType.EMPTY
+        return s
+    end
 
-function command:Option(name)
-    local opt = Option(name)
-    self.option[name] = opt
-    return opt
-end
+    ---Marks command as mandatory
+    ---@return Command
+    function s.Mandatory()
+        mandatory = true
+        return s
+    end
 
-function command:Parse(args)
-    -- Let the options extract their data first; whatever is left is for the command itself.
-    local data = {}
+    ---Adds an option to the command
+    ---@param name string
+    ---@return Option
+    function s.Option(name)
+        local opt = Option.New(name)
+        option[name] = opt
+        return opt
+    end
 
-    for _, option in pairs(self.option) do
-        if not option:Parse(args, data) then
+    ---Parses command and options from args
+    ---@param args string[]
+    ---@return CommandResult|nil
+    function s.Parse(args)
+        -- Let the options extract their data first; whatever is left is for the command
+        local data = {} ---@type CommandResult
+
+        for _, option in pairs(option) do
+            if not option.Parse(args, data) then
+                return nil
+            end
+        end
+
+        local ok
+        ok, data.commandValue = argType.parseValue(type, args[1])
+
+        if not ok then
             return nil
         end
+
+        if data.commandValue == nil and mandatory then
+            log:Error("Missing mandatory value for command")
+            return nil
+        end
+
+        return data
     end
 
-    local ok
-    ok, data.commandValue = argType.parseValue(self.type, args[1])
-
-    if not ok then
-        return nil
-    end
-
-    if data.commandValue == nil and self.mandatory then
-        log:Error("Missing mandatory value for command")
-        return nil
-    end
-
-    return data
+    return setmetatable(s, Command)
 end
 
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                return new()
-            end
-        }
-)
+return Command

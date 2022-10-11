@@ -1,9 +1,9 @@
-SU = {}
+local SU = {}
 
 function SU.CoSplit(str, pat)
-    -- http://lua-users.org/wiki/SplitJoin
+   -- http://lua-users.org/wiki/SplitJoin
 
-   local t = {}  -- NOTE: use {n = 0} in Lua-5.0
+   local t = {} -- NOTE: use {n = 0} in Lua-5.0
    local fpat = "(.-)" .. pat
    local last_end = 1
    local s, e, cap = str:find(fpat, 1)
@@ -11,7 +11,7 @@ function SU.CoSplit(str, pat)
       if s ~= 1 or cap ~= "" then
          table.insert(t, cap)
       end
-      last_end = e+1
+      last_end = e + 1
       s, e, cap = str:find(fpat, last_end)
       coroutine.yield()
    end
@@ -23,7 +23,7 @@ function SU.CoSplit(str, pat)
 end
 
 function SU.Round(num, numDecimalPlaces)
-   local mult = 10^(numDecimalPlaces or 0)
+   local mult = 10 ^ (numDecimalPlaces or 0)
    return math.floor(num * mult + 0.5) / mult
 end
 
@@ -33,7 +33,7 @@ end
 
 function PadLeft(s, width)
    if #s < width then
-       s = string.rep('&nbsp;', width - #s) .. s
+      s = string.rep('&nbsp;', width - #s) .. s
    end
 
    return s
@@ -45,8 +45,8 @@ function SU.FormatThousands(value)
    local done = false
 
    while not done do
-       formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1 %2')
-       done = k == 0
+      formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1 %2')
+      done = k == 0
    end
 
    return formatted
@@ -56,11 +56,13 @@ function SU.Trim(s)
    return s:match "^%s*(.-)%s*$"
 end
 
---- Splits the string into parts, honoring " and ' as quote chars to make multi-word arguments
+---Splits the string into parts, honoring " and ' as quote chars to make multi-word arguments
+---@param s string
+---@return string[]
 function SU.SplitQuoted(s)
    local function isQuote(c) return c == '"' or c == "'" end
 
-   local function isSpace(c)return c == " " end
+   local function isSpace(c) return c == " " end
 
    local function add(target, v)
       v = SU.Trim(v)
@@ -70,7 +72,7 @@ function SU.SplitQuoted(s)
    end
 
    local inQuote = false
-   local parts = {}
+   local parts = {} ---@type string[]
    local current = ""
 
    for c in s:gmatch(".") do

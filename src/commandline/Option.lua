@@ -1,88 +1,104 @@
 local log = require("debug/Log")()
 local argType = require("commandline/Types")
 
-local option = {}
-option.__index = option
+---@class Option
+---@field New fun(name:string):Option
+---@field AsString fun():Option
+---@field AsNumber fun():Option
+---@field AsBoolean fun():Option
+---@field AsEmpty fun():Option
+---@field Mandatory fun():Option
+---@field Default fun(v:ArgumentValueTypes):Option
+---@field Parse fun(args:string[], target:table<string,ArgumentValueTypes>):boolean
 
-local function new(name)
-    local o = {
-        name = name,
-        sanitizedName = name:gsub("^%-*", ""),
-        type = nil,
-        mandatory = false,
-        default = nil
-    }
+local Option = {}
+Option.__index = Option
 
-    return setmetatable(o, option)
-end
+---Creates a new command option
+---@param name string
+---@return Option
+function Option.New(name)
+    local s = {} ---@type Option
+    local sanitizedName = name:gsub("^%-*", "")
+    local optType = nil
+    local mandatory = false
+    local default = nil
 
-function option:AsString()
-    self.type = argType.STRING
-    return self
-end
+    ---Marks option to be a string
+    ---@return Option
+    function s.AsString()
+        optType = argType.STRING
+        return s
+    end
 
-function option:AsNumber()
-    self.type = argType.NUMBER
-    return self
-end
+    ---Mark option as number
+    ---@return Option
+    function s.AsNumber()
+        optType = argType.NUMBER
+        return s
+    end
 
-function option:AsBoolean()
-    self.type = argType.BOOLEAN
-    return self
-end
+    ---Mark option as boolean
+    ---@return Option
+    function s.AsBoolean()
+        optType = argType.BOOLEAN
+        return s
+    end
 
-function option:Mandatory()
-    self.mandatory = true
-    return self
-end
+    ---Mark option as mandatory
+    ---@return Option
+    function s.Mandatory()
+        mandatory = true
+        return s
+    end
 
-function option:Default(v)
-    self.default = v
-end
+    ---Set default value for option
+    ---@param v ArgumentValueTypes
+    function s.Default(v)
+        default = v
+    end
 
-function option:Parse(args, target)
-    -- Find the argument in the input data
-    for i, key in ipairs(args) do
+    ---Parses the arguments, putting the found values in the the target in a key:value fashion, with sanitized key names.
+    ---@param args string[]
+    ---@param target table<string, ArgumentValueTypes>
+    ---@return boolean
+    function s.Parse(args, target)
+        -- Find the argument in the input data
+        for i, key in ipairs(args) do
 
-        if key == self.name then
-            -- Next value is the argument, if it exists
-            if i + 1 <= #args then
-                table.remove(args, i) -- Remove the arg itself
-                local v = table.remove(args, i) -- Remove and store the value
+            if key == name then
+                -- Next value is the argument, if it exists
+                if i + 1 <= #args then
+                    table.remove(args, i) -- Remove the arg itself
+                    local v = table.remove(args, i) -- Remove and store the value
 
-                local ok
-                ok, target[self.sanitizedName] = argType.parseValue(self.type, v)
-                if not ok then
+                    local ok
+                    ok, target[sanitizedName] = argType.parseValue(optType, v)
+                    if not ok then
+                        return false
+                    end
+                elseif mandatory then
+                    log:Error("Missing value for mandatory option ", key)
                     return false
                 end
-            elseif self.mandatory then
-                log:Error("Missing value for mandatory option ", key)
-                return false
+
+                break
             end
-
-            break
         end
+
+        if target[sanitizedName] == nil and default ~= nil then
+            target[sanitizedName] = default
+        end
+
+        local res = (not mandatory) or target[sanitizedName] ~= nil
+
+        if not res then
+            log:Error("Option", name, "not complete")
+        end
+        return res
     end
 
-    if target[self.sanitizedName] == nil and self.default ~= nil then
-        target[self.sanitizedName] = self.default
-    end
-
-    local res = (not self.mandatory) or target[self.sanitizedName] ~= nil
-
-    if not res then
-        log:Error("Option", self.name, "not complete")
-    end
-    return res
+    return setmetatable(s, Option)
 end
 
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                return new(...)
-            end
-        }
-)
+return Option

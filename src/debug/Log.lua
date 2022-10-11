@@ -1,4 +1,3 @@
-require("util/Enum")
 local typeComp = require("debug/TypeComp")
 require("util/Table")
 local json = require("dkjson")
@@ -6,12 +5,13 @@ local json = require("dkjson")
 local log = {}
 log.__index = log
 
-log.LogLevel = Enum {
-    "OFF",
-    "INFO",
-    "ERROR",
-    "WARNING",
-    "DEBUG"
+---@enum LogLevel
+log.LogLevel = {
+    OFF = 0,
+    INFO = 2,
+    ERROR = 3,
+    WARNING = 4,
+    DEBUG = 5
 }
 
 function new()

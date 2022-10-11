@@ -2,70 +2,75 @@ local log = require("debug/Log")()
 local su = require("util/StringUtil")
 local Command = require("commandline/Command")
 
-local commandLine = {}
-commandLine.__index = commandLine
+---@alias CommandFunction fun(data:CommandResult)
+---@alias PreparedCommand {cmd:Command, exec:CommandFunction}
 
-local function new()
-    local o = {
-        command = {}
-    }
+---@class CommandLine
+---@field Accept fun(name:string, func:fun())
+---@field Exec fun(command:string):boolean
 
-    setmetatable(o, commandLine)
+local CommandLine = {}
+CommandLine.__index = CommandLine
+local singleton
 
-    system:onEvent("onInputText", o.inputText, o)
+function CommandLine.New()
+    if singleton then
+        return singleton
+    end
 
-    return o
-end
+    local s = {}
+    local command = {} ---@type table<string, PreparedCommand>
 
-function commandLine.inputText(cmd, text)
-    cmd:Exec(text)
-end
+    ---Receiver of input from the lua chat
+    ---@param cmdLine CommandLine
+    ---@param text string
+    function s.inputText(cmdLine, text)
+        cmdLine.Exec(text)
+    end
 
-function commandLine:Accept(command, func)
-    local o = Command()
-    self.command[command] = { cmd = o, exec = func }
-    return o
-end
+    ---Accepts a command
+    ---@param name string
+    ---@param func CommandFunction
+    ---@return Command
+    function s.Accept(name, func)
+        local o = Command.New()
+        command[name] = { cmd = o, exec = func }
+        return o
+    end
 
-function commandLine:Exec(command)
-    local exeFunc = function(self, commandString)
-        local parts = su.SplitQuoted(commandString)
-        -- We now have each part of the command in an array, where the first part is the command.
-        local possibleCmd = table.remove(parts, 1)
-        local cmd = self.command[possibleCmd]
-        if cmd == nil then
-            log:Error("Command not supported:", possibleCmd)
-        else
-            -- Let the command parse the rest of the arguments. If successful, we get back a table with the values as per the options.
-            -- The command-value itself may be empty if it is not mandatory.
-            local data = cmd.cmd:Parse(parts)
-            if data == nil then
-                log:Error("Cannot execute:", commandString)
+    ---Parses and executes the input command
+    ---@param input string
+    function s.Exec(input)
+        local exeFunc = function(commandString)
+            local parts = su.SplitQuoted(commandString)
+            -- We now have each part of the command in an array, where the first part is the command itself.
+            local possibleCmd = table.remove(parts, 1)
+            local preparedCommand = command[possibleCmd]
+            if preparedCommand == nil then
+                log:Error("Command not supported:", possibleCmd)
             else
-                log:Debug("Executing:", commandString)
-                cmd.exec(data)
+                -- Let the command parse the rest of the arguments. If successful, we get back a table with the values as per the options.
+                -- The command-value itself may be empty if it is not mandatory.
+                local data = preparedCommand.cmd.Parse(parts)
+                if data == nil then
+                    log:Error("Cannot execute:", commandString)
+                else
+                    log:Debug("Executing:", commandString)
+                    preparedCommand.exec(data)
+                end
             end
+        end
+
+        local status, ret = xpcall(exeFunc, traceback, input)
+        if not status then
+            log:Error(ret)
         end
     end
 
-    local status, ret = xpcall(exeFunc, traceback, self, command)
-    if not status then
-        log:Error(ret)
-    end
+    singleton = setmetatable(s, CommandLine)
+
+    system:onEvent("onInputText", s.inputText, s)
+    return singleton
 end
 
-local singleton
-
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if not singleton then
-                    singleton = new()
-                end
-                return singleton
-            end
-        }
-)
+return CommandLine
