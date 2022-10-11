@@ -1,7 +1,12 @@
 local keys = require("input/Keys")
 
+---@alias InputCallback fun()
+---@alias CallbackPair {criteria:Criteria, func:InputCallback}
+
 ---@class Input
 ---@field Instance fun():Input
+---@field Register fun(key:Keys, criteria:Criteria, callback:InputCallback)
+---@field IsPressed fun(key:Keys):boolean
 
 local Input = {}
 Input.__index = Input
@@ -13,8 +18,14 @@ function Input.Instance()
     end
 
     local s = {}
-    local lookup = {}
-    local keyState = {}
+    local lookup = {} ---@type table<Keys, CallbackPair[]>
+    local keyState = {} ---@type table<Keys, boolean>
+
+    -- Create handles for each of the known input actions
+    for _, k in ipairs(keys) do
+        -- Start with all keys in released state
+        keyState[k] = false
+    end
 
     function s.decode(key, isPressed, isRepeat)
         keyState[key] = isPressed
@@ -22,7 +33,7 @@ function Input.Instance()
         local l = lookup[key]
         if l ~= nil then
             for _, entry in ipairs(l) do
-                if entry.criteria:Matches(s, isRepeat, isPressed) then
+                if entry.criteria.Matches(s, isRepeat, isPressed) then
                     entry.func()
                 end
             end
@@ -41,6 +52,9 @@ function Input.Instance()
         s.decode(key, true, true)
     end
 
+    ---Indicates if a key is pressed
+    ---@param key Keys
+    ---@return boolean
     function s.IsPressed(key)
         return keyState[key]
     end
@@ -48,26 +62,20 @@ function Input.Instance()
     ---Register a function to be triggered when a key is pressed and certain modifiers are set
     ---@param key Keys
     ---@param criteria Criteria
-    ---@param func any
-    function s.Register(key, criteria, func)
+    ---@param callback InputCallback
+    function s.Register(key, criteria, callback)
         key = keys[key]
-        local l = lookup[key]
+        local cbPair = lookup[key]
 
-        if l == nil then
-            l = {}
-            lookup[key] = l
+        if cbPair == nil then
+            cbPair = {}
+            lookup[key] = cbPair
         end
 
-        table.insert(l, { criteria = criteria, func = func })
+        table.insert(cbPair, { criteria = criteria, func = callback })
     end
 
     singleton = setmetatable(s, Input)
-
-    -- Create handles for each of the known input actions
-    for _, k in ipairs(keys) do
-        -- Start with all keys in released state
-        s.keyState[k] = false
-    end
 
     system:onEvent("onActionStart", s.keyPress, s)
     system:onEvent("onActionStop", s.keyRelease, s)

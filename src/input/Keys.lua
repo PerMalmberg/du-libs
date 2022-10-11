@@ -30,7 +30,7 @@ local keys = {
     option6 = 28,
     option7 = 29,
     option8 = 30,
-    option = 31
+    option9 = 31
 }
 
 return keys

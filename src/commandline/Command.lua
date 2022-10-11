@@ -2,7 +2,9 @@ local log = require("debug/Log")()
 local Option = require("commandline/Option")
 local argType = require("commandline/Types")
 
----@alias CommandResult table<string, ArgumentValueTypes>
+---@module "commandline/Types"
+
+---@alias CommandResult table<string, ArgumentValueTypes> -- Actual layout: {commandValue:value, sanitizedName:optionValue}
 
 ---@class Command
 ---@field New fun():Command

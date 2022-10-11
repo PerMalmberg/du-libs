@@ -13,20 +13,13 @@ local CommandLine = {}
 CommandLine.__index = CommandLine
 local singleton
 
-function CommandLine.New()
+function CommandLine.Instance()
     if singleton then
         return singleton
     end
 
     local s = {}
     local command = {} ---@type table<string, PreparedCommand>
-
-    ---Receiver of input from the lua chat
-    ---@param cmdLine CommandLine
-    ---@param text string
-    function s.inputText(cmdLine, text)
-        cmdLine.Exec(text)
-    end
 
     ---Accepts a command
     ---@param name string
@@ -40,7 +33,7 @@ function CommandLine.New()
 
     ---Parses and executes the input command
     ---@param input string
-    function s.Exec(input)
+    local function exec(input)
         local exeFunc = function(commandString)
             local parts = su.SplitQuoted(commandString)
             -- We now have each part of the command in an array, where the first part is the command itself.
@@ -65,6 +58,13 @@ function CommandLine.New()
         if not status then
             log:Error(ret)
         end
+    end
+
+    ---Receiver of input from the lua chat
+    ---@param cmdLine CommandLine
+    ---@param text string
+    function s.inputText(cmdLine, text)
+        exec(text)
     end
 
     singleton = setmetatable(s, CommandLine)
