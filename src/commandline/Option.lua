@@ -15,9 +15,13 @@ local Option = {}
 Option.__index = Option
 
 ---Creates a new command option
----@param name string
+---@param name string The option name, such as "-opt", "--opt" or just "opt". Im the latter case a "-" is added to the name.
 ---@return Option
 function Option.New(name)
+    if name:sub(1, 1) ~= "-" then
+        name = "-" .. name
+    end
+
     local s = {} ---@type Option
     local sanitizedName = name:gsub("^%-*", "")
     local optType = nil

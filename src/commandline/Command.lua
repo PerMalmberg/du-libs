@@ -13,7 +13,7 @@ local argType = require("commandline/Types")
 ---@field AsBoolean fun():Command
 ---@field AsEmpty fun():Command
 ---@field Mandatory fun():Command
----@field Option fun():Option
+---@field Option fun(name:string):Option
 ---@field Parse fun(args:string):CommandResult
 
 local Command = {}
@@ -49,6 +49,9 @@ function Command.New()
     ---Marks command as emtpy
     ---@return Command
     function s.AsEmpty()
+        if mandatory then
+            error("Command is mandatory, cannot set as type empty")
+        end
         type = argType.EMPTY
         return s
     end
@@ -56,6 +59,9 @@ function Command.New()
     ---Marks command as mandatory
     ---@return Command
     function s.Mandatory()
+        if type == argType.EMPTY then
+            error("Command is of type empty, cannot set as mandatory")
+        end
         mandatory = true
         return s
     end
