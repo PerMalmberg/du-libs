@@ -5,8 +5,8 @@ local keys = require("input/Keys")
 
 ---@class Input
 ---@field Instance fun():Input
----@field Register fun(key:Keys, criteria:Criteria, callback:InputCallback)
----@field IsPressed fun(key:Keys):boolean
+---@field Register fun(key:integer, criteria:Criteria, callback:InputCallback)
+---@field IsPressed fun(key:integer):boolean
 
 local Input = {}
 Input.__index = Input
@@ -19,18 +19,26 @@ function Input.Instance()
 
     local s = {}
     local lookup = {} ---@type table<Keys, CallbackPair[]>
-    local keyState = {} ---@type table<Keys, boolean>
+    local keyState = {} ---@type table<integer, boolean>
 
     -- Create handles for each of the known input actions
-    for _, k in ipairs(keys) do
+    for _, k in pairs(keys) do
         -- Start with all keys in released state
         keyState[k] = false
     end
 
-    function s.decode(key, isPressed, isRepeat)
+    ---Decodes the event
+    ---@param keyName string
+    ---@param isPressed boolean
+    ---@param isRepeat boolean
+    function s.decode(keyName, isPressed, isRepeat)
+        local key = keys[keyName]
+        if key == nil then return end
+
         keyState[key] = isPressed
 
         local l = lookup[key]
+
         if l ~= nil then
             for _, entry in ipairs(l) do
                 if entry.criteria.Matches(s, isRepeat, isPressed) then
@@ -40,15 +48,15 @@ function Input.Instance()
         end
     end
 
-    function s.keyPress(key)
+    local function keyPress(_, key)
         s.decode(key, true, false)
     end
 
-    function s.keyRelease(key)
+    local function keyRelease(_, key)
         s.decode(key, false, false)
     end
 
-    function s.keyHold(key)
+    local function keyHold(_, key)
         s.decode(key, true, true)
     end
 
@@ -60,11 +68,10 @@ function Input.Instance()
     end
 
     ---Register a function to be triggered when a key is pressed and certain modifiers are set
-    ---@param key Keys
+    ---@param key integer
     ---@param criteria Criteria
     ---@param callback InputCallback
     function s.Register(key, criteria, callback)
-        key = keys[key]
         local cbPair = lookup[key]
 
         if cbPair == nil then
@@ -77,9 +84,9 @@ function Input.Instance()
 
     singleton = setmetatable(s, Input)
 
-    system:onEvent("onActionStart", s.keyPress, s)
-    system:onEvent("onActionStop", s.keyRelease, s)
-    system:onEvent("onActionLoop", s.keyHold, s)
+    system:onEvent("onActionStart", keyPress)
+    system:onEvent("onActionStop", keyRelease)
+    system:onEvent("onActionLoop", keyHold)
 
     return singleton
 end
