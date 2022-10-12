@@ -21,12 +21,6 @@ function Input.Instance()
     local lookup = {} ---@type table<Keys, CallbackPair[]>
     local keyState = {} ---@type table<integer, boolean>
 
-    -- Create handles for each of the known input actions
-    for _, k in pairs(keys) do
-        -- Start with all keys in released state
-        keyState[k] = false
-    end
-
     ---Decodes the event
     ---@param keyName string
     ---@param isPressed boolean
@@ -56,7 +50,7 @@ function Input.Instance()
         s.decode(key, false, false)
     end
 
-    local function keyHold(_, key)
+    local function keyRepeat(_, key)
         s.decode(key, true, true)
     end
 
@@ -64,7 +58,7 @@ function Input.Instance()
     ---@param key Keys
     ---@return boolean
     function s.IsPressed(key)
-        return keyState[key]
+        return keyState[key] or false
     end
 
     ---Register a function to be triggered when a key is pressed and certain modifiers are set
@@ -86,7 +80,7 @@ function Input.Instance()
 
     system:onEvent("onActionStart", keyPress)
     system:onEvent("onActionStop", keyRelease)
-    system:onEvent("onActionLoop", keyHold)
+    system:onEvent("onActionLoop", keyRepeat)
 
     return singleton
 end
