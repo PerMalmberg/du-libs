@@ -20,6 +20,7 @@ TaskState = {
 ---@field Then fun(f:thenFunc, thenArg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
 ---@field Catch fun(f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
 ---@field Finally fun(f:fun(t:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
+---@field Name fun():string Returns the name of the Task
 ---@field catcher fun(t:Task)
 ---@field finalizer fun(t:Task)
 
