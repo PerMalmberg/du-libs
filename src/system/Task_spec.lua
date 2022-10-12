@@ -39,13 +39,13 @@ describe("Task", function()
         local t = Task.New("TestTask", function()
             coroutine.yield()
             first = "first message"
-        end):Then(function()
+        end).Then(function()
             coroutine.yield()
             a = "A"
-        end):Then(function()
+        end).Then(function()
             coroutine.yield()
             b = "B"
-        end):Then(function()
+        end).Then(function()
             coroutine.yield()
             return "last value"
         end)
@@ -77,7 +77,7 @@ describe("Task", function()
         Task.New("TestTask", function()
             local t = Task.New("TestTask2", function()
                 coroutine.yield()
-            end):Then(function()
+            end).Then(function()
                 coroutine.yield()
                 result = 123
             end)
@@ -95,11 +95,11 @@ describe("Task", function()
 
         Task.New("TestTask", function()
             error("Opsie!")
-        end):Then(function()
+        end).Then(function()
             shouldBeNil = "this is not nil"
-        end):Catch(function(task)
+        end).Catch(function(task)
             errorMsg = task:Error()
-        end):Finally(function(task)
+        end).Finally(function(task)
             final = "the end!"
         end)
 
@@ -117,12 +117,12 @@ describe("Task", function()
 
         Task.New("TestTask", function()
             coroutine.yield()
-        end):Then(function(task)
+        end).Then(function(task)
             error("Opsie!")
-        end):Catch(function(task)
+        end).Catch(function(task)
             result = task:Result()
             errorMsg = task:Error()
-        end):Finally(function(task)
+        end).Finally(function(task)
             final = "the end!"
         end)
 
@@ -139,9 +139,9 @@ describe("Task", function()
 
         Task.New("TestTask", function()
             -- Do nothing
-        end):Catch(function(task)
+        end).Catch(function(task)
             errorMsg = "should not see me"
-        end):Finally(function(task)
+        end).Finally(function(task)
             final = "the end!"
         end)
 
@@ -161,7 +161,7 @@ describe("Task", function()
                 coroutine.yield()
             end
             sum = s
-        end, 5, 10):Then(function(arg1, arg2)
+        end, 5, 10).Then(function(arg1, arg2)
             local s = 0
             for i = arg1, arg2 do
                 s = s + i

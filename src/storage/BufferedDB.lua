@@ -68,7 +68,7 @@ function BufferedDB.New(databank)
 
                 coroutine.yield()
             end
-        end):Then(persist):Catch(function(t)
+        end).Then(persist).Catch(function(t)
             error("Error in BeginLoad:" .. t:Error())
         end)
     end

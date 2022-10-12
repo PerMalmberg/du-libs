@@ -12,14 +12,14 @@ TaskState = {
 
 ---@class Task
 ---@field New fun(taskName:string, f:thenFunc, arg1:any?, ...:any[]?):Task Creates a new Task and runs the function ansync.
----@field Run fun(self:Task):TaskState The status of the task
----@field Success fun(self:Task):boolean Returns true if the task succeeded
----@field Result fun(self:Task):any|nil Returns the return value of the task.
----@field Error fun(self:Task):any|nil Returns the error message value of the task, if an error is raised.
----@field Exited fun(self:Task):boolean Returns true when the task has completed its work (or otherwise exited)
----@field Then fun(self:Task, f:thenFunc, arg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
----@field Catch fun(self:Task, f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
----@field Finally fun(self:Task, f:fun(t:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
+---@field Run fun():TaskState The status of the task
+---@field Success fun():boolean Returns true if the task succeeded
+---@field Result fun():any|nil Returns the return value of the task.
+---@field Error fun():any|nil Returns the error message value of the task, if an error is raised.
+---@field Exited fun():boolean Returns true when the task has completed its work (or otherwise exited)
+---@field Then fun(f:thenFunc, thenArg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
+---@field Catch fun(f:fun(t:Task)):Task Sets an error handler, called if the task raises an error
+---@field Finally fun(f:fun(t:Task)):Task Sets a finalizer, always called before the task is removed from the task manager.
 ---@field catcher fun(t:Task)
 ---@field finalizer fun(t:Task)
 
@@ -35,7 +35,7 @@ Task.__index = Task
 function Task.New(taskName, toRun, arg1, ...)
     local s = {
         catcher = nil, ---@type fun(f:Task):Task
-        finalizer = nil, ---@type fun(f:Task):Task
+        finalizer = nil ---@type fun(f:Task):Task
     }
 
     local thenFunc = {} --- @type { co:thread, args:any[] }[]
@@ -67,7 +67,7 @@ function Task.New(taskName, toRun, arg1, ...)
         return TaskState.Running
     end
 
-    function s:Run()
+    function s.Run()
         local result
         if next() == TaskState.Running then
             local t = thenFunc[1]
@@ -85,16 +85,16 @@ function Task.New(taskName, toRun, arg1, ...)
 
     ---Chain another function to run after the previous one is completed
     ---@param thenfunc fun(...:any[]?)
-    ---@param arg1 any? First argument to function to be run
+    ---@param thenArg1 any? First argument to function to be run
     ---@param ... any? Other arguments to be passed to the function to be run
-    function s:Then(thenfunc, arg1, ...)
-        newThen(thenfunc, arg1, ...)
+    function s.Then(thenfunc, thenArg1, ...)
+        newThen(thenfunc, thenArg1, ...)
         return s
     end
 
     ---Sets an error handler
     ---@param catcher fun(t:Task)
-    function s:Catch(catcher)
+    function s.Catch(catcher)
         if type(catcher) ~= "function" then
             error("Can only add function as catchers")
         end
@@ -104,8 +104,8 @@ function Task.New(taskName, toRun, arg1, ...)
     end
 
     ---Sets a finalizer
-    ---@param finalizer function
-    function s:Finally(finalizer)
+    ---@param finalizer fun(t:Task)
+    function s.Finally(finalizer)
         if type(finalizer) ~= "function" then
             error("Can only add function as catchers")
         end
@@ -116,38 +116,38 @@ function Task.New(taskName, toRun, arg1, ...)
 
     ---Indicates success of failure
     ---@return boolean
-    function s:Success()
+    function s.Success()
         return success
     end
 
     ---The result of the task
     ---@return any|nil
-    function s:Result()
+    function s.Result()
         return resultValue
     end
 
     ---The error of the task
     ---@return any|nil
-    function s:Error()
+    function s.Error()
         return errorMessage
     end
 
     ---Indicates if the task has completed its run
     ---@return boolean
-    function s:Exited()
+    function s.Exited()
         return exited
     end
 
     ---Gets the task name
     ---@return string
-    function s:Name()
+    function s.Name()
         return name
     end
 
     newThen(toRun, arg1, ...)
     setmetatable(s, Task)
 
-    taskmanager:Add(s)
+    taskmanager.Add(s)
 
     return s
 end
@@ -164,11 +164,11 @@ function Task.Await(task)
         error("Can only await a Task")
     end
 
-    while not task:Exited() do
+    while not task.Exited() do
         coroutine.yield()
     end
 
-    return task:Result()
+    return task.Result()
 end
 
 return Task

@@ -2,8 +2,8 @@
 
 ---@class Taskmanager
 ---@field Instance fun():Taskmanager Returns the Taskmanager singleton
----@field Add fun(self:table, t:Task) Adds a task
----@field Count fun(self:table):number Returns the number of tasks
+---@field Add fun(t:Task) Adds a task
+---@field Count fun():number Returns the number of tasks
 
 
 local Taskmanager = {}
@@ -18,7 +18,7 @@ function Taskmanager.Instance()
     local s = {}
     local tasks = {} ---@type Task[]
 
-    function s:Add(task)
+    function s.Add(task)
         if type(task) ~= "table" or type(task.Run) ~= "function" then
             error("Can only add Tasks")
         end
@@ -26,7 +26,7 @@ function Taskmanager.Instance()
         table.insert(tasks, task)
     end
 
-    function s:Count()
+    function s.Count()
         return #tasks
     end
 
