@@ -7,12 +7,13 @@ local Command = require("commandline/Command")
 
 ---@class CommandLine
 ---@field Accept fun(name:string, func:fun())
----@field Exec fun(command:string):boolean
 
 local CommandLine = {}
 CommandLine.__index = CommandLine
 local singleton
 
+---Get the commandline instance
+---@return CommandLine
 function CommandLine.Instance()
     if singleton then
         return singleton
