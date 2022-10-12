@@ -109,4 +109,36 @@ describe("Command line tests", function()
         test("bool -opt1 true")
         assert.is_true(v)
     end)
+
+    it("Can handle more complex commands", function()
+        local d
+
+        local verify = function()
+            assert.are_equal("text with space", d.commandValue)
+            assert.are_equal(1, d.a)
+            assert.are_equal("abc", d.boo)
+            assert.are_equal(true, d.c)
+            assert.are_equal(123.456, d.f)
+            assert.are_equal(678, d.default)
+            assert.are_equal(-123.456, d.negative)
+        end
+
+        local c = cmd.Accept("complex", function(data)
+            d = data
+        end).AsString():Mandatory()
+        c.Option("-a").AsNumber().Mandatory()
+        c.Option("--boo").AsString().Mandatory()
+        c.Option("--c").AsBoolean().Mandatory()
+        c.Option("-f").AsNumber().Mandatory()
+        c.Option("-default").AsNumber().Mandatory().Default(678)
+        c.Option("-negative").AsNumber().Mandatory()
+
+
+        test("complex -a 1 --boo abc --c true 'text with space' -f 123.456 -negative -123.456")
+        verify()
+        d = nil
+        test("complex -f 123.456 'text with space' -a 1 --boo abc --c true -negative -123.456")
+        verify()
+
+    end)
 end)
