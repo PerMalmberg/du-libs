@@ -45,7 +45,7 @@ function DBStoredData.New(value, dirty)
         dirty = dirty or false
     }
 
-    function s:Persist()
+    function s.Persist()
         s.dirty = false
         local str = json.encode(
             {

@@ -36,17 +36,17 @@ describe("BufferedDB", function()
     db = BufferedDB.New(dataBank)
 
     it("Has guards against reading/writing before load", function()
-        assert.is_false(db:IsDirty())
+        assert.is_false(db.IsDirty())
         assert.has_error(function()
-            db:Put("myKey", "myValue")
+            db.Put("myKey", "myValue")
         end, "Call to Put before loading is completed")
 
         assert.has_error(function()
-            db:Get("myKey")
+            db.Get("myKey")
         end, "Call to Get before loading is completed")
 
         assert.has_error(function()
-            db:Clear()
+            db.Clear()
         end, "Call to Clear before loading is completed")
 
         assert.has_error(function()
@@ -59,14 +59,14 @@ describe("BufferedDB", function()
     end)
 
     it("Can load data", function()
-        db:BeginLoad()
-        while not db:IsLoaded() do
+        db.BeginLoad()
+        while not db.IsLoaded() do
             runTicks()
         end
 
         local i = 0
-        db:BeginLoad()
-        while not db:IsLoaded() do
+        db.BeginLoad()
+        while not db.IsLoaded() do
             runTicks()
             i = i + 1
         end
@@ -74,57 +74,57 @@ describe("BufferedDB", function()
         -- Loading a second time doesn't do anything
         assert.are_equal(0, i)
 
-        assert.is_true(db:IsLoaded())
-        assert.are_equal(13, db:Size())
-        assert.are_equal("aValue", db:Get("a"))
-        assert.are_equal(1, db:Get("b"))
-        assert.are_equal("value", db:Get("table").key)
+        assert.is_true(db.IsLoaded())
+        assert.are_equal(13, db.Size())
+        assert.are_equal("aValue", db.Get("a"))
+        assert.are_equal(1, db.Get("b"))
+        assert.are_equal("value", db.Get("table").key)
     end)
 
     it("Doesn't allow to save functions", function()
         assert.has_error(function()
-            db:Put("abc", { key = function() end })
+            db.Put("abc", { key = function() end })
         end, "Functions not allowed in PODs: 'key'")
 
         assert.has_error(function()
-            db:Put("abc", { key = { subKey = function() end } })
+            db.Put("abc", { key = { subKey = function() end } })
         end, "Functions not allowed in PODs: 'subKey'")
     end)
 
     it("Can store numbers", function()
-        assert.is_false(db:IsDirty())
-        db:Put("myNumber", 123)
-        assert.is_true(db:IsDirty())
+        assert.is_false(db.IsDirty())
+        db.Put("myNumber", 123)
+        assert.is_true(db.IsDirty())
         runTicks()
-        assert.is_false(db:IsDirty())
+        assert.is_false(db.IsDirty())
 
-        assert.are_equal(123, db:Get("myNumber", 0))
+        assert.are_equal(123, db.Get("myNumber", 0))
     end)
 
     it("Can store strings", function()
-        assert.is_false(db:IsDirty())
-        db:Put("myString", "myValue")
-        assert.is_true(db:IsDirty())
+        assert.is_false(db.IsDirty())
+        db.Put("myString", "myValue")
+        assert.is_true(db.IsDirty())
         runTicks()
-        assert.is_false(db:IsDirty())
+        assert.is_false(db.IsDirty())
     end)
 
     it("Can store tables", function()
-        assert.is_false(db:IsDirty())
-        db:Put("myTable", { key = "table value" })
-        assert.is_true(db:IsDirty())
+        assert.is_false(db.IsDirty())
+        db.Put("myTable", { key = "table value" })
+        assert.is_true(db.IsDirty())
         runTicks()
-        assert.is_false(db:IsDirty())
-        assert.are_equal("table value", db:Get("myTable").key)
+        assert.is_false(db.IsDirty())
+        assert.are_equal("table value", db.Get("myTable").key)
     end)
 
     it("Can clear keys", function()
-        assert.are_equal(16, db:Size())
-        db:Clear()
-        assert.are_equal(0, db:Size())
+        assert.are_equal(16, db.Size())
+        db.Clear()
+        assert.are_equal(0, db.Size())
     end)
 
     it("Can return default value", function()
-        assert.are_equal(123, db:Get("blah", 123))
+        assert.are_equal(123, db.Get("blah", 123))
     end)
 end)

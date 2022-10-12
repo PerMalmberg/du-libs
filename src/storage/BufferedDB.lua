@@ -4,19 +4,19 @@ require("util/Table")
 local DBStoredData = require("storage/DBStoredData")
 
 ---@class BufferedDB
----@field BeginLoad fun(_:table) Starts loading keys into memory
----@field Clear fun(_:table) Clears the databank
----@field IsLoaded fun(_:table):boolean Returns true when all keys have been loaded.
----@field IsDirty fun(_:table):boolean Returns true when a key has not yet been persisted
----@field Get fun(_:table, key:string, default):number|string|table|nil Returns the value of the key, or the default value
----@field Put fun(_:table, key:string, data:number|string|table) Stores the data in key. data can be string, number or (plain data) table.
+---@field BeginLoad fun() Starts loading keys into memory
+---@field Clear fun() Clears the databank
+---@field IsLoaded fun():boolean Returns true when all keys have been loaded.
+---@field IsDirty fun():boolean Returns true when a key has not yet been persisted
+---@field Get fun(key:string, default):number|string|table|nil Returns the value of the key, or the default value
+---@field Put fun(key:string, data:number|string|table) Stores the data in key. data can be string, number or (plain data) table.
 ---@field Size fun():number Returns the number of keys
 
 local BufferedDB = {}
 BufferedDB.__index = BufferedDB
 
 ---Creates a new BufferedDB
----@param databank table The link to the the databank element we're expecting to be connected to.
+---@param databank table|nil The link to the the databank element we're expecting to be connected to.
 ---@return BufferedDB
 function BufferedDB.New(databank)
     if type(databank) ~= "table" or not databank.getStringValue then
@@ -34,13 +34,13 @@ function BufferedDB.New(databank)
     local function persist()
         loaded = true
         while true do
-            if s:IsDirty() then
+            if s.IsDirty() then
                 local i = 0
                 for key, data in pairs(buffer) do
                     coroutine.yield()
 
                     if data.dirty then
-                        db.setStringValue(key, data:Persist())
+                        db.setStringValue(key, data.Persist())
                         dirtyCount = dirtyCount - 1
                     end
                 end
@@ -50,7 +50,7 @@ function BufferedDB.New(databank)
     end
 
     ---Begins loading keys
-    function BufferedDB:BeginLoad()
+    function BufferedDB.BeginLoad()
         if task then
             return
         end
@@ -73,7 +73,7 @@ function BufferedDB.New(databank)
         end)
     end
 
-    function BufferedDB:Clear()
+    function BufferedDB.Clear()
         if not loaded then
             error("Call to Clear before loading is completed")
         end
@@ -85,13 +85,13 @@ function BufferedDB.New(databank)
 
     ---Checks if all keys are loaded
     ---@return boolean
-    function BufferedDB:IsLoaded()
+    function BufferedDB.IsLoaded()
         return loaded
     end
 
     ---Checks if all data has been persisted
     ---@return boolean
-    function BufferedDB:IsDirty()
+    function BufferedDB.IsDirty()
         return dirtyCount > 0
     end
 
@@ -99,7 +99,7 @@ function BufferedDB.New(databank)
     ---@param key string
     ---@param default number|string|table
     ---@return number|string|table|nil
-    function BufferedDB:Get(key, default)
+    function BufferedDB.Get(key, default)
         if not loaded then
             error("Call to Get before loading is completed")
         end
@@ -115,7 +115,7 @@ function BufferedDB.New(databank)
     ---Puts data in key
     ---@param key string
     ---@param data number|string|table
-    function BufferedDB:Put(key, data)
+    function BufferedDB.Put(key, data)
         if not loaded then
             error("Call to Put before loading is completed")
         end
@@ -124,7 +124,7 @@ function BufferedDB.New(databank)
         dirtyCount = dirtyCount + 1
     end
 
-    function BufferedDB:Size()
+    function BufferedDB.Size()
         return TableLen(buffer)
     end
 
