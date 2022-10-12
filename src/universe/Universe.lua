@@ -15,12 +15,12 @@ local posPattern = "::pos{" ..
 
 ---@class Universe
 ---@field Instance fun():Universe
----@field CurrentGalaxyId fun(self:Universe):integer Gets the current galaxy id
----@field CurrentGalaxy fun(self:Universe):Galaxy Gets the current galaxy
----@field ParsePosition fun(self:Universe, pos:string):Position|nil Parses the ::pos{} string and returns a Position or nil.
----@field CreatePos fun(self:Universe, coordinate:Vec3):Position
----@field ClosestBody fun(self:Universe, coordinate:Vec3):Body Returns the closest body to the given coordinate
----@field VerticalReferenceVector fun(self:Universe):Vec3
+---@field CurrentGalaxyId fun():integer Gets the current galaxy id
+---@field CurrentGalaxy fun():Galaxy Gets the current galaxy
+---@field ParsePosition fun(pos:string):Position|nil Parses the ::pos{} string and returns a Position or nil.
+---@field CreatePos fun(coordinate:Vec3):Position
+---@field ClosestBody fun(scoordinate:Vec3):Body Returns the closest body to the given coordinate
+---@field VerticalReferenceVector fun():Vec3
 local Universe = {}
 Universe.__index = Universe
 
@@ -45,20 +45,20 @@ function Universe.Instance()
 
     ---Gets the current galaxy id
     ---@return number The id of the current galaxy
-    function s:CurrentGalaxyId()
+    function s.CurrentGalaxyId()
         return 0 -- Until there are more than one galaxy in the game.
     end
 
     ---Gets the current galaxy
     ---@return Galaxy The current galaxy
-    function s:CurrentGalaxy()
-        return galaxy[s:CurrentGalaxyId()]
+    function s.CurrentGalaxy()
+        return galaxy[s.CurrentGalaxyId()]
     end
 
     ---Parses a position string
     ---@param pos string The "::pos{...}" string
     ---@return Position|nil A position in space or on a planet
-    function s:ParsePosition(pos)
+    function s.ParsePosition(pos)
         local x, y, z, bodyRef
         local galaxyId, bodyId, latitude, longitude, altitude = stringMatch(pos, posPattern)
 
@@ -76,7 +76,7 @@ function Universe.Instance()
                 y = tonumber(longitude)
                 z = tonumber(altitude)
                 local coordinate = Vec3(x, y, z)
-                bodyRef = s:CurrentGalaxy():GetBodyClosestToPosition(coordinate)
+                bodyRef = s.CurrentGalaxy():GetBodyClosestToPosition(coordinate)
                 return Position.New(galaxy[galaxyId], bodyRef, coordinate)
             else
                 -- https://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
@@ -106,29 +106,29 @@ function Universe.Instance()
     ---comment Creates a :Position from the given coordinate, within the current galaxy.
     ---@param coordinate Vec3 The coordinate to create the position for
     ---@return Position
-    function s:CreatePos(coordinate)
+    function s.CreatePos(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
-        local closestBody = s:ClosestBody(coordinate)
-        return Position.New(s:CurrentGalaxy(), closestBody, coordinate)
+        local closestBody = s.ClosestBody(coordinate)
+        return Position.New(s.CurrentGalaxy(), closestBody, coordinate)
     end
 
     --- Gets the information for the closest stellar body
     ---@param coordinate Vec3 The coordinate to get the closest body for
     ---@return table The Body
-    function s:ClosestBody(coordinate)
+    function s.ClosestBody(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:ClosestBody")
 
-        local galaxy = s:CurrentGalaxy()
+        local galaxy = s.CurrentGalaxy()
         return galaxy:GetBodyClosestToPosition(coordinate)
     end
 
     ---Returns a unit vector pointing towards the center of the closest 'gravity well', i.e. planet or space construct.
     --- @return Vec3
-    function s:VerticalReferenceVector()
+    function s.VerticalReferenceVector()
         local worldGrav = Vec3(core.getWorldGravity())
         if worldGrav:len2() == 0 then
             local position = Vec3(construct.getWorldPosition())
-            local body = s:ClosestBody(position)
+            local body = s.ClosestBody(position)
             return (body.Geography.Center - position):normalize()
         else
             return worldGrav:normalize()

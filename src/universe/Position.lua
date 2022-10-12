@@ -5,8 +5,8 @@ local stringFormat = string.format
 
 ---@class Position
 ---@field New fun(galaxy:integer, bodyRef:Body, x:integer, y:integer, z:integer):Position Creates a new Position
----@field AsPosString fun(self:Position):string returns a ::pos{} string
----@field Coordinates fun(self:Position):Vec3 returns the coordinates
+---@field AsPosString fun():string returns a ::pos{} string
+---@field Coordinates fun():Vec3 returns the coordinates
 
 local Position = {}
 Position.__index = Position
@@ -27,13 +27,13 @@ function Position.New(galaxy, bodyRef, coordinate)
         Coords = coordinate
     }
 
-    function s:AsPosString()
+    function s.AsPosString()
         return tostring(s)
     end
 
     ---Returns the coordinates of the position
     ---@return Vec3
-    function s:Coordinates()
+    function s.Coordinates()
         return s.Coords
     end
 
