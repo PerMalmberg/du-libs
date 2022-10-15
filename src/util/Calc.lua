@@ -52,12 +52,14 @@ end
 --- @param coordinate vec3 A position in in world coordinates to convert to local coordinates
 calc.WorldToLocal = function(coordinate)
     local localized = coordinate - Vec3(construct.getWorldPosition())
-    return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(), { localized:unpack() }))
+    return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(),
+        { localized:unpack() }))
 end
 
 --- @param direction vec3 A unit vector, in world coordinates to convert to a local unit vector
 calc.WorldDirectionToLocal = function(direction)
-    return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(), { direction:unpack() }))
+    return Vec3(solve3(construct.getWorldRight(), construct.getWorldForward(), construct.getWorldUp(),
+        { direction:unpack() }))
 end
 --[[ This one does the same thing as the above one, except that it doesn't subtract the construct position to move the vector to origo.
 calc.WorldToLocal = function(worldPos)
@@ -72,7 +74,8 @@ calc.WorldToLocal = function(worldPos)
     )
 
     return localPos
-end]]--
+end]]
+--
 calc.LocalToWorld = function(localCoord)
     local xOffset = localCoord.x * Vec3(construct.getWorldOrientationForward())
     local yOffset = localCoord.y * Vec3(construct.getWorldOrientationRight())
@@ -170,6 +173,12 @@ calc.Ternary = function(condition, a, b)
     return b
 end
 
+---Rotate a vector around a point
+---@param vector vec3 The vector to rotate
+---@param rotationPoint vec3 The point to rotate around
+---@param degrees number The angle, in degrees, to rotate
+---@param axis vec3 The axis to rotate around
+---@return vec3 The vector, rotated around the axis
 calc.RotateAroundAxis = function(vector, rotationPoint, degrees, axis)
     return (vector - rotationPoint):rotate(deg2rad(degrees), axis:normalize_inplace()) + rotationPoint
 end
