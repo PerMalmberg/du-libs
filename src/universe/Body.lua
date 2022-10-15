@@ -18,8 +18,9 @@ local max = math.max
 ---@field Atmosphere table Atmosphere properties
 ---@field Surface table Surface properties
 ---@field PvP table Pvp properties
----@field DistanceToAtmo fun(self:Body, point:Vec3):number Returns the distance to atmo, or 0 if already in atmo.
----@field IsInAtmo fun(self:Body, point:Vec3):boolean Returns true if the point is within the atmosphere of the body.
+---@field DistanceToAtmo fun(self:Body, point:Vec3):number
+---@field IsInAtmo fun(self:Body, point:Vec3):boolean
+---@field DistanceToHighestPossibleSurface fun(coordinate:Vec3)
 
 local Body = {}
 Body.__index = Body
@@ -40,7 +41,8 @@ function Body.New(galaxy, bodyData)
         },
         Geography = {
             Center = Vec3(bodyData.center),
-            Radius = bodyData.radius
+            Radius = bodyData.radius,
+            MaxSurfaceAltitude = bodyData.surfaceMaxAltitude
         },
         Atmosphere = {
             Present = bodyData.hasAtmosphere,
@@ -60,12 +62,24 @@ function Body.New(galaxy, bodyData)
         return instance.Name
     end
 
-    function s:DistanceToAtmo(from)
-        return max(0, (from - s.Geography.Center):len() - s.Atmosphere.Radius)
+    ---Returns the distance between the given position and the atmosphere of the body, 0 if already in atmosphere of the body
+    ---@param coordinate vec3
+    ---@return number
+    function s:DistanceToAtmo(coordinate)
+        return max(0, (coordinate - s.Geography.Center):len() - s.Atmosphere.Radius)
     end
 
-    function s:IsInAtmo(point)
-        return s:DistanceToAtmo(point) == 0
+    ---Returns true if the coordinate is within the atmosphere of the body
+    ---@param coordinate any
+    ---@return boolean
+    function s:IsInAtmo(coordinate)
+        return s:DistanceToAtmo(coordinate) == 0
+    end
+
+    ---Returns the distance to the highest possible point on the body or 0 if below lowest surface
+    ---@param coordinate Vec3
+    function s.DistanceToHighestPossibleSurface(coordinate)
+        return max(0, (coordinate - s.Geography.Center):len() - s.Geography.MaxSurfaceAltitude)
     end
 
     return setmetatable(s, Body)

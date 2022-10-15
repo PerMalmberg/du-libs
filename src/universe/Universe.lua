@@ -1,4 +1,5 @@
 -- Universe - utility class to manage the in-game atlas
+---@alias Vec3 vec3
 
 local checks = require("debug/Checks")
 local log = require("debug/Log")()
