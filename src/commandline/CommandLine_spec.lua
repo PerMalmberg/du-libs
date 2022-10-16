@@ -139,6 +139,50 @@ describe("Command line tests", function()
         d = nil
         test("complex -f 123.456 'text with space' -a 1 --boo abc --c true -negative -123.456")
         verify()
+    end)
 
+    it("Can handle empty boolean option", function()
+        local called = false
+        local value = nil
+
+        local e = cmd.Accept("empty-boolean", function(data)
+            called = true
+            value = data.empty
+        end).AsEmpty()
+        local opt = e.Option("empty")
+        opt.AsBoolean().AsEmptyBoolean()
+
+        test("empty-boolean -empty")
+        assert.is_true(called)
+        assert.is_true(value)
+    end)
+
+    it("Can handle missing empty boolean option", function()
+        local called = false
+        local value = nil
+
+        local e = cmd.Accept("abscent-empty-boolean", function(data)
+            called = true
+            value = data.empty
+        end).AsEmpty()
+        local opt = e.Option("empty")
+        opt.AsEmptyBoolean()
+
+        test("abscent-empty-boolean")
+        assert.is_true(called)
+        assert.is_false(value)
+    end)
+
+    it("Can handle extra text", function()
+        local called = false
+
+        local e = cmd.Accept("empty-boolean-with-extra-text", function(data)
+            called = true
+        end).AsEmpty()
+        local opt = e.Option("empty")
+        opt.AsBoolean().AsEmptyBoolean()
+
+        test("empty-boolean-with-extra-text -empty extra text")
+        assert.is_false(called)
     end)
 end)

@@ -6,7 +6,7 @@ local argType = require("commandline/Types")
 ---@field AsString fun():Option
 ---@field AsNumber fun():Option
 ---@field AsBoolean fun():Option
----@field AsEmpty fun():Option
+---@field AsEmptyBoolean fun():Option
 ---@field Mandatory fun():Option
 ---@field Default fun(v:ArgumentValueTypes):Option
 ---@field Parse fun(args:string[], target:table<string,ArgumentValueTypes>):boolean
@@ -56,6 +56,13 @@ function Option.New(name)
         return s
     end
 
+    ---Mark option as empty
+    ---@return Option
+    function s.AsEmptyBoolean()
+        optType = argType.EMPTY_BOOLEAN
+        return s
+    end
+
     ---Set default value for option
     ---@param v ArgumentValueTypes
     function s.Default(v)
@@ -71,8 +78,10 @@ function Option.New(name)
         for i, key in ipairs(args) do
 
             if key == name then
-                -- Next value is the argument, if it exists
-                if i + 1 <= #args then
+                if optType == argType.EMPTY_BOOLEAN then
+                    target[sanitizedName] = true
+                    table.remove(args, i)
+                elseif i + 1 <= #args then -- Next value is the argument, if it exists
                     table.remove(args, i) -- Remove the arg itself
                     local v = table.remove(args, i) -- Remove and store the value
 
@@ -88,6 +97,10 @@ function Option.New(name)
 
                 break
             end
+        end
+
+        if optType == argType.EMPTY_BOOLEAN and target[sanitizedName] == nil then
+            target[sanitizedName] = false
         end
 
         if target[sanitizedName] == nil and default ~= nil then

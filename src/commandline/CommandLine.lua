@@ -6,7 +6,8 @@ local Command = require("commandline/Command")
 ---@alias PreparedCommand {cmd:Command, exec:CommandFunction}
 
 ---@class CommandLine
----@field Accept fun(name:string, func:fun())
+---@field Accept fun(name:string, func:CommandFunction):Command
+---@field Clear fun()
 
 local CommandLine = {}
 CommandLine.__index = CommandLine
@@ -30,6 +31,11 @@ function CommandLine.Instance()
         local o = Command.New()
         command[name] = { cmd = o, exec = func }
         return o
+    end
+
+    ---Clears all registered commands
+    function s.Clear()
+        command = {}
     end
 
     ---Parses and executes the input command

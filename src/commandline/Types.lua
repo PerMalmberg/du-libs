@@ -4,10 +4,10 @@ local log = require("debug/Log")()
 
 ---@enum ArgTypes
 local argType = {
-    EMPTY = 0,
     BOOLEAN = 1,
     NUMBER = 2,
-    STRING = 3
+    STRING = 3,
+    EMPTY_BOOLEAN = 4
 }
 
 ---Parses the raw input returning status, value

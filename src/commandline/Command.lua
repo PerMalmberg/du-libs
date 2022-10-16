@@ -1,6 +1,7 @@
 local log = require("debug/Log")()
 local Option = require("commandline/Option")
 local argType = require("commandline/Types")
+local calc = require("util/Calc")
 
 ---@module "commandline/Types"
 
@@ -14,14 +15,14 @@ local argType = require("commandline/Types")
 ---@field AsEmpty fun():Command
 ---@field Mandatory fun():Command
 ---@field Option fun(name:string):Option
----@field Parse fun(args:string):CommandResult
+---@field Parse fun(args:string[]):CommandResult
 
 local Command = {}
 Command.__index = Command
 
 function Command.New()
     local s = {} ---@type Command
-    local type = argType.EMPTY
+    local type = argType.EMPTY ---@type ArgTypes
     local option = {} ---@type table<string,Option>
     local mandatory = false
 
@@ -86,6 +87,18 @@ function Command.New()
             if not option.Parse(args, data) then
                 return nil
             end
+        end
+
+        local expectedLength = calc.Ternary(type == argType.EMPTY, 0, 1)
+        local len = TableLen(args)
+        if len < expectedLength then
+            table.remove(args, 1)
+            log:Error("Too few arguments for command.")
+            return nil
+        elseif len > expectedLength then
+            log:Error("Too many arguments for command.")
+            log:Error(args)
+            return nil
         end
 
         local ok
