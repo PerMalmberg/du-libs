@@ -1,6 +1,26 @@
 local Vec3 = require("cpml/vec3")
 local core = library.getCoreUnit()
 
+---@alias fun3 fun():vec3
+---@alias funn fun():number
+---@alias funb fun():boolean
+---@alias VOrientation { Up:fun3, Right:fun3, Forward:fun3, localized: { Up:fun3, Right:fun3, Forward:fun3 } }
+---@alias VMass { Own:fun():number, MassOfDockedConstructs:fun():number, MassOfPlayers:fun():number}
+---@alias VVelocity {Angular:fun3, Movement:fun3, localized:{Angular:fun3}}
+---@alias VAcceleration {Angular:fun3, Movement:fun3, localized: {Angular:fun3}}
+---@alias VPosition {Current:fun3}
+---@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AngularAirFrictionAcceleration:fun3}
+---@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}
+
+---@class Vehicle
+---@field orientation VOrientation
+---@field mass VMass
+---@field velocity VVelocity
+---@field acceleration VAcceleration
+---@field position VPosition
+---@field world VWorld
+---@field player VPlayer
+
 local Vehicle = {}
 Vehicle.__index = Vehicle
 local singleton
@@ -8,12 +28,12 @@ local singleton
 local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
 
 ---Creates a new Core
----@return table A new AxisControl
-function Vehicle:New()
+---@return Vehicle
+function Vehicle.New()
     if singleton ~= nil then
         return singleton
     end
-    
+
     singleton = {
         orientation = {
             Up = function()
@@ -79,7 +99,7 @@ function Vehicle:New()
         },
         acceleration = {
             Angular = function()
-                return Vec3(core.getWorldAngularAcceleration())
+                return Vec3(construct.getWorldAngularAcceleration())
             end,
             Movement = function()
                 return Vec3(construct.getWorldAcceleration())
@@ -111,12 +131,12 @@ function Vehicle:New()
         player = {
             position = {
                 Current = function()
-                    return Vec3(unit.getMasterPlayerWorldPosition())
+                    return Vec3(player.getWorldPosition)
                 end
             },
             orientation = {
                 Up = function()
-                    return Vec3(unit.getMasterPlayerWorldUp())
+                    return Vec3(player.getWorldUp())
                 end
             },
             camera = {
