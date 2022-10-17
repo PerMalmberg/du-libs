@@ -1,9 +1,9 @@
 local env = require("environment")
 
-describe("Timer", function ()
-    Timer = require("system/Timer")
+describe("Timer", function()
+    local Timer = require("system/Timer")
 
-    it("test", function ()
+    it("test", function()
         env.Prepare()
         stub(unit, "setTimer")
         stub(unit, "stopTimer")
@@ -12,7 +12,7 @@ describe("Timer", function ()
         local id = "1234"
         local interval = 5678
 
-        t:Add(id, function () end, interval)
+        t:Add(id, function() end, interval)
         t:Remove(id)
 
         assert.stub(unit.setTimer).was_called_with(id, interval)
@@ -35,4 +35,3 @@ describe("Timer", function ()
         assert.are_equal(1, count)
     end)
 end)
-

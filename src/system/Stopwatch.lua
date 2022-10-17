@@ -19,32 +19,32 @@ function Stopwatch.New()
     local stopTime = nil
 
     ---Starts the stopwatch
-    function s:Start()
-        if not s:IsRunning() then
+    function s.Start()
+        if not s.IsRunning() then
             startTime = utc()
             stopTime = nil
         end
     end
 
     ---Restarts the stopwatch
-    function Stopwatch:Restart()
-        s:Stop()
-        s:Start()
+    function s.Restart()
+        s.Stop()
+        s.Start()
     end
 
     ---Stops the stopwatch
-    function Stopwatch:Stop()
+    function s.Stop()
         stopTime = utc()
     end
 
     ---Resets the stopwatch, Elapsed() will return 0 after this call
-    function Stopwatch:Reset()
+    function s.Reset()
         startTime = nil
         stopTime = nil
     end
 
     ---@return number # Elapsed time, in seconds with fractions.
-    function Stopwatch:Elapsed()
+    function s.Elapsed()
         if startTime == nil then
             return 0
         elseif stopTime == nil then
@@ -56,7 +56,7 @@ function Stopwatch.New()
 
     ---Checks if the stopwatch is running
     ---@return boolean
-    function Stopwatch:IsRunning()
+    function s.IsRunning()
         return startTime ~= nil and stopTime == nil
     end
 
