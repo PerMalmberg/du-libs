@@ -199,6 +199,10 @@ calc.SignLargestAxis = function(vector)
     return calc.Sign(arr[ix])
 end
 
+---Calculates the brake distance
+---@param speed number
+---@param acceleration number
+---@return number
 calc.CalcBrakeDistance = function(speed, acceleration)
     local d = (speed ^ 2) / (2 * acceleration)
     if calc.IsNaN(d) or acceleration == 0 then

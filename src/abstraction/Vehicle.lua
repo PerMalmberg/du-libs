@@ -5,11 +5,11 @@ local core = library.getCoreUnit()
 ---@alias funn fun():number
 ---@alias funb fun():boolean
 ---@alias VOrientation { Up:fun3, Right:fun3, Forward:fun3, localized: { Up:fun3, Right:fun3, Forward:fun3 } }
----@alias VMass { Own:fun():number, MassOfDockedConstructs:fun():number, MassOfPlayers:fun():number}
+---@alias VMass { Own:funn, MassOfDockedConstructs:funn, MassOfPlayers:funn, Total:funn}
 ---@alias VVelocity {Angular:fun3, Movement:fun3, localized:{Angular:fun3}}
 ---@alias VAcceleration {Angular:fun3, Movement:fun3, localized: {Angular:fun3}}
 ---@alias VPosition {Current:fun3}
----@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AngularAirFrictionAcceleration:fun3}
+---@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AngularAirFrictionAcceleration:fun3, GravityDirection:fun3}
 ---@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}
 
 ---@class Vehicle
@@ -126,6 +126,9 @@ function Vehicle.New()
             G = core.getGravityIntensity,
             AngularAirFrictionAcceleration = function()
                 return Vec3(construct.getWorldAirFrictionAcceleration())
+            end,
+            GravityDirection = function()
+                return vec3(core.getWorldVertical())
             end
         },
         player = {
