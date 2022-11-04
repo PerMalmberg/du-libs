@@ -131,6 +131,12 @@ end
 
 -- https://gamedev.stackexchange.com/questions/96459/fast-ray-sphere-collision-code
 -- https://github.com/excessive/cpml/blob/master/modules/intersect.lua#L152
+---@param ray Ray
+---@param sphereCenter vec3
+---@param sphereRadius number
+---@return boolean
+---@return vec3
+---@return number
 calc.LineIntersectSphere = function(ray, sphereCenter, sphereRadius)
     local offset = ray.Start - sphereCenter
     local b = offset:dot(ray.Dir)
@@ -139,17 +145,17 @@ calc.LineIntersectSphere = function(ray, sphereCenter, sphereRadius)
     -- ray's position outside sphere (c > 0)
     -- ray's direction pointing away from sphere (b > 0)
     if c > 0 and b > 0 then
-        return false, nil, nil
+        return false, Vec3(), 0
     end
 
     local discr = b * b - c
 
     -- negative discriminant
     if discr < 0 then
-        return false, nil, nil
+        return false, Vec3(), 0
     end
 
-    -- Clamp t to 0
+    -- If t is negative, ray started inside sphere so clamp t to zero
     local t = -b - sqrt(discr)
     t = t < 0 and 0 or t
 
