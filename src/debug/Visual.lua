@@ -4,7 +4,7 @@ local visual = {}
 visual.__index = visual
 
 local function new()
-    o = {
+    local o = {
         shapes = {}
     }
     return setmetatable(o, visual)
