@@ -3,5 +3,9 @@
         "construct",
         "system",
         "player"
+    ],
+    "Lua.workspace.library": [
+        "${3rd}/luassert/library",
+        "${3rd}/busted/library"
     ]
 }
