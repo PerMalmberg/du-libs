@@ -76,6 +76,11 @@ function Input.Instance()
         table.insert(cbPair, { criteria = criteria, func = callback })
     end
 
+    ---Clears all registered callbacks
+    function s.Clear()
+        lookup = {}
+    end
+
     singleton = setmetatable(s, Input)
 
     system:onEvent("onActionStart", keyPress)

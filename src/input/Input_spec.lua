@@ -68,6 +68,20 @@ describe("Input", function()
         Press(keys.left)
         Release(keys.left)
         assert.are_equal(2, count)
+    end)
+
+    it("Can clear handlers", function()
+        local count = 0
+        input.Clear()
+        input.Register(keys.left, Criteria.New().OnPress(), function()
+            count = count + 1
+        end)
+
+        Press(keys.left)
+        assert.are_equal(1, count)
+        input.Clear()
+        Press(keys.left)
+        assert.are_equal(1, count)
 
     end)
 end)
