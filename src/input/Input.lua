@@ -7,11 +7,14 @@ local keys = require("input/Keys")
 ---@field Instance fun():Input
 ---@field Register fun(key:integer, criteria:Criteria, callback:InputCallback)
 ---@field IsPressed fun(key:integer):boolean
+---@field Clear fun()
 
 local Input = {}
 Input.__index = Input
 local singleton
 
+---Returns the Input intance
+---@return Input
 function Input.Instance()
     if singleton then
         return singleton
