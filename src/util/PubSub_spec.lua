@@ -1,4 +1,12 @@
+require("environment"):Prepare()
 local PubSub = require("util/PubSub")
+local Task = require("system/Task")
+
+local function runUpdate(count)
+    for i = 1, count do
+        system:triggerEvent("onUpdate")
+    end
+end
 
 describe("PubSub", function()
     it("Can publish to a topic", function()
@@ -65,7 +73,28 @@ describe("PubSub", function()
 
         PubSub.Instance().Publish("n", 123)
         assert.are_equal(123, n)
+    end)
 
+    it("Can publish in a Task", function()
+        local a = {}
+
+        PubSub.Instance().RegisterBool("yield", function(topic, value)
+            table.insert(a, value)
+        end)
+
+        PubSub.Instance().RegisterString("yield", function(topic, value)
+            table.insert(a, value)
+        end)
+
+        local t = Task.New("test", function()
+            for i = 1, 10, 1 do
+                PubSub.Instance().Publish("yield", true, true)
+                PubSub.Instance().Publish("yield", "value", true)
+            end
+        end)
+
+        runUpdate(30)
+        assert.are_equal(20, #a)
     end)
 
 end)

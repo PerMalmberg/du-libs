@@ -1,13 +1,13 @@
 ---@class PubSub
----@field RegisterString fun(topic:string, callback:TopicStringCallback)
----@field RegisterNumber fun(topic:string, callback:TopicNumberCallback)
----@field RegisterTable fun(topic:string, callback:TopicTableCallback)
----@field Publish fun(topic:string, value:string)
+---@field RegisterString fun(topic:string, callback:SubStringCallback)
+---@field RegisterNumber fun(topic:string, callback:SubNumberCallback)
+---@field RegisterTable fun(topic:string, callback:SubTableCallback)
+---@field Publish fun(topic:string, value:string, yield:boolean?)
 
----@alias TopicStringCallback fun(topic:string, value:string)
----@alias TopicNumberCallback fun(topic:string, value:number)
----@alias TopicBooleanCallback fun(topic:string, value:boolean)
----@alias TopicTableCallback fun(topic:string, value:table)
+---@alias SubStringCallback fun(topic:string, value:string)
+---@alias SubNumberCallback fun(topic:string, value:number)
+---@alias SubBooleanCallback fun(topic:string, value:boolean)
+---@alias SubTableCallback fun(topic:string, value:table)
 
 
 local PubSub = {}
@@ -21,15 +21,15 @@ function PubSub.Instance()
 
     local s = {}
     local subscribers = {
-        number = {}, ---@type table<string, TopicNumberCallback[]>
-        string = {}, ---@type table<string, TopicStringCallback[]>
-        table = {}, ---@type table<string, TopicTableCallback[]>
-        boolean = {} ---@type table<string, TopicBooleanCallback[]>
+        number = {}, ---@type table<string, SubNumberCallback[]>
+        string = {}, ---@type table<string, SubStringCallback[]>
+        table = {}, ---@type table<string, SubTableCallback[]>
+        boolean = {} ---@type table<string, SubBooleanCallback[]>
     }
 
     ---@param subs table
     ---@param topic string
-    ---@param callback TopicStringCallback|TopicNumberCallback|TopicTableCallback
+    ---@param callback SubStringCallback|SubNumberCallback|SubTableCallback|SubBooleanCallback
     local function register(subs, topic, callback)
         local callbacks = subs[topic]
         if not callbacks then
@@ -42,28 +42,28 @@ function PubSub.Instance()
 
     ---Registers a string callback for the topic
     ---@param topic string
-    ---@param callback TopicStringCallback
+    ---@param callback SubStringCallback
     function s.RegisterString(topic, callback)
         register(subscribers[type("")], topic, callback)
     end
 
     ---Registers a number callback for the topic
     ---@param topic string
-    ---@param callback TopicNumberCallback
+    ---@param callback SubNumberCallback
     function s.RegisterNumber(topic, callback)
         register(subscribers[type(1)], topic, callback)
     end
 
     ---Registers a table callback for the topic
     ---@param topic string
-    ---@param callback TopicTableCallback
+    ---@param callback SubTableCallback
     function s.RegisterTable(topic, callback)
         register(subscribers[type({})], topic, callback)
     end
 
     ---Registers a boolean callback for the topic
     ---@param topic string
-    ---@param callback TopicBooleanCallback
+    ---@param callback SubBooleanCallback
     function s.RegisterBool(topic, callback)
         register(subscribers[type(true)], topic, callback)
     end
@@ -71,17 +71,18 @@ function PubSub.Instance()
     ---Publishes the value on the topic
     ---@param topic string
     ---@param value string|number|table|boolean
-    function s.Publish(topic, value)
-        local t = type(value)
-        local subs = subscribers[t]
+    ---@param yield boolean? Set to true to yield between each callback; only when run in a coroutine.
+    function s.Publish(topic, value, yield)
+        local subs = subscribers[type(value)]
 
         if not subs then return end
 
         local callbacks = subs[topic]
-        if callbacks then
-            for _, subscriber in ipairs(callbacks) do
-                subscriber(topic, value)
-            end
+        if not callbacks then return end
+
+        for _, subscriber in ipairs(callbacks) do
+            subscriber(topic, value)
+            if yield then coroutine.yield() end
         end
     end
 
