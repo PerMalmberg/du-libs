@@ -1,5 +1,5 @@
 ---@class Stopwatch
----@field Start fun() Starts the stopwatch
+---@field Start fun() Starts the stopwatch, or leaves it running if it already is.
 ---@field Restart fun() Restarts the stopwatch
 ---@field Stop fun() Stops the stopwatch
 ---@field Reset fun() Resets the stopwatch to a state as if it never had been started
@@ -18,7 +18,7 @@ function Stopwatch.New()
     local startTime = nil
     local stopTime = nil
 
-    ---Starts the stopwatch
+    ---Starts the stopwatch, or leaves it running if it already is.
     function s.Start()
         if not s.IsRunning() then
             startTime = utc()

@@ -23,7 +23,7 @@ local core = library.getCoreUnit()
 
 local Vehicle = {}
 Vehicle.__index = Vehicle
-local singleton
+local singleton ---@type Vehicle
 
 local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
 

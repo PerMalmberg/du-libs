@@ -5,6 +5,7 @@ local Universe = require("universe/Universe")
 local Position = require("universe/Position")
 local Vec3 = require("cpml/vec3")
 local Ray = require("util/Ray")
+local calc = require("util/Calc")
 
 local u ---@type Universe
 local positionOnAlioth ---@type Position|nil
@@ -107,7 +108,25 @@ describe("Detect bodies in flight path", function()
     assert.are_equal("Madis", bodies[1].Name)
 end)
 
-describe("Veritcal reference vector", function()
+describe("Can calculate distance to sea level", function()
+    it("Can see we're above and below sea level", function()
+        local aliCenter = Vec3(-8.00, -8.00, -126303.00)
+        local b = u.ClosestBody(aliCenter)
+        local above = u.ParsePosition("::pos{0,2,49.9873,160.4911,34.6345}")
+        local below = u.ParsePosition("::pos{0,2,49.5881,160.6972,-2.4599}")
+
+        local aboveSea, dist = b.AboveSeaLevel(above.Coordinates())
+        assert.is_true(aboveSea)
+        assert.are_equal(34.6, calc.Round(dist, 1))
+
+        aboveSea, dist = b.AboveSeaLevel(below.Coordinates())
+        assert.is_false(aboveSea)
+        assert.are_equal(2.5, calc.Round(dist, 1))
+
+    end)
+end)
+
+describe("Vertical reference vector", function()
     it("Can get the vertical reference vector", function()
         local vRef = u.VerticalReferenceVector()
         assert.is_not_nil(vRef.x)
