@@ -128,7 +128,7 @@ function Task.New(taskName, toRun, arg1, ...)
     end
 
     ---The error of the task
-    ---@return any|nil
+    ---@return string|nil
     function s.Error()
         return errorMessage
     end
