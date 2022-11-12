@@ -112,6 +112,11 @@ calc.Kph2Mps = function(kph)
     return kph / 3.6
 end
 
+calc.Clamp = function(v, minVal, maxVal)
+    return min(maxVal, max(v, minVal))
+end
+
+
 ---Returns the nearest point on the line
 ---@param lineStart Vec3
 ---@param lineDirection Vec3
