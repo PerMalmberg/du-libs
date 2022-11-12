@@ -66,7 +66,7 @@ function Galaxy.New(galaxyId, galaxyAtlas)
         local res = {}
 
         local sortFunc = function(a, b)
-            return (a.Geography.Center - ray.Start):len2() < (b.Geography.Center - ray.Start):len2()
+            return (a.Geography.Center - ray.Start):Len2() < (b.Geography.Center - ray.Start):Len2()
         end
 
         for _, b in pairs(body) do
