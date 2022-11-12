@@ -83,24 +83,40 @@ calc.LocalToWorld = function(localCoord)
     return xOffset + yOffset + zOffset + Vec3.New(construct.getWorldPosition())
 end
 
+---@param normal Vec3
+---@param vecA Vec3
+---@param vecB Vec3
+---@return number
 calc.SignedRotationAngle = function(normal, vecA, vecB)
-    vecA = vecA:project_on_plane(normal)
-    vecB = vecB:project_on_plane(normal)
-    return atan(vecA:cross(vecB):Dot(normal), vecA:Dot(vecB))
+    vecA = vecA:ProjectOnPlane(normal)
+    vecB = vecB:ProjectOnPlane(normal)
+    return atan(vecA:Cross(vecB):Dot(normal), vecA:Dot(vecB))
 end
 
+---@param up Vec3
+---@param right Vec3
+---@return Vec3
 calc.StraightForward = function(up, right)
-    return up:cross(right)
+    return up:Cross(right)
 end
 
+---@param mps number
+---@return number
 calc.Mps2Kph = function(mps)
     return mps * 3.6
 end
 
+---@param kph number
+---@return number
 calc.Kph2Mps = function(kph)
     return kph / 3.6
 end
 
+---Returns the nearest point on the line
+---@param lineStart Vec3
+---@param lineDirection Vec3
+---@param pointAwayFromLine Vec3
+---@return Vec3
 calc.NearestPointOnLine = function(lineStart, lineDirection, pointAwayFromLine)
     -- https://forum.unity.com/threads/how-do-i-find-the-closest-point-on-a-line.340058/
     local lineDir = lineDirection:Normalize()
@@ -109,6 +125,11 @@ calc.NearestPointOnLine = function(lineStart, lineDirection, pointAwayFromLine)
     return lineStart + lineDir * d
 end
 
+---@param startPoint Vec3
+---@param endPoint Vec3
+---@param currentPos Vec3
+---@param ahead number
+---@return Vec3
 calc.NearestOnLineBetweenPoints = function(startPoint, endPoint, currentPos, ahead)
     local totalDiff = endPoint - startPoint
     local dir = totalDiff:Normalize()
@@ -161,10 +182,18 @@ calc.LineIntersectSphere = function(ray, sphereCenter, sphereRadius)
     return true, ray.Start + ray.Dir * t, t
 end
 
+---Determmines of the value is NaN
+---@param value number
+---@return boolean
 calc.IsNaN = function(value)
     return value ~= value
 end
 
+---Determines if the difference between a and b is within the margin
+---@param a number
+---@param b number
+---@param margin number
+---@return boolean
 calc.AreAlmostEqual = function(a, b, margin)
     return abs(a - b) < margin
 end
@@ -193,6 +222,8 @@ calc.RotateAroundAxis = function(vector, rotationPoint, degrees, axis)
     return (vector - rotationPoint):Rotate(deg2rad(degrees), axis:NormalizeInPlace()) + rotationPoint
 end
 
+---@param vector Vec3
+---@return number
 calc.SignLargestAxis = function(vector)
     local arr = { vector:Unpack() }
 
@@ -222,6 +253,10 @@ calc.CalcBrakeDistance = function(speed, acceleration)
     return d
 end
 
+---Calculates the required brake acceleration to come to a stop in the remaining distance
+---@param speed number
+---@param remainingDistance number
+---@return number
 calc.CalcBrakeAcceleration = function(speed, remainingDistance)
     local d = (speed ^ 2) / (2 * remainingDistance)
 
@@ -237,10 +272,19 @@ end
 
 -- Get the shortest distance between a point and a plane. The output is signed so it holds information
 -- as to which side of the plane normal the point is.
+---@param planeNormal Vec3
+---@param planePoint Vec3
+---@param point Vec3
+---@return number
 calc.SignedDistancePlanePoint = function(planeNormal, planePoint, point)
-    return planeNormal:Dot(point - planePoint);
+    return planeNormal:Dot(point - planePoint)
 end
 
+---Project a point on a plane
+---@param planeNormal Vec3
+---@param planePoint Vec3
+---@param point Vec3
+---@return Vec3
 calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
     -- First calculate the distance from the point to the plane:
     local distance = calc.SignedDistancePlanePoint(planeNormal, planePoint, point)
@@ -253,12 +297,6 @@ calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
 
     -- Translate the point to form a projection
     return point + translationVector
-end
-
--- Projects a vector onto a plane. The output is not normalized.
---- QQQ Vec3 can do this directly
-calc.ProjectVectorOnPlane = function(planeNormal, vector)
-    return vector - vector:Dot(planeNormal) * planeNormal
 end
 
 return calc

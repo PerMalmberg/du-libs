@@ -53,7 +53,7 @@ end
 
 ---@class EngineAbs
 ---@field Instance fun():EngineAbs
----@field GetMaxPossibleAccelerationInWorldDirectionForPathFollow fun(self:EngineAbs, direction:Vec3, considerAtmoDensity:boolean|nil):number
+---@field GetMaxPossibleAccelerationInWorldDirectionForPathFollow fun(self:EngineAbs, direction:Vec3, considerAtmoDensity?:boolean):number
 
 local Engine = {}
 Engine.__index = Engine
@@ -79,7 +79,7 @@ function Engine.Instance()
 
     ---The maximum acceleration the construct can give without pushing itself more in one direction than the others.
     ---@param direction Vec3 Direction to move
-    ---@param considerAtmoDensity boolean If true, consider atmo influence on engine power
+    ---@param considerAtmoDensity? boolean If true, consider atmo influence on engine power
     ---@return number
     function singleton:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
         considerAtmoDensity = Ternary(considerAtmoDensity == nil, false, considerAtmoDensity)

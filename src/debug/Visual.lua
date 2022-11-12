@@ -12,7 +12,7 @@ end
 
 ---Draws a number
 ---@param number number
----@param worldPos vec3
+---@param worldPos Vec3
 function visual:DrawNumber(number, worldPos)
     local s = self.shapes[number]
     if s ~= nil then

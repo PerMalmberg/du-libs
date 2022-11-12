@@ -17,7 +17,7 @@ end
 
 function check.IsVec3(v, parameterName, functionName)
     assert(typeComp.IsTable(v) and typeComp.IsNumber(v.x and v.y and v.z) and typeComp.IsFunction(v.ProjectOn),
-        formatTypeMessage(parameterName, v, "vec3", functionName))
+        formatTypeMessage(parameterName, v, "Vec3", functionName))
 end
 
 function check.IsNumber(n, parameterName, functionName)

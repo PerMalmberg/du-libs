@@ -21,6 +21,9 @@ describe("Vec3", function()
         local res = Vec3.New(1, 2, 3) * 3
         assert.are_equal(Vec3.New(3, 6, 9), res)
         assert.is_true(Vec3.New(3, 6, 9) == res)
+        print("---------")
+        res = 3 * Vec3.New(1, 2, 3)
+        assert.are_equal(Vec3.New(3, 6, 9), res)
     end)
 
     it("Can divide", function()

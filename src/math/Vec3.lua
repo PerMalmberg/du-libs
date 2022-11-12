@@ -392,7 +392,7 @@ end
 ---@param planeNormal Vec3
 ---@return Vec3
 function Vec3.ProjectOnPlane(a, planeNormal)
-    return a - (planeNormal * a:Dot(planeNormal)) / planeNormal:Len2()
+    return a - planeNormal * a:Dot(planeNormal)
 end
 
 --- Return a boolean showing if a table is or is not a Vec3.
@@ -458,13 +458,20 @@ function Vec3.__sub(a, b)
 end
 
 ---Multiplication operator
----@param a Vec3
+---@param a Vec3|number
 ---@param b Vec3|number
 ---@return Vec3
 function Vec3.__mul(a, b)
-    if Vec3.IsVec3(b) then
+    local aIsVec3 = Vec3.IsVec3(a)
+    local bIsVec3 = Vec3.IsVec3(b)
+    if aIsVec3 and bIsVec3 then
         ---@cast b Vec3
         return a:Mul(b)
+    end
+
+    -- The case when doing <number> * Vec3 a opposed to Vec3 * <number>
+    if type(a) == "number" and bIsVec3 then
+        return b:Scale(a)
     end
 
     ---@cast b number
