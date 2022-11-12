@@ -382,7 +382,7 @@ end
 ---@param v Vec3
 ---@return Vec3
 function Vec3.ProjectOn(a, v)
-    -- (self * v) * v / v:len2()
+    -- (self * v) * v / v:Len2()
     local s = (a.x * v.x + a.y * v.y + a.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
     return Vec3.New(s * v.x, s * v.y, s * v.z)
 end
