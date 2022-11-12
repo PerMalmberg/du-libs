@@ -47,7 +47,7 @@ function Galaxy.New(galaxyId, galaxyAtlas)
         local smallestDistance
 
         for _, b in pairs(body) do
-            local dist = (b.Geography.Center - position):len()
+            local dist = (b.Geography.Center - position):Len()
             if smallestDistance == nil or dist < smallestDistance then
                 smallestDistance = dist
                 closest = b

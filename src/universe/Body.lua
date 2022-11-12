@@ -2,7 +2,7 @@
 
 require("system/locale")
 local checks = require("debug/Checks")
-local Vec3 = require("cpml/vec3")
+local Vec3 = require("math/Vec3")
 local abs = math.abs
 
 local max = math.max
@@ -15,13 +15,13 @@ local max = math.max
 ---@field Name string The name of the body
 ---@field Type string The type of the body
 ---@field Physics { Gravity:number } Physics properties
----@field Geography { Center:vec3, Radius:number, MaxSurfaceAltitude:number} Geography properties
+---@field Geography { Center:Vec3, Radius:number} Geography properties
 ---@field Atmosphere {Present:boolean, Thickness:number, Radius:number} Atmosphere properties
----@field Surface table Surface properties
----@field PvP table Pvp properties
+---@field Surface {MaxAltitude:number, MinAltitude:number}} Surface properties
+---@field PvP {LocatedInSafeZone:boolean} Pvp properties
 ---@field DistanceToAtmo fun(self:Body, point:Vec3):number
 ---@field IsInAtmo fun(self:Body, point:Vec3):boolean
----@field DistanceToHighestPossibleSurface fun(coordinate:Vec3)
+---@field DistanceToHighestPossibleSurface fun(coordinate:Vec3):number
 ---@field AboveSeaLevel fun(coordinate:Vec3):boolean, number
 
 local Body = {}
@@ -42,7 +42,7 @@ function Body.New(galaxy, bodyData)
             Gravity = bodyData.gravity
         },
         Geography = {
-            Center = Vec3(bodyData.center),
+            Center = Vec3.New(bodyData.center),
             Radius = bodyData.radius -- This is the water level, i.e. 0 elevation
         },
         Atmosphere = {
@@ -64,10 +64,10 @@ function Body.New(galaxy, bodyData)
     end
 
     ---Returns the distance between the given position and the atmosphere of the body, 0 if already in atmosphere of the body
-    ---@param coordinate vec3
+    ---@param coordinate Vec3
     ---@return number
     function s:DistanceToAtmo(coordinate)
-        return max(0, (coordinate - s.Geography.Center):len() - s.Atmosphere.Radius)
+        return max(0, (coordinate - s.Geography.Center):Len() - s.Atmosphere.Radius)
     end
 
     ---Returns true if the coordinate is within the atmosphere of the body
@@ -79,16 +79,17 @@ function Body.New(galaxy, bodyData)
 
     ---Returns the distance to the highest possible point on the body or 0 if below higest surface
     ---@param coordinate Vec3
+    ---@return number
     function s.DistanceToHighestPossibleSurface(coordinate)
-        return max(0, (coordinate - s.Geography.Center):len() - s.Geography.Radius - s.Surface.MaxSurfaceAltitude)
+        return max(0, (coordinate - s.Geography.Center):Len() - s.Geography.Radius - s.Surface.MaxAltitude)
     end
 
     ---Returns a boolean indicating if the coordinate is above sea level and a number representing the absolute distance to the sea level
-    ---@param coordinate vec3 The coordinate to get info on.
+    ---@param coordinate Vec3 The coordinate to get info on.
     ---@return boolean, number
     function s.AboveSeaLevel(coordinate)
         local seaLevel = s.Geography.Radius
-        local distanceToCenter = (coordinate - s.Geography.Center):len()
+        local distanceToCenter = (coordinate - s.Geography.Center):Len()
         return distanceToCenter >= seaLevel, abs(distanceToCenter - seaLevel)
     end
 

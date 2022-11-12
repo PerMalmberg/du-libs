@@ -1,7 +1,8 @@
-local Vec3 = require("cpml/vec3")
+local Vec3 = require("math/Vec3")
+local NV3 = Vec3.New
 local core = library.getCoreUnit()
 
----@alias fun3 fun():vec3
+---@alias fun3 fun():Vec3
 ---@alias funn fun():number
 ---@alias funb fun():boolean
 ---@alias VOrientation { Up:fun3, Right:fun3, Forward:fun3, localized: { Up:fun3, Right:fun3, Forward:fun3 } }
@@ -38,25 +39,25 @@ function Vehicle.New()
         orientation = {
             Up = function()
                 -- This points in the current up direction of the vehicle
-                return Vec3(construct.getWorldOrientationUp())
+                return NV3(construct.getWorldOrientationUp())
             end,
             Right = function()
                 -- This points in the current right direction of the vehicle
-                return Vec3(construct.getWorldOrientationRight())
+                return NV3(construct.getWorldOrientationRight())
             end,
             Forward = function()
                 -- This points in the current forward direction of the vehicle
-                return Vec3(construct.getWorldOrientationForward())
+                return NV3(construct.getWorldOrientationForward())
             end,
             localized = {
                 Up = function()
-                    return Vec3(construct.getOrientationUp())
+                    return NV3(construct.getOrientationUp())
                 end,
                 Right = function()
-                    return Vec3(construct.getOrientationRight())
+                    return NV3(construct.getOrientationRight())
                 end,
                 Forward = function()
-                    return Vec3(construct.getOrientationForward())
+                    return NV3(construct.getOrientationForward())
                 end
             }
         },
@@ -86,33 +87,33 @@ function Vehicle.New()
         },
         velocity = {
             Angular = function()
-                return Vec3(construct.getWorldAngularVelocity())
+                return NV3(construct.getWorldAngularVelocity())
             end,
             Movement = function()
-                return Vec3(construct.getWorldAbsoluteVelocity())
+                return NV3(construct.getWorldAbsoluteVelocity())
             end,
             localized = {
                 Angular = function()
-                    return Vec3(construct.getAngularVelocity())
+                    return NV3(construct.getAngularVelocity())
                 end
             }
         },
         acceleration = {
             Angular = function()
-                return Vec3(construct.getWorldAngularAcceleration())
+                return NV3(construct.getWorldAngularAcceleration())
             end,
             Movement = function()
-                return Vec3(construct.getWorldAcceleration())
+                return NV3(construct.getWorldAcceleration())
             end,
             localized = {
                 Angular = function()
-                    return Vec3(construct.getAngularAcceleration())
+                    return NV3(construct.getAngularAcceleration())
                 end
             }
         },
         position = {
             Current = function()
-                return Vec3(construct.getWorldPosition())
+                return NV3(construct.getWorldPosition())
             end
         },
         world = {
@@ -125,38 +126,38 @@ function Vehicle.New()
             end,
             G = core.getGravityIntensity,
             AngularAirFrictionAcceleration = function()
-                return Vec3(construct.getWorldAirFrictionAcceleration())
+                return NV3(construct.getWorldAirFrictionAcceleration())
             end,
             GravityDirection = function()
-                return vec3(core.getWorldVertical())
+                return NV3(core.getWorldVertical())
             end
         },
         player = {
             position = {
                 Current = function()
-                    return Vec3(player.getWorldPosition)
+                    return NV3(player.getWorldPosition)
                 end
             },
             orientation = {
                 Up = function()
-                    return Vec3(player.getWorldUp())
+                    return NV3(player.getWorldUp())
                 end
             },
             camera = {
                 position = {
                     Current = function()
-                        return Vec3(system.getCameraWorldPos())
+                        return NV3(system.getCameraWorldPos())
                     end
                 },
                 orientation = {
                     Forward = function()
-                        return Vec3(system.getCameraWorldForward())
+                        return NV3(system.getCameraWorldForward())
                     end,
                     Up = function()
-                        return Vec3(system.getCameraWorldUp())
+                        return NV3(system.getCameraWorldUp())
                     end,
                     Right = function()
-                        return Vec3(system.getCameraWorldRight())
+                        return NV3(system.getCameraWorldRight())
                     end,
                     IsFirstPerson = system.isFirstPerson
                 }

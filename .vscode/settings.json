@@ -2,7 +2,9 @@
     "Lua.diagnostics.globals": [
         "construct",
         "system",
-        "player"
+        "player",
+        "library",
+        "unit"
     ],
     "Lua.workspace.library": [
         "${3rd}/luassert/library",

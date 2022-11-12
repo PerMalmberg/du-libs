@@ -1,4 +1,4 @@
-local Vec3 = require("cpml/vec3")
+local Vec3 = require("math/Vec3")
 
 ---@class Ray
 ---@field New fun(start:Vec3, direction:Vec3):Ray

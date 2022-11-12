@@ -21,17 +21,17 @@ local verticalSpaceEngines = EngineGroup("vertical", "space_engine")
 
 local function getLongitudinalForce()
     return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines):
-        Intersection(), { localizedOrientation.Forward():unpack() })
+        Intersection(), { localizedOrientation.Forward():Unpack() })
 end
 
 local function getLateralForce()
     return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines):Intersection(),
-        { localizedOrientation.Right():unpack() })
+        { localizedOrientation.Right():Unpack() })
 end
 
 local function getVerticalForce()
     return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines):Intersection()
-        , { localizedOrientation.Up():unpack() })
+        , { localizedOrientation.Up():Unpack() })
 end
 
 local atmoRangeFMaxPlus = 1
@@ -52,8 +52,8 @@ local function getCurrent(range, positive)
 end
 
 ---@class EngineAbs
----@field Instance fun():Engine
----@field GetMaxPossibleAccelerationInWorldDirectionForPathFollow fun(self:EngineAbs, direction:vec3, considerAtmoDensity:boolean|nil):number
+---@field Instance fun():EngineAbs
+---@field GetMaxPossibleAccelerationInWorldDirectionForPathFollow fun(self:EngineAbs, direction:Vec3, considerAtmoDensity:boolean|nil):number
 
 local Engine = {}
 Engine.__index = Engine
@@ -69,7 +69,7 @@ function Engine.Instance()
     singleton = {}
 
     function singleton:MaxForce(engineGroup, axis, positive)
-        local f = construct.getMaxThrustAlongAxis(engineGroup:Intersection(), { axis:unpack() })
+        local f = construct.getMaxThrustAlongAxis(engineGroup:Intersection(), { axis:Unpack() })
         return getCurrent(f, positive)
     end
 
@@ -78,7 +78,7 @@ function Engine.Instance()
     end
 
     ---The maximum acceleration the construct can give without pushing itself more in one direction than the others.
-    ---@param direction vec3 Direction to move
+    ---@param direction Vec3 Direction to move
     ---@param considerAtmoDensity boolean If true, consider atmo influence on engine power
     ---@return number
     function singleton:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
@@ -87,7 +87,7 @@ function Engine.Instance()
         -- Convert world direction to local (need to add position since the function subtracts that.
         direction = calc.WorldDirectionToLocal(direction)
 
-        local directionParts = { direction:unpack() }
+        local directionParts = { direction:Unpack() }
 
         local isRight = directionParts[1] >= 0
         local isForward = directionParts[2] >= 0
@@ -107,9 +107,9 @@ function Engine.Instance()
         -- Add current gravity influence as force in Newtons, with the correct direction. As the force has a direction
         -- this works for knowing both available acceleration force as well as brake force.
         local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * G() * totalMass
-        maxForces[1] = maxForces[1] + gravityForce:dot(calc.Ternary(isRight, 1, -1) * localizedOrientation.Right())
-        maxForces[2] = maxForces[2] + gravityForce:dot(calc.Ternary(isForward, 1, -1) * localizedOrientation.Forward())
-        maxForces[3] = maxForces[3] + gravityForce:dot(calc.Ternary(isUp, 1, -1) * localizedOrientation.Up())
+        maxForces[1] = maxForces[1] + gravityForce:Dot(localizedOrientation.Right() * calc.Ternary(isRight, 1, -1))
+        maxForces[2] = maxForces[2] + gravityForce:Dot(localizedOrientation.Forward() * calc.Ternary(isForward, 1, -1))
+        maxForces[3] = maxForces[3] + gravityForce:Dot(localizedOrientation.Up() * calc.Ternary(isUp, 1, -1))
 
         -- Find the index with the longest part, this is the main direction.
         -- If all are the same then we use the first one as the main direction
@@ -124,7 +124,7 @@ function Engine.Instance()
             end
         end
 
-        -- Create a vector that represents the max force of the main direction, unpack it to
+        -- Create a vector that represents the max force of the main direction, Unpack it to
         -- get the required forces for each axis, in absolute values
         local maxVec = maxForces[main] * direction
         local requiredForces = { abs(maxVec.x), abs(maxVec.y), abs(maxVec.z) }

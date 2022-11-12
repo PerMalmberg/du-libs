@@ -1,11 +1,9 @@
 -- Universe - utility class to manage the in-game atlas
----@alias Vec3 vec3
-
 local checks = require("debug/Checks")
 local log = require("debug/Log")()
 local Galaxy = require("universe/Galaxy")
 local Position = require("universe/Position")
-local Vec3 = require("cpml/vec3")
+local Vec3 = require("math/Vec3")
 local cos = math.cos
 local sin = math.sin
 
@@ -76,7 +74,7 @@ function Universe.Instance()
                 x = tonumber(latitude)
                 y = tonumber(longitude)
                 z = tonumber(altitude)
-                local coordinate = Vec3(x, y, z)
+                local coordinate = Vec3.New(x, y, z)
                 bodyRef = s.CurrentGalaxy():GetBodyClosestToPosition(coordinate)
                 return Position.New(galaxy[galaxyId], bodyRef, coordinate)
             else
@@ -91,7 +89,7 @@ function Universe.Instance()
 
                 local radius = body.Geography.Radius + altitude
                 local cosLat = cos(latitude)
-                local position = Vec3(radius * cosLat * cos(longitude), radius * cosLat * sin(longitude),
+                local position = Vec3.New(radius * cosLat * cos(longitude), radius * cosLat * sin(longitude),
                     radius * sin(latitude))
                 position = position + body.Geography.Center
 
@@ -126,13 +124,13 @@ function Universe.Instance()
     ---Returns a unit vector pointing towards the center of the closest 'gravity well', i.e. planet or space construct.
     --- @return Vec3
     function s.VerticalReferenceVector()
-        local worldGrav = Vec3(core.getWorldGravity())
-        if worldGrav:len2() == 0 then
-            local position = Vec3(construct.getWorldPosition())
+        local worldGrav = Vec3.New(core.getWorldGravity())
+        if worldGrav:Len2() == 0 then
+            local position = Vec3.New(construct.getWorldPosition())
             local body = s.ClosestBody(position)
-            return (body.Geography.Center - position):normalize()
+            return (body.Geography.Center - position):Normalize()
         else
-            return worldGrav:normalize()
+            return worldGrav:Normalize()
         end
     end
 

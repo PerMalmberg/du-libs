@@ -21,8 +21,10 @@ local acos = math.acos
 ---@field Mul fun(a:Vec3, b:Vec3):Vec3
 ---@field Div fun(a:Vec3, b:Vec3):Vec3
 ---@field Normalize fun(a:Vec3):Vec3
+---@field NormalizeInPlace fun(a:Vec3):Vec3
 ---@field NormalizeLen fun(a:Vec3):Vec3,number
 ---@field Trim fun(a:Vec3, len:number):Vec3
+---@field TrimInPlace fun(a:Vec3, len:number):Vec3
 ---@field Cross fun(a:Vec3, b:Vec3):Vec3
 ---@field Dot fun(a:Vec3, b:Vec3):number
 ---@field Len fun(a:Vec3):number
@@ -30,6 +32,7 @@ local acos = math.acos
 ---@field Dist fun(a:Vec3, b:Vec3):number
 ---@field Dist2 fun(a:Vec3, b:Vec3):number
 ---@field Scale fun(a:Vec3, b:number):Vec3
+---@field ScaleInPlace fun(a:Vec3, b:number):Vec3
 ---@field Rotate fun(a:Vec3, phi:number, axis:Vec3):Vec3
 ---@field Perpendicular fun(a:Vec3):Vec3
 ---@field Lerp fun(a:Vec3, b:Vec3, s:number):Vec3
@@ -40,6 +43,8 @@ local acos = math.acos
 ---@field FlipY fun(a:Vec3):Vec3
 ---@field FlipZ fun(a:Vec3):Vec3
 ---@field AngleTo fun(a:Vec3, b:Vec3):number
+---@field ProjectOn fun(a:Vec3, b:Vec3):Vec3
+---@field ProjectOnPlane fun(a:Vec3, planeNormal:Vec3):Vec3
 ---@field IsVec3 fun(a:any):boolean
 ---@field IsZero fun(a:Vec3):boolean
 ---@field ToString fun(a:Vec3):string
@@ -154,9 +159,20 @@ end
 ---@return Vec3
 function Vec3.Normalize(a)
     if a:IsZero() then
-        return new()
+        return Vec3.New()
     end
     return a:Scale(1 / a:Len())
+end
+
+---Normalizes the vector in place
+---@param a Vec3
+---@return Vec3
+function Vec3.NormalizeInPlace(a)
+    if a:IsZero() then
+        return a
+    end
+
+    return a:ScaleInPlace(1 / a:Len())
 end
 
 --- Scale a vector to unit length (1), and return the input length.
@@ -164,7 +180,7 @@ end
 ---@return Vec3, number
 function Vec3.NormalizeLen(a)
     if a:IsZero() then
-        return new(), 0
+        return Vec3.New(), 0
     end
     local len = a:Len()
     return a:Scale(1 / len), len
@@ -176,6 +192,14 @@ end
 ---@return Vec3 out
 function Vec3.Trim(a, len)
     return a:Normalize():Scale(math.min(a:Len(), len))
+end
+
+--- Trim the vector, in place, to a given length
+---@param a Vec3 vector to be trimmed
+---@param len number Length to trim the vector to
+---@return Vec3 out
+function Vec3.TrimInPlace(a, len)
+    return a:NormalizeInPlace():ScaleInPlace(math.min(a:Len(), len))
 end
 
 ---Get the cross product of two vectors.
@@ -242,11 +266,18 @@ end
 ---@param b number Right hand operand
 ---@return Vec3
 function Vec3.Scale(a, b)
-    return Vec3.New(
-        a.x * b,
-        a.y * b,
-        a.z * b
-    )
+    return Vec3.New(a):ScaleInPlace(b)
+end
+
+--- Scale a vector, in place, by a scalar.
+---@param a Vec3 Left hand operand
+---@param b number Right hand operand
+---@return Vec3
+function Vec3.ScaleInPlace(a, b)
+    a.x = a.x * b
+    a.y = a.y * b
+    a.z = a.z * b
+    return a
 end
 
 --- Rotate vector about an axis.
@@ -344,6 +375,24 @@ end
 function Vec3.AngleTo(a, b)
     local v = a:Normalize():Dot(b:Normalize())
     return acos(v)
+end
+
+---Projects vector a onto b
+---@param a Vec3
+---@param v Vec3
+---@return Vec3
+function Vec3.ProjectOn(a, v)
+    -- (self * v) * v / v:len2()
+    local s = (a.x * v.x + a.y * v.y + a.z * v.z) / (v.x * v.x + v.y * v.y + v.z * v.z)
+    return Vec3.New(s * v.x, s * v.y, s * v.z)
+end
+
+---Project a on plane containing origin
+---@param a Vec3
+---@param planeNormal Vec3
+---@return Vec3
+function Vec3.ProjectOnPlane(a, planeNormal)
+    return a - (planeNormal * a:Dot(planeNormal)) / planeNormal:Len2()
 end
 
 --- Return a boolean showing if a table is or is not a Vec3.

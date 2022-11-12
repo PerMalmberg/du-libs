@@ -3,7 +3,8 @@ local typeComp = require("debug/TypeComp")
 local check = {}
 
 local function formatTypeMessage(parameterName, parameter, wantedTypeName, functionName)
-    return string.format("'%s' in '%s' must be '%s', got '%s'", parameterName, functionName, wantedTypeName, type(parameter))
+    return string.format("'%s' in '%s' must be '%s', got '%s'", parameterName, functionName, wantedTypeName,
+        type(parameter))
 end
 
 function check.IsString(s, parameterName, functionName)
@@ -15,7 +16,8 @@ function check.IsTable(t, parameterName, functionName)
 end
 
 function check.IsVec3(v, parameterName, functionName)
-    assert(typeComp.IsTable(v) and typeComp.IsNumber(v.x and v.y and v.z) and typeComp.IsFunction(v.project_on), formatTypeMessage(parameterName, v, "vec3", functionName))
+    assert(typeComp.IsTable(v) and typeComp.IsNumber(v.x and v.y and v.z) and typeComp.IsFunction(v.ProjectOn),
+        formatTypeMessage(parameterName, v, "vec3", functionName))
 end
 
 function check.IsNumber(n, parameterName, functionName)

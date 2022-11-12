@@ -22,7 +22,7 @@ function typeComp.IsBoolean(b)
 end
 
 function typeComp.IsVec3(v)
-    return typeComp.IsTable(v) and typeComp.IsNumber(v.x and v.y and v.z) and typeComp.IsFunction(v.trim_inplace)
+    return typeComp.IsTable(v) and typeComp.IsNumber(v.x and v.y and v.z) and typeComp.IsFunction(v.TrimInPlace)
 end
 
 function typeComp.IsRay(r)
