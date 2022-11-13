@@ -6,6 +6,8 @@
 local ValueTree = {}
 ValueTree.__index = ValueTree
 
+---Creates a new ValueTree
+---@return ValueTree
 function ValueTree.New()
     local s = {}
     local tree = {}
@@ -19,6 +21,10 @@ function ValueTree.New()
 
         for nodeName in string.gmatch(topicPath, "[a-z_]+") do
             table.insert(parts, nodeName)
+        end
+
+        if not tree then
+            tree = {}
         end
 
         local curr = tree
@@ -36,11 +42,11 @@ function ValueTree.New()
         curr[parts[#parts]] = value
     end
 
-    ---Returns the current tree, replacing the old one with a fresh tree.
-    ---@return table
+    ---Returns the current tree, or nil of no data is available.
+    ---@return table|nil
     function s.Pick()
         local old = tree
-        tree = {}
+        tree = nil
         return old
     end
 

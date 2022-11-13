@@ -16,7 +16,7 @@ describe("ValueTree", function()
         assert.are_equal(2, data.bar)
 
         -- Data empty after picking
-        assert.are_equal(0, TableLen(tree.Pick()))
+        assert.is_nil(tree.Pick())
     end)
 
     it("Can add values in sub branches", function()
