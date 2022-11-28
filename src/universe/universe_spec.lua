@@ -7,29 +7,15 @@ local Vec3 = require("math/Vec3")
 local Ray = require("util/Ray")
 local calc = require("util/Calc")
 
-local u ---@type Universe
-local positionOnAlioth ---@type Position|nil
-local positionAboveMarket6 ---@type Position|nil
-local positionNearJago ---@type Position|nil
-local positionNearTalemai ---@type Position|nil
-local positionNearThades ---@type Position|nil
-local positionAboveIon ---@type Position|nil
-local market6Pad ---@type Position|nil
-local sveaBaseSWSide ---@type Position|nil
-
-
-
-before_each(function()
-    u = Universe.Instance()
-    positionOnAlioth = u.ParsePosition("::pos{0,2,7.7093,78.0806,34.7991}")
-    positionAboveMarket6 = u.ParsePosition("::pos{0,2,35.9160,101.2832,132000.2500}")
-    positionNearJago = u.ParsePosition("::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}")
-    positionNearTalemai = u.ParsePosition("::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}")
-    positionNearThades = u.ParsePosition("::pos{0,0,37979880.0000,17169778.0000,-2641396.2500}")
-    positionAboveIon = u.ParsePosition("::pos{0,0,2970018.8563,-98961141.3186,-787105.8790}")
-    market6Pad = u.ParsePosition("::pos{0,2,36.0242,101.2872,231.3857}")
-    sveaBaseSWSide = u.ParsePosition("::pos{0,2,7.5425,78.0995,47.6314}")
-end)
+local u = Universe.Instance()
+local positionOnAlioth = u.ParsePosition("::pos{0,2,7.7093,78.0806,34.7991}")
+local positionAboveMarket6 = u.ParsePosition("::pos{0,2,35.9160,101.2832,132000.2500}")
+local positionNearJago = u.ParsePosition("::pos{0,0,-102232240.0000,36433324.0000,11837611.0000}")
+local positionNearTalemai = u.ParsePosition("::pos{0,0,-10126823.0000,53124664.0000,-14922930.0000}")
+local positionNearThades = u.ParsePosition("::pos{0,0,37979880.0000,17169778.0000,-2641396.2500}")
+local positionAboveIon = u.ParsePosition("::pos{0,0,2970018.8563,-98961141.3186,-787105.8790}")
+local market6Pad = u.ParsePosition("::pos{0,2,36.0242,101.2872,231.3857}")
+local sveaBaseSWSide = u.ParsePosition("::pos{0,2,7.5425,78.0995,47.6314}")
 
 describe("Singelton", function()
     it("Are the same instance", function()
