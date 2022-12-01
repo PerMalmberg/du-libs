@@ -1,5 +1,9 @@
 local Panel = require("panel/Panel")
 
+---@class SharedPanel
+---@field Get fun(self:SharedPanel, title:string):Panel
+---@field Close fun(self:SharedPanel, title:string)
+
 local singleton = nil
 
 local panel = {}
@@ -31,15 +35,15 @@ function panel:Get(title)
 end
 
 return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                if singleton == nil then
-                    singleton = new()
-                end
-                return singleton
+    {
+        new = new
+    },
+    {
+        __call = function(_, ...)
+            if singleton == nil then
+                singleton = new()
             end
-        }
+            return singleton
+        end
+    }
 )

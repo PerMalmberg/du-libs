@@ -1,5 +1,11 @@
 local ValueWidget = require("panel/ValueWidget")
 
+---@class Panel
+---@field Close fun(self:Panel)
+---@field Clear fun(self:Panel)
+---@field Update fun(self:Panel)
+---@field CreateValue fun(self:Panel, title?:string, unit?:string)
+
 local panel = {}
 panel.__index = panel
 
@@ -46,12 +52,12 @@ function panel:Update()
 end
 
 return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                return new(...)
-            end
-        }
+    {
+        new = new
+    },
+    {
+        __call = function(_, ...)
+            return new(...)
+        end
+    }
 )
