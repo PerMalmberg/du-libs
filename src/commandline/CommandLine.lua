@@ -8,6 +8,7 @@ local Command = require("commandline/Command")
 ---@class CommandLine
 ---@field Accept fun(name:string, func:CommandFunction):Command
 ---@field Clear fun()
+---@field Exec fun(command:string)
 
 local CommandLine = {}
 CommandLine.__index = CommandLine
@@ -65,6 +66,12 @@ function CommandLine.Instance()
         if not status then
             log:Error(ret)
         end
+    end
+
+    ---Executes the provided command
+    ---@param command string
+    function s.Exec(command)
+        exec(command)
     end
 
     ---Receiver of input from the lua chat
