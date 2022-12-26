@@ -137,7 +137,7 @@ describe("Command line tests", function()
         test("complex -a 1 --boo abc --c true 'text with space' -f 123.456 -negative -123.456")
         verify()
         d = nil
-        test("complex -f 123.456 'text with space' -a 1 --boo abc --c true -negative -123.456")
+        test("complex -f 123.456 \"text with space\" -a 1 --boo abc --c true -negative -123.456")
         verify()
     end)
 
