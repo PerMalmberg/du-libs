@@ -19,7 +19,7 @@ function ValueTree.New()
         -- Build a tree for the path
         local parts = {}
 
-        for nodeName in string.gmatch(topicPath, "[a-z_]+") do
+        for nodeName in string.gmatch(topicPath, "[a-zA-Z_]+") do
             table.insert(parts, nodeName)
         end
 

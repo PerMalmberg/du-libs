@@ -3,6 +3,7 @@
 ---@field RegisterNumber fun(topic:string, callback:SubNumberCallback)
 ---@field RegisterTable fun(topic:string, callback:SubTableCallback)
 ---@field Publish fun(topic:string, value:string, yield:boolean?)
+---@field Instance fun():PubSub
 
 ---@alias SubStringCallback fun(topic:string, value:string)
 ---@alias SubNumberCallback fun(topic:string, value:number)
@@ -14,6 +15,8 @@ local PubSub = {}
 PubSub.__index = PubSub
 local singelton
 
+---Gets the instance
+---@return PubSub
 function PubSub.Instance()
     if singelton then
         return singelton
