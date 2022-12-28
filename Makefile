@@ -29,3 +29,6 @@ test: clean
 	@LUA_PATH="$(LUA_PATH)" busted .
 	@luacov
 	@$(CLEAN_COV)
+
+container: test
+	@LUA_PATH="$(LUA_PATH)" du-lua build --copy=development/examples/ContainerExample

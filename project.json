@@ -7,38 +7,8 @@
   "sourcePath": "src",
   "outputPath": "out",
   "builds": {
-    "tests/Universe": {
-      "name": "tests/Universe",
-      "type": "control",
-      "slots": {}
-    },
-    "tests/BufferedDB": {
-      "name": "tests/BufferedDB",
-      "type": "control",
-      "slots": {}
-    },
-    "tests/Timer": {
-      "name": "tests/Timer",
-      "type": "control",
-      "slots": {}
-    },
-    "tests/CoRunner": {
-      "name": "tests/CoRunner",
-      "type": "control",
-      "slots": {}
-    },
-    "tests/CommandLine": {
-      "name": "tests/CommandLine",
-      "type": "control",
-      "slots": {}
-    },
-    "tests/Input": {
-      "name": "tests/Input",
-      "type": "control",
-      "slots": {}
-    },
-    "tests/Engine": {
-      "name": "tests/Engine",
+    "main": {
+      "name": "examples/ContainerExample",
       "type": "control",
       "slots": {}
     }

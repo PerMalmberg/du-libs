@@ -15,7 +15,7 @@ TaskState = {
 ---@field Run fun():TaskState The status of the task
 ---@field Success fun():boolean Returns true if the task succeeded
 ---@field Result fun():any|nil Returns the return value of the task.
----@field Error fun():any|nil Returns the error message value of the task, if an error is raised.
+---@field Error fun():string|nil Returns the error message value of the task, if an error is raised.
 ---@field Exited fun():boolean Returns true when the task has completed its work (or otherwise exited)
 ---@field Then fun(f:thenFunc, thenArg1:any?, ...:any?):Task Chains another call to be run when the previous one has completed.
 ---@field Catch fun(f:fun(t:Task)):Task Sets an error handler, called if the task raises an error

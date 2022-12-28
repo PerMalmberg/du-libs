@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "pucelle.run-on-save",
+        "sumneko.lua",
+        "ms-vscode.makefile-tools"
+    ]
+}
