@@ -2,7 +2,7 @@
 ---@field RegisterString fun(topic:string, callback:SubStringCallback)
 ---@field RegisterNumber fun(topic:string, callback:SubNumberCallback)
 ---@field RegisterTable fun(topic:string, callback:SubTableCallback)
----@field Publish fun(topic:string, value:string, yield:boolean?)
+---@field Publish fun(topic:string, value:string|number|table|boolean, yield:boolean?)
 ---@field Instance fun():PubSub
 
 ---@alias SubStringCallback fun(topic:string, value:string)
