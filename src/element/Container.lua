@@ -1,18 +1,23 @@
+local ContainerTalents = require("element/ContainerTalents")
 local Task = require("system/Task")
 local log = require("debug/Log")()
 
 ---@class Container
 ---@field New fun(itemId:integer):Container
 ---@field GetAll fun():Container[]
+---@field FuelFillFactor fun(talents:ContainerTalents)
 
 local core = library.getCoreUnit()
+local nitronMass = 4
+local kergonMass = 6
+local xeronMass = 0.8
 
 if core == nil then
     error("No core linked")
 end
 
----@alias ContainerData { Cap:number, Factor:number, FuelMass:number}
-local sizes = {} ---@type ContainerData
+---@alias ContainerData {Cap:number, Factor:number, FuelMass:number}
+local sizes = {} ---@type table<string,ContainerData>
 sizes["basic container xs"] = { Cap = 1000, Factor = 1 }
 sizes["uncommon optimised container xs"] = { Cap = 1300, Factor = 1 }
 sizes["advanced optimised container xs"] = { Cap = 1690, Factor = 1 }
@@ -55,7 +60,7 @@ sizes["exotic gravity-inverted container l"] = { Cap = 83981, Factor = 0.66 }
 
 sizes["basic container xl"] = { Cap = 256000, Factor = 1 }
 sizes["uncommon optimised container xl"] = { Cap = 332800, Factor = 1 }
-sizes["advanced optimised container xl"] = { Cap = 432640, Factor = 1 }
+sizes["advanced optimised atmoFuelTankHandlingcontainer xl"] = { Cap = 432640, Factor = 1 }
 sizes["rare optimised container xl"] = { Cap = 562432, Factor = 1 }
 sizes["exotic optimised container xl"] = { Cap = 731162, Factor = 1 }
 sizes["uncommon gravity-inverted container xl"] = { Cap = 230400, Factor = 0.9 }
@@ -73,20 +78,20 @@ sizes["expanded advanced gravity-inverted container xxl"] = { Cap = 414720, Fact
 sizes["expanded rare gravity-inverted container xxl"] = { Cap = 373248, Factor = 0.73 }
 sizes["expanded exotic gravity-inverted container xxl"] = { Cap = 335923, Factor = 0.66 }
 
-sizes["atmospheric fuel tank xs"] = { Cap = 100, Factor = 1, FuelMass = 4 }
-sizes["atmospheric fuel tank s"] = { Cap = 400, Factor = 1, FuelMass = 4 }
-sizes["atmospheric fuel tank m"] = { Cap = 1600, Factor = 1, FuelMass = 4 }
-sizes["atmospheric fuel tank l"] = { Cap = 12800, Factor = 1, FuelMass = 4 }
+sizes["atmospheric fuel tank xs"] = { Cap = 100, Factor = 1, FuelMass = nitronMass }
+sizes["atmospheric fuel tank s"] = { Cap = 400, Factor = 1, FuelMass = nitronMass }
+sizes["atmospheric fuel tank m"] = { Cap = 1600, Factor = 1, FuelMass = nitronMass }
+sizes["atmospheric fuel tank l"] = { Cap = 12800, Factor = 1, FuelMass = nitronMass }
 
-sizes["space fuel tank xs"] = { Cap = 100, Factor = 1, FuelMass = 6 }
-sizes["space fuel tank s"] = { Cap = 400, Factor = 1, FuelMass = 6 }
-sizes["space fuel tank m"] = { Cap = 1600, Factor = 1, FuelMass = 6 }
-sizes["space fuel tank l"] = { Cap = 12800, Factor = 1, FuelMass = 6 }
+sizes["space fuel tank xs"] = { Cap = 100, Factor = 1, FuelMass = kergonMass }
+sizes["space fuel tank s"] = { Cap = 400, Factor = 1, FuelMass = kergonMass }
+sizes["space fuel tank m"] = { Cap = 1600, Factor = 1, FuelMass = kergonMass }
+sizes["space fuel tank l"] = { Cap = 12800, Factor = 1, FuelMass = kergonMass }
 
-sizes["rocket fuel tank xs"] = { Cap = 400, Factor = 1, FuelMass = 0.8 }
-sizes["rocket fuel tank s"] = { Cap = 800, Factor = 1, FuelMass = 0.8 }
-sizes["rocket fuel tank m"] = { Cap = 6400, Factor = 1, FuelMass = 0.8 }
-sizes["rocket fuel tank l"] = { Cap = 50000, Factor = 1, FuelMass = 0.8 }
+sizes["rocket fuel tank xs"] = { Cap = 400, Factor = 1, FuelMass = xeronMass }
+sizes["rocket fuel tank s"] = { Cap = 800, Factor = 1, FuelMass = xeronMass }
+sizes["rocket fuel tank m"] = { Cap = 6400, Factor = 1, FuelMass = xeronMass }
+sizes["rocket fuel tank l"] = { Cap = 50000, Factor = 1, FuelMass = xeronMass }
 
 ---Looksup the container data, or errors if not found
 ---@param name string
@@ -106,6 +111,7 @@ ContainerType = {
     Atmospheric = 2,
     Space = 4,
     Rocket = 8,
+    Fuel = 14,
     All = 15
 }
 
@@ -125,14 +131,50 @@ function Container.New(localId, unitMass, containerData)
         name = core.getElementNameById(localId),
     }
 
-    log:Info(s)
+    local function standardVolume(containerProficiency)
+        return containerData.Cap * (1 + containerProficiency / 10) -- 10% per level
+    end
 
+    local function fuelVolume(containerProficiency)
+        return containerData.Cap * (1 + containerProficiency / 5) -- 20% per level
+    end
+
+    local function contentMass()
+        return core.getElementMassById(localId) - unitMass;
+    end
+
+    ---Returns to which factor (0...1) the container is filled, if it is a fuel tank; otherwise 0.
+    ---@param talents ContainerTalents
+    function s.FuelFillFactor(talents)
+        if not containerData.FuelMass then return 0 end
+
+        local reducedMass = contentMass()
+        local actualMass = reducedMass
+
+        if talents.FuelTankOptimization > 0 or talents.ContainerOptimization > 0 then
+            actualMass = reducedMass / (1 - (talents.FuelTankOptimization + talents.ContainerOptimization) * 0.05)
+        end
+
+        local volume
+        if containerData.FuelMass == xeronMass then
+            volume = fuelVolume(talents.RocketFuelTankHandling)
+        elseif containerData.FuelMass == kergonMass then
+            volume = fuelVolume(talents.SpaceFuelTankHandling)
+        else
+            volume = fuelVolume(talents.AtmoFuelTankHandling)
+        end
+
+        local currentLiters = actualMass / containerData.FuelMass
+        local fillFactor = currentLiters / volume
+
+        return fillFactor
+    end
 
     return setmetatable(s, Container)
 end
 
 ---Gets all containers. Only call from a coroutine
----@param filter ContainerType
+---@param filter ContainerType|integer
 ---@return Container[]
 function Container.GetAllCo(filter)
     local containers = {} ---@type Container[]
@@ -140,7 +182,7 @@ function Container.GetAllCo(filter)
     ---@param input ContainerType
     ---@param wanted ContainerType
     local function hasBit(input, wanted)
-        return (input & filter) > 0
+        return (input & wanted) == wanted
     end
 
     ---@diagnostic disable-next-line: undefined-field
@@ -150,9 +192,9 @@ function Container.GetAllCo(filter)
 
         if not elementClass:find("hub") then
             local include = hasBit(filter, ContainerType.Standard) and elementClass:find("containers")
-            include = include or hasBit(filter, ContainerType.Atmospheric) and elementClass:find("atmospheric fuel")
-            include = include or hasBit(filter, ContainerType.Space) and elementClass:find("space fuel")
-            include = include or hasBit(filter, ContainerType.Rocket) and elementClass:find("rocket fuel")
+            include = include or hasBit(filter, ContainerType.Atmospheric) and elementClass:find("atmofuelcontainer")
+            include = include or hasBit(filter, ContainerType.Space) and elementClass:find("spacefuelcontainer")
+            include = include or hasBit(filter, ContainerType.Rocket) and elementClass:find("rocketfuelcontainer")
 
             if include then
                 local itemId = core.getElementItemIdById(localId)

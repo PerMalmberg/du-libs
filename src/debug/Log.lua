@@ -14,7 +14,7 @@ log.LogLevel = {
     DEBUG = 5
 }
 
-function new()
+local function new()
     local o = {
         level = log.LogLevel.ERROR
     }
