@@ -4,6 +4,7 @@ local log = require("debug/Log")()
 
 ---@class Container
 ---@field New fun(itemId:integer):Container
+---@field Name fun():string
 ---@field GetAll fun():Container[]
 ---@field FuelFillFactor fun(talents:ContainerTalents)
 
@@ -128,7 +129,8 @@ function Container.New(localId, unitMass, containerData)
     end
 
     local s = {
-        name = core.getElementNameById(localId),
+        ---@type string
+        name = core.getElementNameById(localId)
     }
 
     local function standardVolume(containerProficiency)
@@ -168,6 +170,12 @@ function Container.New(localId, unitMass, containerData)
         local fillFactor = currentLiters / volume
 
         return fillFactor
+    end
+
+    ---Gets the container name
+    ---@return string
+    function s.Name()
+        return s.name
     end
 
     return setmetatable(s, Container)
