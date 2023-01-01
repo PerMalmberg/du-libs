@@ -1,7 +1,8 @@
 ---A ValueTree works a bit like Json; it allows you to set values in a tree structure.
 ---@class ValueTree
----@field Set fun(topicPath:string, value:string|number|boolean|nil)
+---@field Set fun(topicPath:string, value:string|number|boolean|table|nil)
 ---@field Pick fun():table
+---@field Peek fun():table
 
 local ValueTree = {}
 ValueTree.__index = ValueTree
@@ -14,12 +15,12 @@ function ValueTree.New()
 
     ---Sets the value in tree
     ---@param topicPath string A path or just a name, such as a/b or just myValue.
-    ---@param value string|number|boolean|nil
+    ---@param value string|number|boolean|table|nil
     function s.Set(topicPath, value)
         -- Build a tree for the path
         local parts = {}
 
-        for nodeName in string.gmatch(topicPath, "[a-zA-Z_]+") do
+        for nodeName in string.gmatch(topicPath, "[a-zA-Z0-9_]+") do
             table.insert(parts, nodeName)
         end
 
@@ -42,12 +43,18 @@ function ValueTree.New()
         curr[parts[#parts]] = value
     end
 
-    ---Returns the current tree, or nil of no data is available.
+    ---Picks the current tree, or returns nil if no data is available.
     ---@return table|nil
     function s.Pick()
         local old = tree
         tree = nil
         return old
+    end
+
+    ---Returns the current tree or nil if no data is available
+    ---@return table
+    function s.Peek()
+        return tree
     end
 
     return setmetatable(s, ValueTree)
