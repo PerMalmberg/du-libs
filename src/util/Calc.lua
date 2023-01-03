@@ -134,7 +134,7 @@ end
 ---@param endPoint Vec3
 ---@param currentPos Vec3
 ---@param ahead number
----@return Vec3
+---@return { nearest:Vec3, rabbit:Vec3 }
 calc.NearestOnLineBetweenPoints = function(startPoint, endPoint, currentPos, ahead)
     local totalDiff = endPoint - startPoint
     local dir = totalDiff:Normalize()
