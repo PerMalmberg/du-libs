@@ -222,7 +222,7 @@ end
 ---@param rotationPoint Vec3 The point to rotate around
 ---@param degrees number The angle, in degrees, to rotate
 ---@param axis Vec3 The axis to rotate around
----@return Vec3 The vector, rotated around the axis
+---@return Vec3 #The vector, rotated around the axis
 calc.RotateAroundAxis = function(vector, rotationPoint, degrees, axis)
     return (vector - rotationPoint):Rotate(deg2rad(degrees), axis:NormalizeInPlace()) + rotationPoint
 end
