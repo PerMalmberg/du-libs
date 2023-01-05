@@ -36,7 +36,7 @@ function Universe.Instance()
     local s = {}
 
     local duAtlas = require("atlas")
-    checks.IsTable(duAtlas, "duAtlas", "Universe:Prepare")
+    checks.IsTable(duAtlas, "duAtlas", "Universe:Instance")
 
     for galaxyId, galaxyData in pairs(duAtlas) do
         galaxy[galaxyId] = Galaxy.New(galaxyId, galaxyData)
@@ -108,17 +108,18 @@ function Universe.Instance()
     function s.CreatePos(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
         local closestBody = s.ClosestBody(coordinate)
-        return Position.New(s.CurrentGalaxy(), closestBody, coordinate)
+        local p = Position.New(s.CurrentGalaxy(), closestBody, coordinate)
+        return p
     end
 
     --- Gets the information for the closest stellar body
     ---@param coordinate Vec3 The coordinate to get the closest body for
-    ---@return table The Body
+    ---@return Body #The Body
     function s.ClosestBody(coordinate)
         checks.IsVec3(coordinate, "coordinate", "universe:ClosestBody")
 
-        local galaxy = s.CurrentGalaxy()
-        return galaxy:GetBodyClosestToPosition(coordinate)
+        local g = s.CurrentGalaxy()
+        return g:GetBodyClosestToPosition(coordinate)
     end
 
     ---Returns a unit vector pointing towards the center of the closest 'gravity well', i.e. planet or space construct.

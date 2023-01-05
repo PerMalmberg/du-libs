@@ -135,7 +135,7 @@ function Vehicle.New()
         player = {
             position = {
                 Current = function()
-                    return NV3(player.getWorldPosition)
+                    return NV3(player.getWorldPosition())
                 end
             },
             orientation = {

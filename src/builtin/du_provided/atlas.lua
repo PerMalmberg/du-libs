@@ -40,6 +40,7 @@ return {
       surfaceMaxAltitude = 1261.97,
       surfaceMinAltitude = 451.43,
       GM = 6932495925.00,
+      maxStaticAltitude = 1460.00,
       ores = { 4234772167, 262147665, 3724036288, 299255727, 2029139010, 4041459743 },
       territories = 30722
     },
@@ -51,7 +52,7 @@ return {
       classification = nil,
       habitability = nil,
       description = nil,
-      iconPath = "gui/screen_unit/img/planets/madius_moon_1.png",
+      iconPath = "gui/screen_unit/img/planets/madis_moon_1.png",
       hasAtmosphere = false,
       isSanctuary = false,
       isInSafeZone = true,
@@ -68,6 +69,7 @@ return {
       surfaceAverageAltitude = 191.685,
       surfaceMaxAltitude = 458.48,
       surfaceMinAltitude = 0,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 4234772167, 343766315, 1050500112 },
       territories = 1472
     },
@@ -79,7 +81,7 @@ return {
       classification = nil,
       habitability = nil,
       description = nil,
-      iconPath = "gui/screen_unit/img/planets/madius_moon_2.png",
+      iconPath = "gui/screen_unit/img/planets/madis_moon_2.png",
       hasAtmosphere = false,
       isSanctuary = false,
       isInSafeZone = true,
@@ -96,6 +98,7 @@ return {
       surfaceAverageAltitude = -1825.951,
       surfaceMaxAltitude = 651.737,
       surfaceMinAltitude = -4018.44,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 3724036288, 2289641763, 3837858336 },
       territories = 1922
     },
@@ -107,7 +110,7 @@ return {
       classification = nil,
       habitability = nil,
       description = nil,
-      iconPath = "gui/screen_unit/img/planets/madius_moon_3.png",
+      iconPath = "gui/screen_unit/img/planets/madis_moon_3.png",
       hasAtmosphere = false,
       isSanctuary = false,
       isInSafeZone = true,
@@ -124,6 +127,7 @@ return {
       surfaceAverageAltitude = 433.322,
       surfaceMaxAltitude = 1112.76,
       surfaceMinAltitude = 0,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 262147665, 2029139010, 1065079614 },
       territories = 3632
     },
@@ -156,6 +160,7 @@ return {
       surfaceMaxAltitude = 1091.73,
       surfaceMinAltitude = -548.89,
       GM = 157198800627.69,
+      maxStaticAltitude = 1300.00,
       ores = { 299255727, 3724036288, 262147665, 4234772167, 3086347393, 1050500112 },
       territories = 259472
     },
@@ -184,6 +189,7 @@ return {
       surfaceAverageAltitude = 43.665,
       surfaceMaxAltitude = 305.16,
       surfaceMinAltitude = -176.382,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 3724036288, 343766315, 4041459743 },
       territories = 14522
     },
@@ -212,6 +218,7 @@ return {
       surfaceAverageAltitude = -6.453,
       surfaceMaxAltitude = -42.324,
       surfaceMinAltitude = -83.175,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 4234772167, 2029139010, 1065079614 },
       territories = 14522
     },
@@ -240,6 +247,7 @@ return {
       surfaceAverageAltitude = 97.905,
       surfaceMaxAltitude = 512.067,
       surfaceMinAltitude = -109.20,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 299255727, 262147665, 4234772167 },
       territories = 111632
     },
@@ -268,6 +276,7 @@ return {
       surfaceAverageAltitude = 132.365,
       surfaceMaxAltitude = 788.779,
       surfaceMinAltitude = -22.402,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 3724036288, 4234772167, 262147665 },
       territories = 111632
     },
@@ -289,8 +298,7 @@ return {
       isInSafeZone = true,
       systemId = 0,
       positionInSystem = 3,
-      satellites = { 30, 31, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417,
-        418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433 },
+      satellites = { 30, 31, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420, 421, 422, 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433 },
       center = { 29165536.00, 10865536.00, 65536.00 },
       gravity = 4.8670,
       radius = 49000.00,
@@ -301,6 +309,7 @@ return {
       surfaceAverageAltitude = 12536.892,
       surfaceMaxAltitude = 13809.09,
       surfaceMinAltitude = -778.1,
+      maxStaticAltitude = 14709.00,
       ores = { 3724036288, 299255727, 262147665, 4234772167, 2289641763, 1065079614 },
       territories = 38882
     },
@@ -329,7 +338,8 @@ return {
       surfaceAverageAltitude = 167.399,
       surfaceMaxAltitude = 423.661,
       surfaceMinAltitude = 0,
-      ores = { 299255727, 262147665, 2289641763, 4041459743 },
+      maxStaticAltitude = 2500.00,
+      ores = { 299255727, 262147665, 2289641763, 4041459743},
       territories = 3002
     },
     [31] = {
@@ -357,6 +367,7 @@ return {
       surfaceAverageAltitude = 184.010,
       surfaceMaxAltitude = 477.009,
       surfaceMinAltitude = 0,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 3724036288, 3086347393, 1065079614 },
       territories = 3632
     },
@@ -385,6 +396,7 @@ return {
       surfaceAverageAltitude = 54.424,
       surfaceMaxAltitude = 921.193,
       surfaceMinAltitude = -837.498,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 4234772167 },
       territories = 272
     },
@@ -413,6 +425,7 @@ return {
       surfaceAverageAltitude = -685.459,
       surfaceMaxAltitude = 836.309,
       surfaceMinAltitude = -1925.87,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 3724036288 },
       territories = 272
     },
@@ -441,6 +454,7 @@ return {
       surfaceAverageAltitude = -956.392,
       surfaceMaxAltitude = 168.572,
       surfaceMinAltitude = -2060.55,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 299255727 },
       territories = 272
     },
@@ -469,6 +483,7 @@ return {
       surfaceAverageAltitude = -597.324,
       surfaceMaxAltitude = 1395.83,
       surfaceMinAltitude = -2500.29,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 262147665 },
       territories = 272
     },
@@ -497,6 +512,7 @@ return {
       surfaceAverageAltitude = -544.506,
       surfaceMaxAltitude = 1601.43,
       surfaceMinAltitude = -1658.22,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 262147665 },
       territories = 272
     },
@@ -525,6 +541,7 @@ return {
       surfaceAverageAltitude = -476.32,
       surfaceMaxAltitude = 1093.61,
       surfaceMinAltitude = -1836.26,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 4234772167 },
       territories = 272
     },
@@ -553,6 +570,7 @@ return {
       surfaceAverageAltitude = -704.756,
       surfaceMaxAltitude = 1051.98,
       surfaceMinAltitude = -2124.6,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 299255727, 3724036288 },
       territories = 272
     },
@@ -581,6 +599,7 @@ return {
       surfaceAverageAltitude = 161.911,
       surfaceMaxAltitude = 1505.11,
       surfaceMinAltitude = -1473.85,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 299255727 },
       territories = 272
     },
@@ -609,6 +628,7 @@ return {
       surfaceAverageAltitude = -936.01,
       surfaceMaxAltitude = 688.978,
       surfaceMinAltitude = -2498.5,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 299255727 },
       territories = 272
     },
@@ -637,6 +657,7 @@ return {
       surfaceAverageAltitude = -261.982,
       surfaceMaxAltitude = 1811.89,
       surfaceMinAltitude = -1705.35,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 262147665 },
       territories = 272
     },
@@ -665,6 +686,7 @@ return {
       surfaceAverageAltitude = -923.761,
       surfaceMaxAltitude = 465.953,
       surfaceMinAltitude = -1705.78,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 262147665 },
       territories = 272
     },
@@ -693,6 +715,7 @@ return {
       surfaceAverageAltitude = -897.714,
       surfaceMaxAltitude = 317.114,
       surfaceMinAltitude = -1993.37,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 262147665 },
       territories = 272
     },
@@ -721,6 +744,7 @@ return {
       surfaceAverageAltitude = -1231.337,
       surfaceMaxAltitude = 332.356,
       surfaceMinAltitude = -2017.24,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 4234772167 },
       territories = 272
     },
@@ -749,6 +773,7 @@ return {
       surfaceAverageAltitude = -462.878,
       surfaceMaxAltitude = 1558.25,
       surfaceMinAltitude = -1455.30,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 299255727, 262147665, 4234772167 },
       territories = 272
     },
@@ -777,6 +802,7 @@ return {
       surfaceAverageAltitude = -941.413,
       surfaceMaxAltitude = 667.795,
       surfaceMinAltitude = -2063.120,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 4234772167 },
       territories = 272
     },
@@ -805,6 +831,7 @@ return {
       surfaceAverageAltitude = -102.078,
       surfaceMaxAltitude = 1711.750,
       surfaceMinAltitude = -1248.490,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 3724036288 },
       territories = 272
     },
@@ -833,6 +860,7 @@ return {
       surfaceAverageAltitude = -1388.131,
       surfaceMaxAltitude = -34.923,
       surfaceMinAltitude = -2501.310,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 299255727 },
       territories = 272
     },
@@ -861,6 +889,7 @@ return {
       surfaceAverageAltitude = -171.626,
       surfaceMaxAltitude = 1396.390,
       surfaceMinAltitude = -1270.20,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 3724036288 },
       territories = 272
     },
@@ -889,6 +918,7 @@ return {
       surfaceAverageAltitude = -175.909,
       surfaceMaxAltitude = 1242.240,
       surfaceMinAltitude = -1081.320,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 4234772167 },
       territories = 272
     },
@@ -917,6 +947,7 @@ return {
       surfaceAverageAltitude = -1102.891,
       surfaceMaxAltitude = 598.225,
       surfaceMinAltitude = -2306.690,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 4234772167 },
       territories = 272
     },
@@ -945,6 +976,7 @@ return {
       surfaceAverageAltitude = -603.555,
       surfaceMaxAltitude = 1582.350,
       surfaceMinAltitude = -2158.800,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 4234772167, 262147665 },
       territories = 272
     },
@@ -973,6 +1005,7 @@ return {
       surfaceAverageAltitude = -899.330,
       surfaceMaxAltitude = 1089.520,
       surfaceMinAltitude = -2425.300,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 299255727 },
       territories = 272
     },
@@ -1001,6 +1034,7 @@ return {
       surfaceAverageAltitude = -1159.166,
       surfaceMaxAltitude = 966.797,
       surfaceMinAltitude = -2501.170,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 299255727 },
       territories = 272
     },
@@ -1029,6 +1063,7 @@ return {
       surfaceAverageAltitude = 59.944,
       surfaceMaxAltitude = 2240.940,
       surfaceMinAltitude = -1196.110,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 299255727 },
       territories = 272
     },
@@ -1057,6 +1092,7 @@ return {
       surfaceAverageAltitude = -634.507,
       surfaceMaxAltitude = 1521.540,
       surfaceMinAltitude = -2498.500,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 262147665 },
       territories = 272
     },
@@ -1085,6 +1121,7 @@ return {
       surfaceAverageAltitude = -184.796,
       surfaceMaxAltitude = 936.977,
       surfaceMinAltitude = -1009.590,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 262147665 },
       territories = 272
     },
@@ -1113,6 +1150,7 @@ return {
       surfaceAverageAltitude = -599.773,
       surfaceMaxAltitude = 1421.290,
       surfaceMinAltitude = -1916.820,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 3724036288 },
       territories = 272
     },
@@ -1141,6 +1179,7 @@ return {
       surfaceAverageAltitude = 50.800,
       surfaceMaxAltitude = 1210.470,
       surfaceMinAltitude = -657.505,
+      maxStaticAltitude = 2500.00,
       ores = { 3724036288, 262147665, 299255727 },
       territories = 272
     },
@@ -1169,6 +1208,7 @@ return {
       surfaceAverageAltitude = -1322.002,
       surfaceMaxAltitude = 367.258,
       surfaceMinAltitude = -2342.960,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 4234772167 },
       territories = 272
     },
@@ -1197,6 +1237,7 @@ return {
       surfaceAverageAltitude = -171.916,
       surfaceMaxAltitude = 1432.140,
       surfaceMinAltitude = -1545.310,
+      maxStaticAltitude = 2500.00,
       ores = { 299255727, 3724036288 },
       territories = 272
     },
@@ -1225,6 +1266,7 @@ return {
       surfaceAverageAltitude = -688.637,
       surfaceMaxAltitude = 1538.470,
       surfaceMinAltitude = -2500.330,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 299255727 },
       territories = 272
     },
@@ -1253,6 +1295,7 @@ return {
       surfaceAverageAltitude = -333.031,
       surfaceMaxAltitude = 1683.290,
       surfaceMinAltitude = -1670.060,
+      maxStaticAltitude = 2500.00,
       ores = { 262147665, 3724036288 },
       territories = 272
     },
@@ -1279,8 +1322,9 @@ return {
       GM = 25620700.57,
       surfaceArea = 341757843.00,
       surfaceAverageAltitude = -454.695,
-      surfaceMaxAltitude = 15445.980,
+      surfaceMaxAltitude = 1545.980,
       surfaceMinAltitude = -2146.780,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 262147665 },
       territories = 272
     },
@@ -1309,8 +1353,129 @@ return {
       surfaceAverageAltitude = -202.747,
       surfaceMaxAltitude = 1247.770,
       surfaceMinAltitude = -1595.650,
+      maxStaticAltitude = 2500.00,
       ores = { 4234772167, 262147665, 3724036288 },
       territories = 272
+    },
+    [4] = {
+      id = 4,
+      name = { "Talemai", "Talemai", "Talemai"},
+      type = { "Planet", "Planète", "Planet" },
+      biosphere = { "Barren", "Désert", "Karg" },
+      classification = { "Psychroplanet", "Psychroplanète", "Psychroplanet"},
+      habitability = { "Average", "Moyenne", "Mittlere "},
+      description = {
+        [[Talemai is a planet in the final stages of an Ice Age. It seems likely that the planet was thrown into tumult by a cataclysmic volcanic event which resulted in its current state. The arkship geological survey reports large mountainous regions across the entire planet.]],
+        [[Talemai est une planète en fin de période glaciaire. Il est probable qu'un événement volcanique cataclysmique soit responsable de son état actuel. L'étude géologique du Vaisseau-Arche signale de grandes zones montagneuses sur toute la planète.]],
+        [[Talemai ist ein Planet, der sich im Endstadium einer Eiszeit befindet. Es wird vermutet, dass der Planet durch ein kataklysmisches vulkanisches Ereignis in seinen heutigen Zustand versetzt wurde. Die geologische Untersuchung des Archenschiffs berichtet von weiten Gebirgsregionen auf dem gesamten Planeten.]]
+      },
+      iconPath = "gui/screen_unit/img/planets/talemai.png",
+      hasAtmosphere = true,
+      isSanctuary = false,
+      isInSafeZone = false,
+      systemId = 0,
+      positionInSystem = 4,
+      satellites = { 40, 41, 42},
+      center = { -13234464.00, 55765536.00, 465536.00 },
+      gravity = 4.5530,
+      radius = 57500.00,
+      atmosphereThickness = 16000.00,
+      atmosphereRadius = 72500.00,
+      GM = 15053356250.00,
+      surfaceArea = 41547562844,
+      surfaceAverageAltitude = 631.26,
+      surfaceMaxAltitude = 2755.23,
+      surfaceMinAltitude = -1778.1,
+      maxStaticAltitude = 14709.00,
+      ores = { 299255727, 4234772167, 3724036288, 343766315, 1065079614, 271971371},
+      territories = 52922
+    },
+    [40] = {
+      id = 40,
+      name = {"Talemai Moon 2","Talemai Lune 2","Talemai Mond 2"},
+      type = { "Moon", "Lune", "Mond"},
+      biosphere = nil,
+      classification = nil,
+      habitability = nil,
+      description = nil,
+      iconPath = "gui/screen_unit/img/planets/talemai_moon_2.png",
+      hasAtmosphere = false,
+      isSanctuary = false,
+      isInSafeZone = false,
+      systemId = 4,
+      positionInSystem = 2,
+      satellites = nil,
+      center = { -13503090.34, 55594324.49, 769836.53 },
+      gravity = 0.9420,
+      radius = 12000.00,
+      atmosphereThickness = 0.00,
+      atmosphereRadius = 0.00,
+      GM = 135648000.00,
+      surfaceArea = 1809557368.00,
+      surfaceAverageAltitude = 178.06,
+      surfaceMaxAltitude = 497.87,
+      surfaceMinAltitude = 0,
+      maxStaticAltitude = 2500.00,
+      ores = { 262147665, 3724036288, 4234772167, 3086347393,4041459743,1467310917},
+      territories = 1922
+    },
+    [41] = {
+      id = 41,
+      name = {"Talemai Moon 3","Talemai Lune 3","Talemai Mond 3"},
+      type = { "Moon", "Lune", "Mond"},
+      biosphere = nil,
+      classification = nil,
+      habitability = nil,
+      description = nil,
+      iconPath = "gui/screen_unit/img/planets/talemai_moon_3.png",
+      hasAtmosphere = false,
+      isSanctuary = false,
+      isInSafeZone = false,
+      systemId = 4,
+      positionInSystem = 3,
+      satellites = nil,
+      center = { -12800514.62, 55700257.46, 325207.84 },
+      gravity = 0.8635,
+      radius = 11000.00,
+      atmosphereThickness = 0.00,
+      atmosphereRadius = 0.00,
+      GM = 104423000.00,
+      surfaceArea = 1520530844.00,
+      surfaceAverageAltitude = 313.12,
+      surfaceMaxAltitude = 582.08,
+      surfaceMinAltitude = 0,
+      maxStaticAltitude = 2500.00,
+      ores = { 262147665, 299255727, 4234772167, 2289641763, 1050500112, 1866812055},
+      territories = 1922
+    },
+    [42] = {
+      id = 42,
+      name = {"Talemai Moon 1","Talemai Lune 1","Talemai Mond 1"},
+      type = { "Moon", "Lune", "Mond"},
+      biosphere = nil,
+      classification = nil,
+      habitability = nil,
+      description = nil,
+      iconPath = "gui/screen_unit/img/planets/talemai_moon_1.png",
+      hasAtmosphere = false,
+      isSanctuary = false,
+      isInSafeZone = false,
+      systemId = 4,
+      positionInSystem = 1,
+      satellites = nil,
+      center = { -13058408.39, 55781856.76, 740177.66 },
+      gravity = 1.1775,
+      radius = 15000.00,
+      atmosphereThickness = 0.00,
+      atmosphereRadius = 0.00,
+      GM = 265050000.00,
+      surfaceArea = 282743388.00,
+      surfaceAverageAltitude = 423.70,
+      surfaceMaxAltitude = 1077.57,
+      surfaceMinAltitude = 0,
+      maxStaticAltitude = 2500.00,
+      ores = { 299255727, 3724036288, 262147665, 2029139010, 1065079614, 3546085401},
+      territories = 3632
     },
     [8] = {
       id = 8,
@@ -1341,6 +1506,7 @@ return {
       surfaceAverageAltitude = -294.246,
       surfaceMaxAltitude = 1341.99,
       surfaceMinAltitude = -576.98,
+      maxStaticAltitude = 1540.00,
       ores = { 299255727, 4234772167, 343766315, 3837858336, 1467310917 },
       territories = 60752
     },
@@ -1373,6 +1539,7 @@ return {
       surfaceAverageAltitude = -374.1116,
       surfaceMaxAltitude = 1093.681,
       surfaceMinAltitude = -499.43,
+      maxStaticAltitude = 1300.00,
       ores = { 2029139010, 3724036288, 3837858336, 271971371, 789110817 },
       territories = 60752
     }

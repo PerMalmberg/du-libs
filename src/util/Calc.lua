@@ -130,28 +130,24 @@ calc.NearestPointOnLine = function(lineStart, lineDirection, pointAwayFromLine)
     return lineStart + lineDir * d
 end
 
----@param startPoint Vec3
----@param endPoint Vec3
----@param currentPos Vec3
----@param ahead number
----@return { nearest:Vec3, rabbit:Vec3 }
-calc.NearestOnLineBetweenPoints = function(startPoint, endPoint, currentPos, ahead)
-    local totalDiff = endPoint - startPoint
-    local dir = totalDiff:Normalize()
-    local nearestPoint = calc.NearestPointOnLine(startPoint, dir, currentPos)
+---Gets the closest point to p on the line segment a-b
+---@param a Vec3
+---@param b Vec3
+---@param p Vec3 The point away from the line
+---@return Vec3 #Point on the line segment
+calc.NearestOnLineBetweenPoints = function(a, b, p)
+    local ab = b - a
+    local ap = p - a
 
-    ahead = (ahead or 0)
-    local startDiff = nearestPoint - startPoint
-    local distanceFromStart = startDiff:Len()
-    local rabbitDistance = min(distanceFromStart + ahead, totalDiff:Len())
-    local rabbit = startPoint + dir * rabbitDistance
+    local proj = ap:Dot(ab)
+    local d = proj / ab:Len2()
 
-    if startDiff:Normalize():Dot(dir) < 0 then
-        return { nearest = startPoint, rabbit = rabbit }
-    elseif startDiff:Len() >= totalDiff:Len() then
-        return { nearest = endPoint, rabbit = rabbit }
+    if d <= 0 then
+        return a
+    elseif d >= 1 then
+        return b
     else
-        return { nearest = nearestPoint, rabbit = rabbit }
+        return a + ab * d
     end
 end
 

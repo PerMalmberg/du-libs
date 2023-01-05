@@ -38,6 +38,7 @@ function Position.New(galaxy, bodyRef, coordinate)
     end
 
     function Position.__tostring(p) -- __tostring must be in the metatable, not the instance
+        local res
         -- The game starts giving space coordinates at an altitude of 70km above
         -- the planets radius on Alioth so we're mimicing that behaviour.
         local altitude = (p.Coords - p.Body.Geography.Center):Len() - p.Body.Geography.Radius
@@ -47,8 +48,15 @@ function Position.New(galaxy, bodyRef, coordinate)
             -- Calculate around origo; planet center is added in Universe:ParsePosition
             -- and we're reversing that calculation.
             local calcPos = p.Coords - p.Body.Geography.Center
-            local lat = math.asin(calcPos.z / radius)
-            local lon = math.atan(calcPos.y, calcPos.x)
+
+            local lat = 0
+            local lon = 0
+
+            -- When the input coordinates are the same as the center of the planet, trigonomitry fails so just leave them at 0.
+            if calcPos:Len2() > 0 then
+                lat = math.asin(calcPos.z / radius)
+                lon = math.atan(calcPos.y, calcPos.x)
+            end
 
             return stringFormat("::pos{%d,%d,%.4f,%.4f,%.4f}", p.Galaxy.Id, p.Body.Id, math.deg(lat), math.deg(lon),
                 altitude)

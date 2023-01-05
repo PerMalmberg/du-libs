@@ -26,7 +26,7 @@ function Galaxy.New(galaxyId, galaxyAtlas)
         Id = galaxyId
     }
 
-    local body = {} -- Stellar bodies by id
+    local body = {} ---@type Body[] -- Stellar bodies by id
 
     checks.IsTable(galaxyAtlas, "galaxyAtlas", "galaxy:Prepare")
 
@@ -38,7 +38,7 @@ function Galaxy.New(galaxyId, galaxyAtlas)
         return body[id]
     end
 
-    ---Gets the body closes to the given position
+    ---Gets the body closest to the given position
     ---@param position Vec3 position to get closest body for
     ---@return Body The body
     function s:GetBodyClosestToPosition(position)
