@@ -17,23 +17,24 @@ local Telemeter = {}
 Telemeter.__index = Telemeter
 
 ---Create a new Telemeter
----@param telemeter TelementerAPI
-function Telemeter.New(telemeter)
+---@param api TelementerAPI
+---@return Telemeter
+function Telemeter.New(api)
     local s = {}
 
     ---Measure distance
     ---@return TelemeterResult
     function s.Measure()
-        local res = telemeter.raycast()
+        local res = api.raycast()
         return { Hit = true, Point = Vec3.New(res.point), Distance = res.distance }
     end
 
     ---Checks if the link has the expected functions
     ---@return boolean
     function s.IsTelemeter()
-        return type(telemeter.getMaxDistance) == "function"
-            and type(telemeter.raycast) == "function"
-            and type(telemeter.getRayWorldOrigin) == "function"
+        return type(api.getMaxDistance) == "function"
+            and type(api.raycast) == "function"
+            and type(api.getRayWorldOrigin) == "function"
     end
 
     return setmetatable(s, Telemeter)
