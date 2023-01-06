@@ -6,7 +6,7 @@ local Vec3 = require("math/Vec3")
 ---@alias TeleDist fun():number
 ---@alias TeleWorldAxis fun():TelemeterVec3
 ---@alias TelementerAPI {raycast:TeleRaycast, getMaxDistance:TeleDist, getRayWorldAxis:TeleWorldAxis, getRayWorldOrigin:TeleWorldAxis}
----@alias TelemeterResult {Hit:boolean, distance:number, point:Vec3}
+---@alias TelemeterResult {Hit:boolean, Distance:number, Point:Vec3}
 
 ---@class Telemeter
 ---@field New fun(telemeter:TelementerAPI):Telemeter
