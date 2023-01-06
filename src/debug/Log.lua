@@ -16,7 +16,7 @@ log.LogLevel = {
 
 local function new()
     local o = {
-        level = log.LogLevel.ERROR
+        level = log.LogLevel.WARNING
     }
     return setmetatable(o, log)
 end
