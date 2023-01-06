@@ -2,7 +2,9 @@
 ---@field RegisterString fun(topic:string, callback:SubStringCallback)
 ---@field RegisterNumber fun(topic:string, callback:SubNumberCallback)
 ---@field RegisterTable fun(topic:string, callback:SubTableCallback)
+---@field RegisterBool fun(topic:string, callback:SubBooleanCallback)
 ---@field Publish fun(topic:string, value:string|number|table|boolean, yield:boolean?)
+---@field Unregister fun(topic:string, callback:SubStringCallback|SubNumberCallback|SubTableCallback|SubBooleanCallback)
 ---@field Instance fun():PubSub
 
 ---@alias SubStringCallback fun(topic:string, value:string)
@@ -41,6 +43,22 @@ function PubSub.Instance()
         end
 
         table.insert(callbacks, callback)
+    end
+
+    ---@param topic string
+    ---@param callback SubStringCallback|SubNumberCallback|SubTableCallback|SubBooleanCallback
+    function s.Unregister(topic, callback)
+        for _, topics in pairs(subscribers) do
+            local subs = topics[topic]
+            if subs then
+                for index, sub in ipairs(subs) do
+                    if sub == callback then
+                        table.remove(subs, index)
+                        return
+                    end
+                end
+            end
+        end
     end
 
     ---Registers a string callback for the topic
