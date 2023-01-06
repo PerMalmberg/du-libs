@@ -9,6 +9,7 @@ local Vec3 = require("math/Vec3")
 ---@alias TelemeterResult {Hit:boolean, distance:number, point:Vec3}
 
 ---@class Telemeter
+---@field New fun(telemeter:TelementerAPI):Telemeter
 ---@field Measure fun():TelemeterResult
 ---@field IsTelemeter fun():boolean
 
