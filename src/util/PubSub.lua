@@ -3,7 +3,7 @@
 ---@field RegisterNumber fun(topic:string, callback:SubNumberCallback)
 ---@field RegisterTable fun(topic:string, callback:SubTableCallback)
 ---@field RegisterBool fun(topic:string, callback:SubBooleanCallback)
----@field Publish fun(topic:string, value:string|number|table|boolean, yield:boolean?)
+---@field Publish fun(topic:string, value:string|number|table|boolean)
 ---@field Unregister fun(topic:string, callback:SubStringCallback|SubNumberCallback|SubTableCallback|SubBooleanCallback)
 ---@field Instance fun():PubSub
 
@@ -11,7 +11,6 @@
 ---@alias SubNumberCallback fun(topic:string, value:number)
 ---@alias SubBooleanCallback fun(topic:string, value:boolean)
 ---@alias SubTableCallback fun(topic:string, value:table)
-
 
 local PubSub = {}
 PubSub.__index = PubSub
@@ -92,8 +91,7 @@ function PubSub.Instance()
     ---Publishes the value on the topic
     ---@param topic string
     ---@param value string|number|table|boolean
-    ---@param yield boolean? Set to true to yield between each callback; only when run in a coroutine.
-    function s.Publish(topic, value, yield)
+    function s.Publish(topic, value)
         local subs = subscribers[type(value)]
 
         if not subs then return end
@@ -103,7 +101,6 @@ function PubSub.Instance()
 
         for _, subscriber in ipairs(callbacks) do
             subscriber(topic, value)
-            if yield then coroutine.yield() end
         end
     end
 
