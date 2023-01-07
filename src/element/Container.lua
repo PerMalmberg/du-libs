@@ -180,7 +180,7 @@ function Container.New(localId, unitMass, containerData)
         if talents.ContainerOptimization > 0 then
             actualMass = reducedMass / (1 - talents.ContainerOptimization * 0.05)
         end
-        system.print("D")
+
         return actualMass
     end
 
@@ -210,7 +210,7 @@ function Container.GetAllCo(filter)
         local elementClass = core.getElementClassById(localId) ---@type string
         elementClass = elementClass:lower()
 
-        if not elementClass:find("hub") then
+        if not elementClass:find("itemcontainer") then -- filter hubs
             local include = hasBit(filter, ContainerType.Atmospheric) and elementClass:find("atmofuelcontainer")
             include = include or hasBit(filter, ContainerType.Space) and elementClass:find("spacefuelcontainer")
             include = include or hasBit(filter, ContainerType.Rocket) and elementClass:find("rocketfuelcontainer")
