@@ -7,6 +7,7 @@ local log = require("debug/Log")()
 ---@field Name fun():string
 ---@field GetAll fun():Container[]
 ---@field FuelFillFactor fun(talents:ContainerTalents)
+---@field ActualContentMass fun(talents:ContainerTalents)
 
 local core = library.getCoreUnit()
 local nitronMass = 4
@@ -141,7 +142,7 @@ function Container.New(localId, unitMass, containerData)
         return containerData.Cap * (1 + containerProficiency / 5) -- 20% per level
     end
 
-    local function contentMass()
+    local function rawContentMass()
         return core.getElementMassById(localId) - unitMass;
     end
 
@@ -150,7 +151,7 @@ function Container.New(localId, unitMass, containerData)
     function s.FuelFillFactor(talents)
         if not containerData.FuelMass then return 0 end
 
-        local reducedMass = contentMass()
+        local reducedMass = rawContentMass()
         local actualMass = reducedMass
 
         if talents.FuelTankOptimization > 0 or talents.ContainerOptimization > 0 then
@@ -170,6 +171,17 @@ function Container.New(localId, unitMass, containerData)
         local fillFactor = currentLiters / volume
 
         return fillFactor
+    end
+
+    ---@param talents ContainerTalents
+    function s.ActualContentMass(talents)
+        local reducedMass = rawContentMass()
+        local actualMass = reducedMass
+        if talents.ContainerOptimization > 0 then
+            actualMass = reducedMass / (1 - talents.ContainerOptimization * 0.05)
+        end
+        system.print("D")
+        return actualMass
     end
 
     ---Gets the container name
@@ -199,10 +211,12 @@ function Container.GetAllCo(filter)
         elementClass = elementClass:lower()
 
         if not elementClass:find("hub") then
-            local include = hasBit(filter, ContainerType.Standard) and elementClass:find("containers")
-            include = include or hasBit(filter, ContainerType.Atmospheric) and elementClass:find("atmofuelcontainer")
+            local include = hasBit(filter, ContainerType.Atmospheric) and elementClass:find("atmofuelcontainer")
             include = include or hasBit(filter, ContainerType.Space) and elementClass:find("spacefuelcontainer")
             include = include or hasBit(filter, ContainerType.Rocket) and elementClass:find("rocketfuelcontainer")
+            include = include or
+                (hasBit(filter, ContainerType.Standard) and elementClass:find("container") and
+                    not elementClass:find("fuel"))
 
             if include then
                 local itemId = core.getElementItemIdById(localId)
