@@ -26,7 +26,7 @@ function Telemeter.New(api)
     ---@return TelemeterResult
     function s.Measure()
         local res = api.raycast()
-        return { Hit = true, Point = Vec3.New(res.point), Distance = res.distance }
+        return { Hit = res.hit, Point = Vec3.New(res.point), Distance = res.distance }
     end
 
     ---Checks if the link has the expected functions
