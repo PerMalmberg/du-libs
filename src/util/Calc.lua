@@ -140,7 +140,15 @@ calc.NearestOnLineBetweenPoints = function(a, b, p)
     local ap = p - a
 
     local proj = ap:Dot(ab)
-    local d = proj / ab:Len2()
+
+    local abLen2 = ab:Len2()
+
+    if abLen2 <= 0 then
+        -- a and b are on the same place
+        return a
+    end
+
+    local d = proj / abLen2
 
     if d <= 0 then
         return a
