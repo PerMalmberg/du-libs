@@ -40,14 +40,20 @@ local function formatValues(...)
     local args = { ... }
 
     for i = 1, #args, 1 do
-        local v = args[i] or ""
+        local v
+
+        if args[i] == nil then
+            v = ""
+        else
+            v = args[i]
+        end
+
         local s = ""
+
         if typeComp.IsString(v) then
             s = string.format("%s", v)
         elseif typeComp.IsNumber(v) then
             s = string.format("%s", tonumber(v))
-        elseif typeComp.IsVec3(v) then
-            s = string.format("Vec3(%s, %s, %s)", v.x, v.y, v.z)
         elseif typeComp.IsBoolean(v) then
             s = tostring(v)
         elseif typeComp.IsFunction(v) then
