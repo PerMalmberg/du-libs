@@ -16,6 +16,7 @@ ContainerSkills.__index = ContainerSkills
 ---@param atmoFuelTankHandling integer,
 ---@param spaceFuelTankHandling integer,
 ---@param rocketFuelTankHandling integer
+---@return ContainerTalents
 function ContainerSkills.New(containerProficiency, fuelTankOptimization, containerOptimization, atmoFuelTankHandling,
                              spaceFuelTankHandling, rocketFuelTankHandling)
     local s = {
