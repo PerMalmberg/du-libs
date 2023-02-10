@@ -1,4 +1,4 @@
-local vehicle = require("abstraction/Vehicle"):New()
+local vehicle = require("abstraction/Vehicle").New()
 local G = vehicle.world.G
 local EngineGroup = require("abstraction/EngineGroup")
 local calc = require("util/Calc")
