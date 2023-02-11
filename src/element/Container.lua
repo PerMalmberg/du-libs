@@ -119,6 +119,8 @@ ContainerType = {
 
 local Container = {}
 Container.__index = Container
+local preFiltered ---@type table<ContainerType, Container[]>
+
 
 ---Creates a new container
 ---@param localId integer The local id of the container
@@ -193,41 +195,70 @@ function Container.New(localId, unitMass, containerData)
     return setmetatable(s, Container)
 end
 
+---@param localId number
+---@return Container
+local function makeContainer(localId)
+    local itemId = core.getElementItemIdById(localId)
+    ---@type {name:string, unitMass:number, unitVolume:number, displayNameWithSize:string}
+    local data = system.getItem(itemId)
+    local lowerName = data.displayNameWithSize:lower()
+    local containerData = lookupContainerData(lowerName)
+    return Container.New(localId, data.unitMass, containerData)
+end
+
+---@param input ContainerType
+---@param wanted ContainerType
+local function hasBit(input, wanted)
+    return (input & wanted) == wanted
+end
+
 ---Gets all containers. Only call from a coroutine
 ---@param filter ContainerType|integer
 ---@return Container[]
 function Container.GetAllCo(filter)
     local containers = {} ---@type Container[]
 
-    ---@param input ContainerType
-    ---@param wanted ContainerType
-    local function hasBit(input, wanted)
-        return (input & wanted) == wanted
+    if not preFiltered then
+        preFiltered = {}
+        preFiltered[ContainerType.Standard] = {}
+        preFiltered[ContainerType.Atmospheric] = {}
+        preFiltered[ContainerType.Space] = {}
+        preFiltered[ContainerType.Rocket] = {}
+
+        ---@diagnostic disable-next-line: undefined-field
+        for _, localId in ipairs(core.getElementIdList()) do
+            local elementClass = core.getElementClassById(localId) ---@type string
+            elementClass = elementClass:lower()
+
+            if not elementClass:find("itemcontainer") then -- filter hubs
+                if elementClass:find("atmofuelcontainer") then
+                    table.insert(preFiltered[ContainerType.Atmospheric], makeContainer(localId))
+                elseif elementClass:find("spacefuelcontainer") then
+                    table.insert(preFiltered[ContainerType.Space], makeContainer(localId))
+                elseif elementClass:find("rocketfuelcontainer") then
+                    table.insert(preFiltered[ContainerType.Rocket], makeContainer(localId))
+                elseif elementClass:find("container") and elementClass:find("fuel") then
+                    table.insert(preFiltered[ContainerType.Standard], makeContainer(localId))
+                end
+            end
+            coroutine.yield()
+        end
     end
 
-    ---@diagnostic disable-next-line: undefined-field
-    for _, localId in ipairs(core.getElementIdList()) do
-        local elementClass = core.getElementClassById(localId) ---@type string
-        elementClass = elementClass:lower()
+    if (hasBit(filter, ContainerType.Atmospheric)) then
+        CopyTable(containers, preFiltered[ContainerType.Atmospheric])
+    end
 
-        if not elementClass:find("itemcontainer") then -- filter hubs
-            local include = hasBit(filter, ContainerType.Atmospheric) and elementClass:find("atmofuelcontainer")
-            include = include or hasBit(filter, ContainerType.Space) and elementClass:find("spacefuelcontainer")
-            include = include or hasBit(filter, ContainerType.Rocket) and elementClass:find("rocketfuelcontainer")
-            include = include or
-                (hasBit(filter, ContainerType.Standard) and elementClass:find("container") and
-                    not elementClass:find("fuel"))
+    if (hasBit(filter, ContainerType.Space)) then
+        CopyTable(containers, preFiltered[ContainerType.Space])
+    end
 
-            if include then
-                local itemId = core.getElementItemIdById(localId)
-                ---@type {name:string, unitMass:number, unitVolume:number, displayNameWithSize:string}
-                local data = system.getItem(itemId)
-                local lowerName = data.displayNameWithSize:lower()
-                local containerData = lookupContainerData(lowerName)
-                table.insert(containers, Container.New(localId, data.unitMass, containerData))
-            end
-        end
-        coroutine.yield()
+    if (hasBit(filter, ContainerType.Rocket)) then
+        CopyTable(containers, preFiltered[ContainerType.Rocket])
+    end
+
+    if (hasBit(filter, ContainerType.Standard)) then
+        CopyTable(containers, preFiltered[ContainerType.Standard])
     end
 
     return containers

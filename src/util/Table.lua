@@ -21,3 +21,13 @@ ReverseInplace = function(list)
         n = n - 1
     end
 end
+
+---Copies elements from one list to another
+---@param from table
+---@param to table
+CopyTable = function(to, from)
+    local start = #to
+    for i, item in ipairs(from) do
+        to[start + i] = item
+    end
+end
