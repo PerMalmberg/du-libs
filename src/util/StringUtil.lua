@@ -103,4 +103,11 @@ function SU.SplitQuoted(s)
    return parts
 end
 
+---Returns true if the original string starts with the prefix
+---@param original string
+---@param prefix string
+function SU.StartsWith(original, prefix)
+   return original:find(prefix, 1, true) == 1
+end
+
 return SU
