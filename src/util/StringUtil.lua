@@ -110,4 +110,14 @@ function SU.StartsWith(original, prefix)
    return original:find(prefix, 1, true) == 1
 end
 
+---@param original string
+---@param prefix string
+function SU.RemovePrefix(original, prefix)
+   if SU.StartsWith(original, prefix) then
+      return original:sub(#prefix + 1, #original)
+   else
+      return original
+   end
+end
+
 return SU
