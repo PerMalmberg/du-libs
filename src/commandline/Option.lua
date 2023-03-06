@@ -67,6 +67,7 @@ function Option.New(name)
     ---@param v ArgumentValueTypes
     function s.Default(v)
         default = v
+        return s
     end
 
     ---Parses the arguments, putting the found values in the the target in a key:value fashion, with sanitized key names.
@@ -76,13 +77,12 @@ function Option.New(name)
     function s.Parse(args, target)
         -- Find the argument in the input data
         for i, key in ipairs(args) do
-
             if key == name then
                 if optType == argType.EMPTY_BOOLEAN then
                     target[sanitizedName] = true
                     table.remove(args, i)
-                elseif i + 1 <= #args then -- Next value is the argument, if it exists
-                    table.remove(args, i) -- Remove the arg itself
+                elseif i + 1 <= #args then          -- Next value is the argument, if it exists
+                    table.remove(args, i)           -- Remove the arg itself
                     local v = table.remove(args, i) -- Remove and store the value
 
                     local ok

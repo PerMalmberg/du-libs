@@ -20,6 +20,7 @@ local max = math.max
 ---@field Surface {MaxAltitude:number, MinAltitude:number}} Surface properties
 ---@field PvP {LocatedInSafeZone:boolean} Pvp properties
 ---@field DistanceToAtmo fun(self:Body, point:Vec3):number
+---@field DistanceToAtmoEdge fun(self:Body, point:Vec3):number
 ---@field IsInAtmo fun(self:Body, point:Vec3):boolean
 ---@field DistanceToHighestPossibleSurface fun(coordinate:Vec3):number
 ---@field AboveSeaLevel fun(coordinate:Vec3):boolean, number
@@ -33,7 +34,8 @@ function Body.New(galaxy, bodyData)
 
     local language = LocaleIndex()
 
-    local s = { ---@type Body
+    local s = {
+        ---@type Body
         Galaxy = galaxy,
         Id = bodyData.id,
         Name = bodyData.name[language],
@@ -68,6 +70,18 @@ function Body.New(galaxy, bodyData)
     ---@return number
     function s:DistanceToAtmo(coordinate)
         return max(0, (coordinate - s.Geography.Center):Len() - s.Atmosphere.Radius)
+    end
+
+    ---Returns the distance to the edge of the atmosphere, from the given position
+    ---@param coordinate Vec3
+    function s:DistanceToAtmoEdge(coordinate)
+        local dist = s:DistanceToAtmo(coordinate)
+        if dist == 0 then
+            -- Inside atmo
+            return s.Atmosphere.Radius - (coordinate - s.Geography.Center):Len()
+        end
+
+        return dist
     end
 
     ---Returns true if the coordinate is within the atmosphere of the body

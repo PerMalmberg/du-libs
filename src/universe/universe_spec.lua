@@ -60,7 +60,7 @@ end)
 
 describe("Body", function()
     it("Can calculate distance to atmo", function()
-        local aliCenter = Vec3.New(-8.00, -8.00, -126303.00)
+        local aliCenter = Vec3.New( -8.00, -8.00, -126303.00)
         local b = u.ClosestBody(aliCenter)
         assert.are_equal("Alioth", tostring(b))
         local point10kmOutsideAtmo = aliCenter + Vec3.unit_x * (b.Atmosphere.Radius + 10000)
@@ -68,16 +68,27 @@ describe("Body", function()
     end)
 
     it("Can detect if a point is in atmo", function()
-        local aliCenter = Vec3.New(-8.00, -8.00, -126303.00)
+        local aliCenter = Vec3.New( -8.00, -8.00, -126303.00)
         local b = u.ClosestBody(aliCenter)
         assert.are_equal("Alioth", tostring(b))
         local pointInsideAtmo = aliCenter + Vec3.unit_y * (b.Atmosphere.Radius / 2) ---@type Vec3
         assert.is_true(b:IsInAtmo(pointInsideAtmo))
     end)
+
+    it("Can calculate the distance to atmo edge", function()
+        local aliCenter = Vec3.New( -8.00, -8.00, -126303.00)
+        local b = u.ClosestBody(aliCenter)
+        assert.are_equal("Alioth", tostring(b))
+        local pointInsideAtmo = aliCenter + Vec3.unit_y * (b.Atmosphere.Radius / 2) ---@type Vec3
+        assert.equal(b.Atmosphere.Radius / 2, b:DistanceToAtmoEdge(pointInsideAtmo))
+
+        local pointOutsideAtmo = aliCenter + Vec3.unit_y * (b.Atmosphere.Radius * 2) ---@type Vec3
+        assert.equal(b.Atmosphere.Radius, b:DistanceToAtmoEdge(pointOutsideAtmo))
+    end)
 end)
 
 describe("Detect bodies in flight path", function()
-    local aliCenter = Vec3.New(-8.00, -8.00, -126303.00)
+    local aliCenter = Vec3.New( -8.00, -8.00, -126303.00)
     local b = u.ClosestBody(aliCenter)
 
     local g = u.CurrentGalaxy()
@@ -96,7 +107,7 @@ end)
 
 describe("Can calculate distance to sea level", function()
     it("Can see we're above and below sea level", function()
-        local aliCenter = Vec3.New(-8.00, -8.00, -126303.00)
+        local aliCenter = Vec3.New( -8.00, -8.00, -126303.00)
         local b = u.ClosestBody(aliCenter)
         local above = u.ParsePosition("::pos{0,2,49.9873,160.4911,34.6345}")
         local below = u.ParsePosition("::pos{0,2,49.5881,160.6972,-2.4599}")
@@ -108,7 +119,6 @@ describe("Can calculate distance to sea level", function()
         aboveSea, dist = b.AboveSeaLevel(below.Coordinates())
         assert.is_false(aboveSea)
         assert.are_equal(2.5, calc.Round(dist, 1))
-
     end)
 end)
 
@@ -128,5 +138,4 @@ describe("Vertical reference vector", function()
         assert.are_equal(0, vRef.y)
         assert.are_equal(0, vRef.z)
     end)
-
 end)
