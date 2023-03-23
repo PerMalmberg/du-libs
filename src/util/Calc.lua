@@ -112,6 +112,11 @@ calc.Kph2Mps = function(kph)
     return kph / 3.6
 end
 
+---Clamps v between minVal and maxVal, inclusive
+---@param v number
+---@param minVal number
+---@param maxVal number
+---@return number
 calc.Clamp = function(v, minVal, maxVal)
     return min(maxVal, max(v, minVal))
 end

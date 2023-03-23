@@ -1,4 +1,5 @@
 local keys = require("input/Keys")
+local clamp = require("util/Calc").Clamp
 
 ---@alias InputCallback fun()
 ---@alias CallbackPair {criteria:Criteria, func:InputCallback}
@@ -8,6 +9,7 @@ local keys = require("input/Keys")
 ---@field Register fun(key:integer, criteria:Criteria, callback:InputCallback)
 ---@field IsPressed fun(key:integer):boolean
 ---@field Clear fun()
+---@field Throttle fun():number
 
 local Input = {}
 Input.__index = Input
@@ -23,6 +25,7 @@ function Input.Instance()
     local s = {}
     local lookup = {} ---@type table<Keys, CallbackPair[]>
     local keyState = {} ---@type table<integer, boolean>
+    local throttleValue = 0
 
     ---Decodes the event
     ---@param keyName string
@@ -57,6 +60,10 @@ function Input.Instance()
         s.decode(key, true, true)
     end
 
+    local function update()
+        throttleValue = clamp(throttleValue + system.getThrottleInputFromMouseWheel(), 0, 100)
+    end
+
     ---Indicates if a key is pressed
     ---@param key Keys
     ---@return boolean
@@ -84,11 +91,18 @@ function Input.Instance()
         lookup = {}
     end
 
+    ---Returns the throttle value, 0...100
+    ---@return number
+    function s.Throttle()
+        return throttleValue
+    end
+
     singleton = setmetatable(s, Input)
 
     system:onEvent("onActionStart", keyPress)
     system:onEvent("onActionStop", keyRelease)
     system:onEvent("onActionLoop", keyRepeat)
+    system:onEvent("onUpdate", update)
 
     return singleton
 end
