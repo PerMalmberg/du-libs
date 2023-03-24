@@ -12,6 +12,7 @@ local core = library.getCoreUnit()
 ---@alias VPosition {Current:fun3}
 ---@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AngularAirFrictionAcceleration:fun3, GravityDirection:fun3}
 ---@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}
+---@alias VSpeed {MaxSpeed:funn}
 
 ---@class Vehicle
 ---@field orientation VOrientation
@@ -21,6 +22,7 @@ local core = library.getCoreUnit()
 ---@field position VPosition
 ---@field world VWorld
 ---@field player VPlayer
+---@field speed VSpeed
 
 local Vehicle = {}
 Vehicle.__index = Vehicle
@@ -162,6 +164,15 @@ function Vehicle.New()
                     IsFirstPerson = system.isFirstPerson
                 }
             }
+        },
+        speed = {
+            MaxSpeed = function()
+                if singleton.world.IsInAtmo() then
+                    return construct.getFrictionBurnSpeed() * 0.99
+                end
+
+                return construct.getMaxSpeed()
+            end
         }
     }
 
