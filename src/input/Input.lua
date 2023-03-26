@@ -10,6 +10,8 @@ local clamp = require("util/Calc").Clamp
 ---@field IsPressed fun(key:integer):boolean
 ---@field Clear fun()
 ---@field Throttle fun():number
+---@field SetThrottle fun(value:number)
+---@field SetThrottleStep fun(value:number)
 
 local Input = {}
 Input.__index = Input
@@ -26,6 +28,7 @@ function Input.Instance()
     local lookup = {} ---@type table<Keys, CallbackPair[]>
     local keyState = {} ---@type table<integer, boolean>
     local throttleValue = 0
+    local throttleStep = 0.1
 
     ---Decodes the event
     ---@param keyName string
@@ -61,7 +64,7 @@ function Input.Instance()
     end
 
     local function update()
-        throttleValue = clamp(throttleValue + system.getThrottleInputFromMouseWheel(), 0, 100)
+        throttleValue = clamp(throttleValue + throttleStep * system.getThrottleInputFromMouseWheel(), 0, 1)
     end
 
     ---Indicates if a key is pressed
@@ -91,10 +94,22 @@ function Input.Instance()
         lookup = {}
     end
 
-    ---Returns the throttle value, 0...100
+    ---Returns the throttle value, 0...1
     ---@return number
     function s.Throttle()
         return throttleValue
+    end
+
+    ---Sets the throttle value 0...1
+    ---@param value number
+    function s.SetThrottle(value)
+        throttleValue = clamp(value, 0, 1)
+    end
+
+    ---Sets the throttle step 0...1
+    ---@param value number
+    function s.SetThrottleStep(value)
+        throttleStep = clamp(value, 0.01, 1)
     end
 
     singleton = setmetatable(s, Input)
