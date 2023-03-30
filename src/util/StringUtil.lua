@@ -110,6 +110,10 @@ function SU.StartsWith(original, prefix)
    return original:find(prefix, 1, true) == 1
 end
 
+function SU.EndsWith(str, ending)
+   return ending == "" or str:sub(- #ending) == ending
+end
+
 ---@param original string
 ---@param prefix string
 function SU.RemovePrefix(original, prefix)
