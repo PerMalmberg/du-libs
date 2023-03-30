@@ -64,7 +64,11 @@ end
 function DBStoredData.NewFromDB(readData)
     if readData ~= nil then
         local decoded = json.decode(readData)
-        if decoded ~= nil and type(decoded) == "table" and decoded.t and decoded.v then
+        if decoded ~= nil
+            and type(decoded) == "table"
+            and decoded.t
+            and decoded.v ~= nil -- must check against nil, as v may be boolean 'false'
+        then
             return DBStoredData.New(decoded.v)
         end
     end
