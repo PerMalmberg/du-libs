@@ -10,7 +10,7 @@ local core = library.getCoreUnit()
 ---@alias VVelocity {Angular:fun3, Movement:fun3, localized:{Angular:fun3}}
 ---@alias VAcceleration {Angular:fun3, Movement:fun3, localized: {Angular:fun3}}
 ---@alias VPosition {Current:fun3}
----@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AngularAirFrictionAcceleration:fun3, GravityDirection:fun3}
+---@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AirFrictionAcceleration:fun3, AngularAirFrictionAcceleration:fun3, GravityDirection:fun3}
 ---@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}
 ---@alias VSpeed {MaxSpeed:funn}
 
@@ -128,6 +128,9 @@ function Vehicle.New()
             end,
             G = core.getGravityIntensity,
             AngularAirFrictionAcceleration = function()
+                return NV3(construct.getWorldAirFrictionAngularAcceleration())
+            end,
+            AirFrictionAcceleration = function()
                 return NV3(construct.getWorldAirFrictionAcceleration())
             end,
             GravityDirection = function()
