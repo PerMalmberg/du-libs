@@ -21,7 +21,7 @@ local verticalSpaceEngines = EngineGroup("vertical", "space_engine")
 
 local function getLongitudinalForce()
     return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines):
-        Intersection(), { localizedOrientation.Forward():Unpack() })
+    Intersection(), { localizedOrientation.Forward():Unpack() })
 end
 
 local function getLateralForce()
@@ -31,7 +31,7 @@ end
 
 local function getVerticalForce()
     return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines):Intersection()
-        , { localizedOrientation.Up():Unpack() })
+    , { localizedOrientation.Up():Unpack() })
 end
 
 local atmoRangeFMaxPlus = 1
@@ -39,6 +39,9 @@ local atmoRangeFMaxMinus = 2
 local spaceRangeFMaxPlus = 3
 local spaceRangeFMaxMinus = 4
 
+---@param range number[]
+---@param positive boolean
+---@return number
 local function getCurrent(range, positive)
     local r
 

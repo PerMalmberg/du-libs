@@ -1,22 +1,35 @@
 local Ternary = require("util/Calc").Ternary
 
+---@class Accumulator
+---@field New fun(backlogCount:number, evaluator:function)
+---@field Add fun(value:number):number
+---@field Avg fun():number
+
+
 local Accumulator = {}
 Accumulator.__index = Accumulator
-function Accumulator:New(backlogCount, evaluator)
-    local self = {}
+
+---@param backlogCount number
+---@param evaluator function
+---@return Accumulator
+function Accumulator.New(backlogCount, evaluator)
+    local s = {}
 
     local log = {}
 
-    function self:Add(value)
+    ---@param value number
+    ---@return number
+    function s.Add(value)
         table.insert(log, 1, evaluator(value))
         while #log >= backlogCount do
             table.remove(log)
         end
 
-        return self:Avg()
+        return s.Avg()
     end
 
-    function self:Avg()
+    ---@return number
+    function s.Avg()
         local sum = 0
         for _, v in ipairs(log) do
             sum = sum + v
@@ -25,7 +38,7 @@ function Accumulator:New(backlogCount, evaluator)
         return sum / #log
     end
 
-    return setmetatable(self, Accumulator)
+    return setmetatable(s, Accumulator)
 end
 
 --- Makes the accumulator return a value between 0 and 1 indicating if added values are mostly true or false.

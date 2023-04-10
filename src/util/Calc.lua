@@ -25,6 +25,8 @@ calc.Round = function(number, decimalPlaces)
     return math.floor(number * mult + 0.5) / mult
 end
 
+---@param v number
+---@return number
 calc.Sign = function(v)
     if v > 0 then
         return 1
@@ -35,6 +37,9 @@ calc.Sign = function(v)
     end
 end
 
+---@param value number
+---@param sign integer -1 or 1
+---@return number
 calc.SetSign = function(value, sign)
     value = abs(value)
 
