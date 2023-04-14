@@ -141,8 +141,8 @@ calc.NearestPointOnLine = function(lineStart, lineDirection, pointAwayFromLine)
 end
 
 ---Gets the closest point to p on the line segment a-b
----@param a Vec3
----@param b Vec3
+---@param a Vec3 Line start
+---@param b Vec3 Line end
 ---@param p Vec3 The point away from the line
 ---@return Vec3 #Point on the line segment
 calc.NearestOnLineBetweenPoints = function(a, b, p)
