@@ -3,11 +3,12 @@ local Vec3 = require("math/Vec3")
 local solve3 = library.systemResolution3
 
 local atan = math.atan
+local cos = math.cos
 local max = math.max
 local min = math.min
 local abs = math.abs
-local deg2rad = math.rad
 local sqrt = math.sqrt
+local deg2rad = math.pi / 180
 
 local calc = {}
 
@@ -238,7 +239,7 @@ end
 ---@param axis Vec3 The axis to rotate around
 ---@return Vec3 #The vector, rotated around the axis
 calc.RotateAroundAxis = function(vector, rotationPoint, degrees, axis)
-    return (vector - rotationPoint):Rotate(deg2rad(degrees), axis:NormalizeInPlace()) + rotationPoint
+    return (vector - rotationPoint):Rotate(degrees * deg2rad, axis:NormalizeInPlace()) + rotationPoint
 end
 
 ---@param vector Vec3
@@ -316,6 +317,10 @@ calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
 
     -- Translate the point to form a projection
     return point + translationVector
+end
+
+calc.AngleToDot = function(angleDegrees)
+    return cos(angleDegrees * deg2rad)
 end
 
 return calc
