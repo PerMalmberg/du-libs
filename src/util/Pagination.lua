@@ -10,7 +10,7 @@ local p = {}
 function p.Paginate(list, page, perPage)
     if #list == 0 then return {} end
 
-    local totalPages = math.ceil(#list / perPage)
+    local totalPages = p.GetPageCount(list, perPage)
     page = calc.Clamp(page, 1, totalPages)
 
     local startIx = (page - 1) * perPage + 1
