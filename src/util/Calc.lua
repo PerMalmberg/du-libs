@@ -260,6 +260,7 @@ calc.SignLargestAxis = function(vector)
     return calc.Sign(arr[ix])
 end
 
+
 ---Calculates the brake distance
 ---@param speed number
 ---@param acceleration number
@@ -278,13 +279,8 @@ end
 ---@param remainingDistance number
 ---@return number
 calc.CalcBrakeAcceleration = function(speed, remainingDistance)
-    local d = (speed ^ 2) / (2 * remainingDistance)
-
-    if calc.IsNaN(d) or remainingDistance == 0 then
-        return 0
-    end
-
-    return d
+    ---Calculating the brake acceleration is the same mathematical operation as for the brake distance so we resuse for less code.
+    return calc.CalcBrakeDistance(speed, remainingDistance)
 end
 
 
@@ -296,7 +292,7 @@ end
 ---@param planePoint Vec3
 ---@param point Vec3
 ---@return number
-calc.SignedDistancePlanePoint = function(planeNormal, planePoint, point)
+local function signedDistancePlanePoint(planeNormal, planePoint, point)
     return planeNormal:Dot(point - planePoint)
 end
 
@@ -307,7 +303,7 @@ end
 ---@return Vec3
 calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
     -- First calculate the distance from the point to the plane:
-    local distance = calc.SignedDistancePlanePoint(planeNormal, planePoint, point)
+    local distance = signedDistancePlanePoint(planeNormal, planePoint, point)
 
     -- Reverse the sign of the distance
     distance = distance * -1;
