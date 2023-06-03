@@ -12,25 +12,25 @@ local localizedOrientation = vehicle.orientation.localized
 local abs = math.abs
 local min = math.min
 
-local longitudinalAtmoEngines = EngineGroup("longitudinal", "atmospheric_engine")
-local longitudinalSpaceEngines = EngineGroup("longitudinal", "space_engine")
-local lateralAtmoEngines = EngineGroup("lateral", "atmospheric_engine")
-local lateralSpaceEngines = EngineGroup("lateral", "space_engine")
-local verticalAtmoEngines = EngineGroup("vertical", "atmospheric_engine")
-local verticalSpaceEngines = EngineGroup("vertical", "space_engine")
+local longitudinalAtmoEngines = EngineGroup.New("longitudinal", "atmospheric_engine")
+local longitudinalSpaceEngines = EngineGroup.New("longitudinal", "space_engine")
+local lateralAtmoEngines = EngineGroup.New("lateral", "atmospheric_engine")
+local lateralSpaceEngines = EngineGroup.New("lateral", "space_engine")
+local verticalAtmoEngines = EngineGroup.New("vertical", "atmospheric_engine")
+local verticalSpaceEngines = EngineGroup.New("vertical", "space_engine")
 
 local function getLongitudinalForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines):
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines).
     Intersection(), { localizedOrientation.Forward():Unpack() })
 end
 
 local function getLateralForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines):Intersection(),
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines).Intersection(),
         { localizedOrientation.Right():Unpack() })
 end
 
 local function getVerticalForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines):Intersection()
+    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines).Intersection()
     , { localizedOrientation.Up():Unpack() })
 end
 
@@ -60,23 +60,23 @@ end
 
 local Engine = {}
 Engine.__index = Engine
-local singleton
+local s
 
 ---Gets the Engine instance
 ---@return EngineAbs
 function Engine.Instance()
-    if singleton then
-        return singleton
+    if s then
+        return s
     end
 
-    singleton = {}
+    s = {}
 
-    function singleton:MaxForce(engineGroup, axis, positive)
-        local f = construct.getMaxThrustAlongAxis(engineGroup:Intersection(), { axis:Unpack() })
+    function s:MaxForce(engineGroup, axis, positive)
+        local f = construct.getMaxThrustAlongAxis(engineGroup.Intersection(), { axis:Unpack() })
         return getCurrent(f, positive)
     end
 
-    function singleton:MaxAcceleration(engineGroup, axis, positive)
+    function s:MaxAcceleration(engineGroup, axis, positive)
         return self:MaxForce(engineGroup, axis, positive) / mass.Total()
     end
 
@@ -84,7 +84,7 @@ function Engine.Instance()
     ---@param direction Vec3 Direction to move
     ---@param considerAtmoDensity? boolean If true, consider atmo influence on engine power
     ---@return number
-    function singleton:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
+    function s:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
         considerAtmoDensity = Ternary(considerAtmoDensity == nil, false, considerAtmoDensity)
 
         -- Convert world direction to local (need to add position since the function subtracts that.
@@ -152,31 +152,31 @@ function Engine.Instance()
         return Ternary(density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF, density, 1) * maxThrust / totalMass
     end
 
-    function singleton:MaxForwardThrust()
+    function s:MaxForwardThrust()
         return getCurrent(getLongitudinalForce(), true)
     end
 
-    function singleton:MaxBackwardThrust()
+    function s:MaxBackwardThrust()
         return getCurrent(getLongitudinalForce(), false)
     end
 
-    function singleton:MaxRightwardThrust()
+    function s:MaxRightwardThrust()
         return getCurrent(getLateralForce(), true)
     end
 
-    function singleton:MaxLeftwardThrust()
+    function s:MaxLeftwardThrust()
         return getCurrent(getLateralForce(), false)
     end
 
-    function singleton:MaxUpwardThrust()
+    function s:MaxUpwardThrust()
         return getCurrent(getVerticalForce(), true)
     end
 
-    function singleton:MaxDownwardThrust()
+    function s:MaxDownwardThrust()
         return getCurrent(getVerticalForce(), false)
     end
 
-    return setmetatable(singleton, Engine)
+    return setmetatable(s, Engine)
 end
 
 return Engine
