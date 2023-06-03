@@ -1,63 +1,53 @@
 local ValueWidget = require("panel/ValueWidget")
 
 ---@class Panel
----@field Close fun(self:Panel)
----@field Clear fun(self:Panel)
----@field Update fun(self:Panel)
----@field CreateValue fun(self:Panel, title?:string, unit?:string)
+---@field New fun(title:string):Panel
+---@field Close fun()
+---@field Clear fun()
+---@field Update fun()
+---@field CreateValue fun(title?:string, unit?:string)
 
-local panel = {}
-panel.__index = panel
+local Panel = {}
+Panel.__index = Panel
 
-local function new(title)
-    local instance = {
-        title = title,
+---@param title string
+---@return Panel
+function Panel.New(title)
+    local s = {
         panelId = system.createWidgetPanel(title),
         widgets = {},
         updateHandlerId = nil
     }
 
-    setmetatable(instance, panel)
+    function s.Close()
+        system:clearEvent("update", s.updateHandlerId)
 
-    instance.updateHandlerId = system:onEvent("onUpdate", instance.Update, instance)
+        s.Clear()
 
-    return instance
-end
-
-function panel:Close()
-    system:clearEvent("update", self.updateHandlerId)
-
-    self:Clear()
-
-    system.destroyWidgetPanel(self.panelId)
-end
-
-function panel:Clear()
-    for _, widget in pairs(self.widgets) do
-        widget:Close()
+        system.destroyWidgetPanel(s.panelId)
     end
-    self.widgets = {}
-end
 
-function panel:CreateValue(title, unit)
-    local w = ValueWidget(self.panelId, title or "", unit or "")
-    self.widgets[w.widgetId] = w
-    return w
-end
-
-function panel:Update()
-    for _, widget in pairs(self.widgets) do
-        widget:Update()
-    end
-end
-
-return setmetatable(
-    {
-        new = new
-    },
-    {
-        __call = function(_, ...)
-            return new(...)
+    function s.Clear()
+        for _, widget in pairs(s.widgets) do
+            widget:Close()
         end
-    }
-)
+        s.widgets = {}
+    end
+
+    function s.CreateValue(valueTitle, unit)
+        local w = ValueWidget.New(s.panelId, valueTitle or "", unit or "")
+        s.widgets[w.WidgetId()] = w
+        return w
+    end
+
+    function s.Update()
+        for _, widget in pairs(s.widgets) do
+            widget.Update()
+        end
+    end
+
+    s.updateHandlerId = system:onEvent("onUpdate", s.Update, s)
+    return setmetatable(s, Panel)
+end
+
+return Panel

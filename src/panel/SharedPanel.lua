@@ -1,49 +1,39 @@
 local Panel = require("panel/Panel")
 
 ---@class SharedPanel
----@field Get fun(self:SharedPanel, title:string):Panel
----@field Close fun(self:SharedPanel, title:string)
+---@field Instance fun():SharedPanel
+---@field Get fun(title:string):Panel
+---@field Close fun(title:string)
 
 local singleton = nil
 
-local panel = {}
-panel.__index = panel
+local SharedPanel = {}
+SharedPanel.__index = SharedPanel
 
-local function new()
-    local instance = {
-        panels = {}
-    }
+---@return SharedPanel
+function SharedPanel.Instance()
+    if singleton then return singleton end
+    local s = {}
+    local panels = {}
 
-    setmetatable(instance, panel)
-    return instance
-end
-
-function panel:Close(title)
-    local p = self.panels[title]
-    if p ~= nil then
-        p:Close()
-        self.panels[title] = nil
-    end
-end
-
-function panel:Get(title)
-    if self.panels[title] == nil then
-        self.panels[title] = Panel(title)
-    end
-
-    return self.panels[title]
-end
-
-return setmetatable(
-    {
-        new = new
-    },
-    {
-        __call = function(_, ...)
-            if singleton == nil then
-                singleton = new()
-            end
-            return singleton
+    function s.Close(title)
+        local p = panels[title]
+        if p ~= nil then
+            p:Close()
+            panels[title] = nil
         end
-    }
-)
+    end
+
+    function s.Get(title)
+        if panels[title] == nil then
+            panels[title] = Panel.New(title)
+        end
+
+        return panels[title]
+    end
+
+    singleton = setmetatable(s, SharedPanel)
+    return s
+end
+
+return SharedPanel

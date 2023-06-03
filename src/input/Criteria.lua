@@ -28,7 +28,6 @@ function Criteria.New()
         if (isRepeat and not onRepeat) then
             return false
         elseif not isRepeat then
-
             if (not onPress and not onRelease) then
                 return false
             end
@@ -99,9 +98,7 @@ function Criteria.New()
         return s
     end
 
-    setmetatable(s, Criteria)
-
-    return s
+    return setmetatable(s, Criteria)
 end
 
 return Criteria
