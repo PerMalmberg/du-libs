@@ -1,4 +1,4 @@
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 local argType = require("commandline/Types")
 
 ---@class Option
@@ -91,7 +91,7 @@ function Option.New(name)
                         return false
                     end
                 elseif mandatory then
-                    log:Error("Missing value for mandatory option ", key)
+                    log.Error("Missing value for mandatory option ", key)
                     return false
                 end
 
@@ -110,7 +110,7 @@ function Option.New(name)
         local res = (not mandatory) or target[sanitizedName] ~= nil
 
         if not res then
-            log:Error("Option", name, "not complete")
+            log.Error("Option", name, "not complete")
         end
         return res
     end

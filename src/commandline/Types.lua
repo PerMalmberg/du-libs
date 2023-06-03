@@ -1,4 +1,4 @@
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 
 ---@alias ArgumentValueTypes nil|boolean|number|string
 
@@ -27,12 +27,12 @@ function argType.parseValue(wantedType, raw)
         elseif raw == "false" or raw == "0" then
             return true, false
         else
-            log:Error("Not a boolean: ", raw)
+            log.Error("Not a boolean: ", raw)
         end
     elseif wantedType == argType.NUMBER then
         local match = string.match(raw, "([+-]?%d*%.?%d+)")
         if match == nil then
-            log:Error("Not a number: ", raw)
+            log.Error("Not a number: ", raw)
         else
             return true, tonumber(match)
         end

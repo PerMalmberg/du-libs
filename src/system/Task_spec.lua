@@ -98,7 +98,7 @@ describe("Task", function()
         end).Then(function()
             shouldBeNil = "this is not nil"
         end).Catch(function(task)
-            errorMsg = task:Error()
+            errorMsg = task.Error()
         end).Finally(function(task)
             final = "the end!"
         end)
@@ -121,7 +121,7 @@ describe("Task", function()
             error("Opsie!")
         end).Catch(function(task)
             result = task:Result()
-            errorMsg = task:Error()
+            errorMsg = task.Error()
         end).Finally(function(task)
             final = "the end!"
         end)
@@ -175,5 +175,4 @@ describe("Task", function()
         assert.are_equal(45, sum)
         assert.are_equal(15, t:Result())
     end)
-
 end)

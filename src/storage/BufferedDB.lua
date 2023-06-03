@@ -1,5 +1,5 @@
 local Task = require("system/Task")
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 require("util/Table")
 local DBStoredData = require("storage/DBStoredData")
 
@@ -63,13 +63,13 @@ function BufferedDB.New(databank)
                 if d then
                     buffer[k] = d
                 else
-                    log:Error("Could not load key '", k, "'")
+                    log.Error("Could not load key '", k, "'")
                 end
 
                 coroutine.yield()
             end
         end).Then(persist).Catch(function(t)
-            error("Error in BeginLoad:" .. t:Error())
+            error("Error in BeginLoad:" .. t.Error())
         end)
     end
 

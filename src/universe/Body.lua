@@ -1,7 +1,6 @@
 -- Body - stellar body
 
 require("system/locale")
-local checks = require("debug/Checks")
 local Vec3 = require("math/Vec3")
 local abs = math.abs
 
@@ -28,10 +27,10 @@ local max = math.max
 local Body = {}
 Body.__index = Body
 
+---@param galaxy table
+---@param bodyData table
+---@return Body
 function Body.New(galaxy, bodyData)
-    checks.IsTable(galaxy, "galaxy", "body:Prepare")
-    checks.IsTable(bodyData, "data", "body:Prepare")
-
     local language = LocaleIndex()
 
     local s = {

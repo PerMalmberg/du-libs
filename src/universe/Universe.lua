@@ -1,6 +1,5 @@
 -- Universe - utility class to manage the in-game atlas
-local checks = require("debug/Checks")
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 local Galaxy = require("universe/Galaxy")
 local Position = require("universe/Position")
 local Vec3 = require("math/Vec3")
@@ -36,7 +35,11 @@ function Universe.Instance()
     local s = {}
 
     local duAtlas = require("atlas")
-    checks.IsTable(duAtlas, "duAtlas", "Universe:Instance")
+
+    if type(duAtlas) ~= "table" then
+        error("Invalid atlas")
+        unit.exit()
+    end
 
     for galaxyId, galaxyData in pairs(duAtlas) do
         galaxy[galaxyId] = Galaxy.New(galaxyId, galaxyData)
@@ -97,7 +100,7 @@ function Universe.Instance()
             end
         end
 
-        log:Error("Invalid position string: ", pos)
+        log.Error("Invalid position string: ", pos)
 
         return nil
     end
@@ -106,7 +109,6 @@ function Universe.Instance()
     ---@param coordinate Vec3 The coordinate to create the position for
     ---@return Position
     function s.CreatePos(coordinate)
-        checks.IsVec3(coordinate, "coordinate", "universe:CreatePos")
         local closestBody = s.ClosestBody(coordinate)
         local p = Position.New(s.CurrentGalaxy(), closestBody, coordinate)
         return p
@@ -116,8 +118,6 @@ function Universe.Instance()
     ---@param coordinate Vec3 The coordinate to get the closest body for
     ---@return Body #The Body
     function s.ClosestBody(coordinate)
-        checks.IsVec3(coordinate, "coordinate", "universe:ClosestBody")
-
         local g = s.CurrentGalaxy()
         return g:GetBodyClosestToPosition(coordinate)
     end

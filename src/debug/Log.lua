@@ -1,12 +1,16 @@
-local typeComp = require("debug/TypeComp")
-require("util/Table")
-local json = require("dkjson")
+---@class Log
+---@field Instance fun():Log
+---@field SetLevel fun(level:LogLevel)
+---@field Info fun(...:any)
+---@field Warning fun(...:any)
+---@field Error fun(...:any)
+---@field Debug fun(...:any)
 
-local log = {}
-log.__index = log
+local Log = {}
+Log.__index = Log
 
 ---@enum LogLevel
-log.LogLevel = {
+LVL = {
     OFF = 0,
     INFO = 2,
     ERROR = 3,
@@ -14,104 +18,104 @@ log.LogLevel = {
     DEBUG = 5
 }
 
-local function new()
-    local o = {
-        level = log.LogLevel.WARNING
-    }
-    return setmetatable(o, log)
-end
+local instance ---@type Log
 
-local function getLevelStr(lvl)
-    if lvl == log.LogLevel.DEBUG then
-        return "D"
-    elseif lvl == log.LogLevel.ERROR then
-        return "E"
-    elseif lvl == log.LogLevel.INFO then
-        return "I"
-    elseif lvl == log.LogLevel.WARNING then
-        return "W"
-    else
-        return "UNKOWN"
-    end
-end
+---@return Log
+function Log.Instance()
+    if instance then return instance end
+    local s = {}
+    local level = LVL.WARNING
 
-local function formatValues(...)
-    local parts = {}
-    local args = { ... }
-
-    for i = 1, #args, 1 do
-        local v
-
-        if args[i] == nil then
-            v = ""
+    local function getLevelStr(lvl)
+        if lvl == LVL.DEBUG then
+            return "D"
+        elseif lvl == LVL.ERROR then
+            return "E"
+        elseif lvl == LVL.INFO then
+            return "I"
+        elseif lvl == LVL.WARNING then
+            return "W"
         else
+            return "UNKOWN"
+        end
+    end
+
+    local function formatValues(...)
+        local parts = {}
+        local args = { ... }
+
+        for i = 1, #args, 1 do
+            local v
+
             v = args[i]
-        end
-
-        local s = ""
-
-        if typeComp.IsString(v) then
-            s = string.format("%s", v)
-        elseif typeComp.IsNumber(v) then
-            s = string.format("%s", tonumber(v))
-        elseif typeComp.IsBoolean(v) then
-            s = tostring(v)
-        elseif typeComp.IsFunction(v) then
-            s = tostring(v)
-        elseif typeComp.IsTable(v) then
-            s = "{"
-            for key, data in pairs(v) do
-                s = s .. formatValues(key, ": ", data, ",")
+            if v == nil then
+                v = ""
             end
-            s = s .. "}"
-        else
-            s = json.encode(v)
+
+            local r = ""
+
+            local t = type(v)
+            if t == "string" then
+                r = string.format("%s", v)
+            elseif t == "number" then
+                r = string.format("%s", tonumber(v))
+            elseif t == "boolean" then
+                r = tostring(v)
+            elseif t == "function" then
+                r = tostring(v)
+            elseif t == "table" then
+                r = "{"
+                for key, data in pairs(v) do
+                    r = r .. formatValues(key, ": ", data, ",")
+                end
+                r = r .. "}"
+            else
+                r = "unprintable: '" .. t .. "'"
+            end
+
+            parts[#parts + 1] = string.format("%s", r)
         end
 
-        table.insert(parts, #parts + 1, string.format(" %s", s))
+        return table.concat(parts)
     end
 
-    return table.concat(parts)
-end
-
-function log:print(level, ...)
-    if self.level >= level then
-        system.print(string.format("[%s] %s", getLevelStr(level), formatValues(...)))
-    end
-end
-
-function log:SetLevel(level)
-    self.level = level
-end
-
-function log:Info(msg, ...)
-    self:print(log.LogLevel.INFO, msg, ...)
-end
-
-function log:Warning(msg, ...)
-    self:print(log.LogLevel.WARNING, msg, ...)
-end
-
-function log:Error(msg, ...)
-    self:print(log.LogLevel.ERROR, msg, ...)
-end
-
-function log:Debug(msg, ...)
-    self:print(log.LogLevel.DEBUG, msg, ...)
-end
-
-local singleton
-
-return setmetatable(
-    {
-        new = new
-    },
-    {
-        __call = function(_, ...)
-            if singleton == nil then
-                singleton = new()
-            end
-            return singleton
+    function s.print(logLevel, ...)
+        if logLevel >= level then
+            system.print(string.format("[%s] %s", getLevelStr(logLevel), formatValues(...)))
         end
-    }
-)
+    end
+
+    ---@param logLevel LogLevel
+    function s.SetLevel(logLevel)
+        level = logLevel
+    end
+
+    ---@param msg any
+    ---@param ... any
+    function s.Info(msg, ...)
+        s.print(LVL.INFO, msg, ...)
+    end
+
+    ---comment
+    ---@param msg any
+    ---@param ... any
+    function s.Warning(msg, ...)
+        s.print(LVL.WARNING, msg, ...)
+    end
+
+    ---@param msg any
+    ---@param ... any
+    function s.Error(msg, ...)
+        s.print(LVL.ERROR, msg, ...)
+    end
+
+    ---@param msg any
+    ---@param ... any
+    function s.Debug(msg, ...)
+        s.print(LVL.DEBUG, msg, ...)
+    end
+
+    return setmetatable(s, Log)
+end
+
+return Log

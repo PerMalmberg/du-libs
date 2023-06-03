@@ -1,14 +1,16 @@
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 local su = require("util/StringUtil")
 local Command = require("commandline/Command")
 
 ---@alias CommandFunction fun(data:CommandResult)
 ---@alias PreparedCommand {cmd:Command, exec:CommandFunction}
+---@alias AccessCheck fun(cmd:string):boolean
 
 ---@class CommandLine
 ---@field Accept fun(name:string, func:CommandFunction):Command
 ---@field Clear fun()
 ---@field Exec fun(command:string)
+---@field SetAccess fun(f:AccessCheck)
 
 local CommandLine = {}
 CommandLine.__index = CommandLine
@@ -21,8 +23,17 @@ function CommandLine.Instance()
         return singleton
     end
 
-    local s = {}
+    local s       = {}
     local command = {} ---@type table<string, PreparedCommand>
+    ---@type AccessCheck
+    local access  = function(_)
+        return true
+    end
+
+    ---@param f AccessCheck
+    function s.SetAccess(f)
+        access = f
+    end
 
     ---Accepts a command
     ---@param name string
@@ -48,23 +59,27 @@ function CommandLine.Instance()
             local possibleCmd = table.remove(parts, 1)
             local preparedCommand = command[possibleCmd]
             if preparedCommand == nil then
-                log:Error("Command not supported:", possibleCmd)
+                log.Error("Command not supported:", possibleCmd)
             else
                 -- Let the command parse the rest of the arguments. If successful, we get back a table with the values as per the options.
                 -- The command-value itself may be empty if it is not mandatory.
                 local data = preparedCommand.cmd.Parse(parts)
                 if data == nil then
-                    log:Error("Cannot execute:", commandString)
+                    log.Error("Cannot execute:", commandString)
                 else
-                    log:Debug("Executing:", commandString)
-                    preparedCommand.exec(data)
+                    if access(possibleCmd) then
+                        log.Info("Executing:", commandString)
+                        preparedCommand.exec(data)
+                    else
+                        log.Error("Not authorized to execute command '", possibleCmd)
+                    end
                 end
             end
         end
 
         local status, ret = xpcall(exeFunc, traceback, input)
         if not status then
-            log:Error(ret)
+            log.Error(ret)
         end
     end
 

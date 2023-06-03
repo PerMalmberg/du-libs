@@ -1,6 +1,5 @@
 ---Represents a position in the universe.
 
-local checks = require("debug/Checks")
 local stringFormat = string.format
 
 ---@class Position
@@ -17,10 +16,6 @@ Position.__index = Position
 ---@param coordinate Vec3 World coordinates
 ---@return Position
 function Position.New(galaxy, bodyRef, coordinate)
-    checks.IsTable(galaxy, "galaxy", "Position:new")
-    checks.IsTable(bodyRef, "bodyRef", "Position:new")
-    checks.IsVec3(coordinate, "coordinate", "Position:new")
-
     local s = {
         Body = bodyRef,
         Galaxy = galaxy,

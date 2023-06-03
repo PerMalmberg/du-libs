@@ -1,5 +1,5 @@
 local SU = require("util/StringUtil")
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 
 ---@enum EngineType
 EngineType = {
@@ -125,7 +125,7 @@ function Lock.New()
             for size = EngineSize.XS, EngineSize.XL do
                 local count = limits[t][size]
                 if count ~= noLimit and count < 0 then
-                    log:Error(math.abs(count), " too many engines of type: ", typeStr(t), " ", sizeStr(size))
+                    log.Error(math.abs(count), " too many engines of type: ", typeStr(t), " ", sizeStr(size))
                     res = false
                 end
             end

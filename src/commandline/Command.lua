@@ -1,4 +1,4 @@
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 local Option = require("commandline/Option")
 local argType = require("commandline/Types")
 local calc = require("util/Calc")
@@ -93,11 +93,11 @@ function Command.New()
         local len = TableLen(args)
         if len < expectedLength then
             table.remove(args, 1)
-            log:Error("Too few arguments for command.")
+            log.Error("Too few arguments for command.")
             return nil
         elseif len > expectedLength then
-            log:Error("Too many arguments for command.")
-            log:Error(args)
+            log.Error("Too many arguments for command.")
+            log.Error(args)
             return nil
         end
 
@@ -109,7 +109,7 @@ function Command.New()
         end
 
         if data.commandValue == nil and mandatory then
-            log:Error("Missing mandatory value for command")
+            log.Error("Missing mandatory value for command")
             return nil
         end
 

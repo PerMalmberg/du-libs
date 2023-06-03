@@ -1,6 +1,6 @@
 local ContainerTalents = require("element/ContainerTalents")
 local Task = require("system/Task")
-local log = require("debug/Log")()
+local log = require("debug/Log").Instance()
 
 ---@class Container
 ---@field New fun(itemId:integer):Container
