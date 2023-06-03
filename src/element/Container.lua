@@ -1,6 +1,4 @@
-local ContainerTalents = require("element/ContainerTalents")
-local Task = require("system/Task")
-local log = require("debug/Log").Instance()
+---@module "element/ContainerTalents")
 
 ---@class Container
 ---@field New fun(itemId:integer):Container
@@ -127,10 +125,6 @@ local preFiltered ---@type table<ContainerType, Container[]>
 ---@param containerData ContainerData
 ---@return Container
 function Container.New(localId, unitMass, containerData)
-    local function rawMass()
-        return core.getElementMassById(localId)
-    end
-
     local s = {
         ---@type string
         name = core.getElementNameById(localId)
