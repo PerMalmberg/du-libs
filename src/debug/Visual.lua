@@ -1,48 +1,42 @@
 local Number = require("debug/NumberShape")
 
-local visual = {}
-visual.__index = visual
+---@class Visual
+---@field New fun():Visual
+---@field DrawNumber fun(number:number, coord:Vec3)
+---@field RemoveNumber fun(number:number)
 
-local function new()
-    local o = {
-        shapes = {}
-    }
-    return setmetatable(o, visual)
-end
+local Visual = {}
+Visual.__index = Visual
 
----Draws a number
----@param number number
----@param worldPos Vec3
-function visual:DrawNumber(number, worldPos)
-    local s = self.shapes[number]
-    if s ~= nil then
-        s.worldPos = worldPos
-    else
-        self.shapes[number] = Number(library.getCoreUnit(), number, worldPos)
-    end
-end
+local instance ---@type Visual
 
-function visual:RemoveNumber(number)
-    local s = self.shapes[number]
-    if s then
-        s:Remove()
-        self.shapes[number] = nil
-    end
-end
+function Visual.New()
+    if instance then return instance end
 
-local singleton = nil
+    local s = {}
+    local shapes = {}
 
-return setmetatable(
-    {
-        new = new
-    },
-    {
-        __call = function(_, ...)
-            if singleton == nil then
-                singleton = new()
-            end
-
-            return singleton
+    ---Draws a number
+    ---@param number number
+    ---@param worldPos Vec3
+    function s.DrawNumber(number, worldPos)
+        local shape = shapes[number]
+        if shape ~= nil then
+            shape.worldPos = worldPos
+        else
+            shapes[number] = Number.New(library.getCoreUnit(), number, worldPos)
         end
-    }
-)
+    end
+
+    function s.RemoveNumber(number)
+        local shape = shapes[number]
+        if shape then
+            shape.Remove()
+            shapes[number] = nil
+        end
+    end
+
+    return setmetatable(s, Visual)
+end
+
+return Visual

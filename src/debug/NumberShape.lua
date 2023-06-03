@@ -1,46 +1,43 @@
 local calc = require("util/Calc")
 
-local numberShape = {}
-numberShape.__index = numberShape
+---@class NumberShape
+---@field New fun(core:CoreUnit, number:number, worldPos:Vec3):NumberShape
+---@field Draw fun()
+---@field Remove fun()
 
-function numberShape:Draw()
-    local constructLocal = calc.WorldToLocal(self.worldPos)
-    if self.index == -1 then
-        self.index = self.core.spawnNumberSticker(self.number, constructLocal.x, constructLocal.y, constructLocal.z, "front")
-    else
-        self.core.moveSticker(self.index, constructLocal.x, constructLocal.y, constructLocal.z)
-    end
-end
+local NumberShape = {}
+NumberShape.__index = NumberShape
 
-function numberShape:Remove()
-    if self.index ~= -1 then
-        system:clearEvent("update", self.updateHandler)
-        self.core.deleteSticker(self.index)
-        self.index = -1
-    end
-end
-
-local function new(core, number, worldPos)
-    local instance = {
-        core = core,
-        number = number,
-        worldPos = worldPos,
+---@param core CoreUnit
+---@param number number
+---@param worldPos Vec3
+---@return NumberShape
+function NumberShape.New(core, number, worldPos)
+    local s = {
         index = -1,
         updateHandler = -1
     }
 
-    setmetatable(instance, numberShape)
-    instance.updateHandler = system:onEvent("onUpdate", instance.Draw, instance)
-    return instance
+    function s.Draw()
+        local constructLocal = calc.WorldToLocal(worldPos)
+        if s.index == -1 then
+            s.index = core.spawnNumberSticker(number, constructLocal.x, constructLocal.y, constructLocal.z,
+                "front")
+        else
+            core.moveSticker(s.index, constructLocal.x, constructLocal.y, constructLocal.z)
+        end
+    end
+
+    function s.Remove()
+        if s.index ~= -1 then
+            system:clearEvent("update", s.updateHandler)
+            core.deleteSticker(s.index)
+            s.index = -1
+        end
+    end
+
+    s.updateHandler = system:onEvent("onUpdate", s.Draw, s)
+    return setmetatable(s, NumberShape)
 end
 
-return setmetatable(
-        {
-            new = new
-        },
-        {
-            __call = function(_, ...)
-                return new(...)
-            end
-        }
-)
+return NumberShape
