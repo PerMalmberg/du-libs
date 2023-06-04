@@ -1,10 +1,14 @@
+---@class Item
+---@field New fun(core:CoreUnit):Item
+---@field FilterItemsByName fun(...):table[]
+
 local Item = {}
 Item.__index = Item
-function Item:New(core)
-    local self = {}
+function Item.New(core)
+    local s = {}
 
     -- Returns the list of items on the construct which has all the given name parts.
-    function self:FilterItemsByName(...)
+    function s.FilterItemsByName(...)
         local items = {}
         for _, lid in ipairs(core.getElementIdList()) do
             local info = system.getItem(core.getElementItemIdById(lid))
@@ -21,7 +25,7 @@ function Item:New(core)
             end
 
             if count == #terms then
-                table.insert(items, info)
+                items[#items + 1] = info
                 system.print(info.name)
             end
         end
@@ -29,12 +33,7 @@ function Item:New(core)
         return items
     end
 
-    return setmetatable(self, Item)
-end
-
--- Static function
-Item.staticFunction = function()
-
+    return setmetatable(s, Item)
 end
 
 return Item
