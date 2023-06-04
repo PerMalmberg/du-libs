@@ -79,8 +79,10 @@ function Log.Instance()
         return table.concat(parts)
     end
 
+    ---@param logLevel LogLevel
+    ---@param ... any
     function s.print(logLevel, ...)
-        if logLevel >= level then
+        if logLevel <= level then
             system.print(string.format("[%s] %s", getLevelStr(logLevel), formatValues(...)))
         end
     end

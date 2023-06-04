@@ -2,6 +2,7 @@ local log = require("debug/Log").Instance()
 local Option = require("commandline/Option")
 local argType = require("commandline/Types")
 local calc = require("util/Calc")
+require("util/Table")
 
 ---@module "commandline/Types"
 

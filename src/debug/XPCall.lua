@@ -1,5 +1,5 @@
 local XPCall = {}
-XPCall.__inded = XPCall
+XPCall.__index = XPCall
 
 XPCall.Call = function(entryName, f, ...)
     local status, err, _ = xpcall(f, traceback, ...)
