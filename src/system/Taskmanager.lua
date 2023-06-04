@@ -18,12 +18,9 @@ function Taskmanager.Instance()
     local s = {}
     local tasks = {} ---@type Task[]
 
+    ---@param task Task
     function s.Add(task)
-        if type(task) ~= "table" or type(task.Run) ~= "function" then
-            error("Can only add Tasks")
-        end
-
-        table.insert(tasks, task)
+        tasks[#tasks + 1] = task
     end
 
     function s.Count()
@@ -31,12 +28,11 @@ function Taskmanager.Instance()
     end
 
     local function update()
-        for i = 1, #tasks do
+        local keep = {}
+        for i, t in ipairs(tasks) do
             local curr = tasks[i]
-            if curr and curr:Run() == TaskState.Dead then
-                table.remove(tasks, i)
-
-                if not curr:Success() then
+            if curr.Run() == TaskState.Dead then
+                if not curr.Success() then
                     if curr.catcher then
                         curr.catcher(curr)
                     end
@@ -45,8 +41,12 @@ function Taskmanager.Instance()
                 if curr.finalizer then
                     curr.finalizer(curr)
                 end
+            else
+                keep[#keep + 1] = curr
             end
         end
+
+        tasks = keep
     end
 
     instance = setmetatable(s, Taskmanager)

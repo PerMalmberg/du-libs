@@ -1,4 +1,4 @@
-local taskmanager = require("system/Taskmanager"):Instance()
+local taskmanager = require("system/Taskmanager").Instance()
 local status = coroutine.status
 local resume = coroutine.resume
 
@@ -42,7 +42,7 @@ function Task.New(taskName, toRun, arg1, ...)
     local thenFunc = {} --- @type { co:thread, args:any[] }[]
 
     local function newThen(fun, ...)
-        table.insert(thenFunc, { co = coroutine.create(fun), args = { ... } })
+        thenFunc[#thenFunc + 1] = { co = coroutine.create(fun), args = { ... } }
     end
 
     local resultValue ---@type any|nil
@@ -53,14 +53,17 @@ function Task.New(taskName, toRun, arg1, ...)
 
     ---Moves to next call when needed
     local function next()
+        if #thenFunc == 0 then
+            return TaskState.Dead
+        end
+
         local dead = status(thenFunc[1].co) == "dead"
 
         if dead then
             -- Move to next, or are we done?
-            if #thenFunc > 1 then
-                table.remove(thenFunc, 1)
-            else
-                exited = true
+            table.remove(thenFunc, 1)
+            exited = #thenFunc == 0
+            if exited then
                 return TaskState.Dead
             end
         end
@@ -153,18 +156,10 @@ function Task.New(taskName, toRun, arg1, ...)
     return s
 end
 
-function Task.IsTask(task)
-    return type(task) == "table" and type(task.Run) == "function"
-end
-
 ---Waits for the task to complete
 ---@param task Task
 ---@return any
 function Task.Await(task)
-    if type(task) ~= "table" or type(task.Run) ~= "function" then
-        error("Can only await a Task")
-    end
-
     while not task.Exited() do
         coroutine.yield()
     end

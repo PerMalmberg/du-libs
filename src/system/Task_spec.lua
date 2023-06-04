@@ -1,6 +1,6 @@
 require("environment"):Prepare()
 local Task = require("system/Task")
-local taskmanger = require("system/Taskmanager"):Instance()
+local taskmanager = require("system/Taskmanager").Instance()
 
 local function runUpdate(count)
     for i = 1, count do
@@ -9,7 +9,7 @@ local function runUpdate(count)
 end
 
 local function createTask()
-    local t = Task.New("TestTask", function()
+    local t = Task.New("SumTo10", function()
         local sum = 0
 
         for i = 1, 10, 1 do
@@ -23,12 +23,12 @@ local function createTask()
     return t
 end
 
-describe("Task", function()
+describe("Task #task", function()
     it("Can run tasks", function()
         createTask()
-        assert.are_equal(1, taskmanger:Count())
+        assert.are_equal(1, taskmanager.Count())
         runUpdate(11)
-        assert.are_equal(0, taskmanger:Count())
+        assert.are_equal(0, taskmanager.Count())
     end)
 
     it("Can run multiple Then", function()
@@ -36,7 +36,7 @@ describe("Task", function()
         local a
         local b
 
-        local t = Task.New("TestTask", function()
+        local t = Task.New("Can run multiple Then", function()
             coroutine.yield()
             first = "first message"
         end).Then(function()
@@ -50,19 +50,20 @@ describe("Task", function()
             return "last value"
         end)
 
-        assert.are_equal(1, taskmanger:Count())
+        assert.are_equal(1, taskmanager.Count())
         runUpdate(8)
         assert.are_equal("first message", first)
         assert.are_equal("A", a)
         assert.are_equal("B", b)
-        assert.are_equal("last value", t:Result())
+        assert.are_equal("last value", t.Result())
     end)
 
     it("Can do await", function()
         local result = 0
 
         -- Only another Task/coroutine can do Await
-        Task.New("TestTask", function()
+        Task.New("Can do await", function()
+            print("running first task")
             local t = createTask()
             result = Task.Await(t)
         end)
@@ -79,12 +80,12 @@ describe("Task", function()
                 coroutine.yield()
             end).Then(function()
                 coroutine.yield()
-                result = 123
+                return 123
             end)
             result = Task.Await(t)
         end)
 
-        runUpdate(5)
+        runUpdate(50)
         assert.are_equal(123, result)
     end)
 
@@ -120,7 +121,7 @@ describe("Task", function()
         end).Then(function(task)
             error("Opsie!")
         end).Catch(function(task)
-            result = task:Result()
+            result = task.Result()
             errorMsg = task.Error()
         end).Finally(function(task)
             final = "the end!"
@@ -173,6 +174,44 @@ describe("Task", function()
         runUpdate(20)
 
         assert.are_equal(45, sum)
-        assert.are_equal(15, t:Result())
+        assert.are_equal(15, t.Result())
+    end)
+
+    it("Can handle task that exits", function()
+        local a = 0
+        local b = 0
+
+        local aTask = Task.New("A", function()
+            while true do
+                coroutine.yield()
+                a = a + 1
+                if a == 20 then
+                    return
+                end
+            end
+        end)
+
+        local bTask = Task.New("B", function()
+            while true do
+                coroutine.yield()
+                b = b + 1
+                if b == 20 then
+                    return
+                end
+            end
+        end)
+
+        local f = coroutine.create(function(...)
+            Task.Await(aTask)
+            Task.Await(bTask)
+        end)
+
+        while coroutine.status(f) ~= "dead" do
+            coroutine.resume(f)
+            runUpdate(1)
+        end
+
+        assert.Equal(20, a)
+        assert.Equal(20, b)
     end)
 end)
