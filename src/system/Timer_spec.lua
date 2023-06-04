@@ -12,8 +12,8 @@ describe("Timer", function()
         local id = "1234"
         local interval = 5678
 
-        t:Add(id, function() end, interval)
-        t:Remove(id)
+        t.Add(id, function() end, interval)
+        t.Remove(id)
 
         assert.stub(unit.setTimer).was_called_with(id, interval)
         assert.stub(unit.stopTimer).was_called_with(id)
@@ -27,7 +27,7 @@ describe("Timer", function()
         local t = Timer.Instance()
         local count = 0
 
-        t:Add("myEvent", function()
+        t.Add("myEvent", function()
             count = count + 1
         end, 1)
 

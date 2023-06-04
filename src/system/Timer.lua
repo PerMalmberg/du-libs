@@ -17,14 +17,14 @@ function Timer.Instance()
     local s = {}
     local functions = {}
 
-    function s:Add(id, func, interval)
-        s:Remove(id)
+    function s.Add(id, func, interval)
+        s.Remove(id)
 
         functions[id] = func
         unit.setTimer(id, interval)
     end
 
-    function s:Remove(id)
+    function s.Remove(id)
         if functions[id] ~= nil then
             unit.stopTimer(id)
             functions[id] = nil
