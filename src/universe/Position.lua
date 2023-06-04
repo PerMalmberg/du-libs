@@ -33,7 +33,6 @@ function Position.New(galaxy, bodyRef, coordinate)
     end
 
     function Position.__tostring(p) -- __tostring must be in the metatable, not the instance
-        local res
         -- The game starts giving space coordinates at an altitude of 70km above
         -- the planets radius on Alioth so we're mimicing that behaviour.
         local altitude = (p.Coords - p.Body.Geography.Center):Len() - p.Body.Geography.Radius
