@@ -65,10 +65,10 @@ function CommandLine.Instance()
                 -- The command-value itself may be empty if it is not mandatory.
                 local data = preparedCommand.cmd.Parse(parts)
                 if data == nil then
-                    log.Error("Cannot execute:", commandString)
+                    log.Error("Cannot execute: ", commandString)
                 else
                     if access(possibleCmd) then
-                        log.Info("Executing:", commandString)
+                        log.Info("Executing: ", commandString)
                         preparedCommand.exec(data)
                     else
                         log.Error("Not authorized to execute command '", possibleCmd)
