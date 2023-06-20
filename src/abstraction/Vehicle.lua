@@ -68,8 +68,7 @@ function Vehicle.New()
                 return construct.getMass()
             end,
             Total = function()
-                local m = singleton.mass
-                return m.Own() + m.MassOfDockedConstructs() + m.MassOfPlayers()
+                return construct.getTotalMass()
             end,
             MassOfDockedConstructs = function()
                 local mass = 0
