@@ -1,4 +1,4 @@
-local json = require("dkjson")
+local json = require("json")
 
 local function findAnyFunction(o)
     if type(o) ~= "table" then
