@@ -1,7 +1,7 @@
 local env = require("environment")
 local assert = require("luassert")
 local stub = require("luassert.stub")
-local json = require("dkjson")
+local json = require("json")
 
 local function runTicks()
     for i = 1, 1000, 1 do

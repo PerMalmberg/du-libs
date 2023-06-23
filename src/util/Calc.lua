@@ -4,11 +4,13 @@ local solve3 = library.systemResolution3
 
 local atan = math.atan
 local cos = math.cos
+local acos = math.acos
 local max = math.max
 local min = math.min
 local abs = math.abs
 local sqrt = math.sqrt
 local deg2rad = math.pi / 180
+local rad2deg = 180 / math.pi
 
 local calc = {}
 
@@ -315,8 +317,18 @@ calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
     return point + translationVector
 end
 
+---Returns the corresponding dot product for the given angle
+---@param angleDegrees number degrees
+---@return number
 calc.AngleToDot = function(angleDegrees)
     return cos(angleDegrees * deg2rad)
+end
+
+---Returns the corresponding angle for the given dot product (for unit vectors)
+---@param dot number Dot product
+---@return number # Angle in degrees
+calc.DotToAngle = function(dot)
+    return rad2deg * acos(dot)
 end
 
 return calc
