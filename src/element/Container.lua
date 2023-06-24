@@ -240,19 +240,19 @@ function Container.GetAllCo(filter)
     end
 
     if (hasBit(filter, ContainerType.Atmospheric)) then
-        CopyTable(containers, preFiltered[ContainerType.Atmospheric])
+        CopyList(containers, preFiltered[ContainerType.Atmospheric])
     end
 
     if (hasBit(filter, ContainerType.Space)) then
-        CopyTable(containers, preFiltered[ContainerType.Space])
+        CopyList(containers, preFiltered[ContainerType.Space])
     end
 
     if (hasBit(filter, ContainerType.Rocket)) then
-        CopyTable(containers, preFiltered[ContainerType.Rocket])
+        CopyList(containers, preFiltered[ContainerType.Rocket])
     end
 
     if (hasBit(filter, ContainerType.Standard)) then
-        CopyTable(containers, preFiltered[ContainerType.Standard])
+        CopyList(containers, preFiltered[ContainerType.Standard])
     end
 
     return containers
