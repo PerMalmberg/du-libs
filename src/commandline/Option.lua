@@ -110,7 +110,7 @@ function Option.New(name)
         local res = (not mandatory) or target[sanitizedName] ~= nil
 
         if not res then
-            log.Error("Option", name, "not complete")
+            log.Error("Option ", name, " not complete")
         end
         return res
     end

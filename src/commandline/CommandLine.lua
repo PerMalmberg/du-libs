@@ -59,7 +59,7 @@ function CommandLine.Instance()
             local possibleCmd = table.remove(parts, 1)
             local preparedCommand = command[possibleCmd]
             if preparedCommand == nil then
-                log.Error("Command not supported:", possibleCmd)
+                log.Error("Command not supported: ", possibleCmd)
             else
                 -- Let the command parse the rest of the arguments. If successful, we get back a table with the values as per the options.
                 -- The command-value itself may be empty if it is not mandatory.
