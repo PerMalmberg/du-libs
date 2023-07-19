@@ -14,25 +14,25 @@ function Visual.New()
     if instance then return instance end
 
     local s = {}
-    local shapes = {}
+    local numbers = {} ---@type NumberShape[]
 
     ---Draws a number
     ---@param number number
     ---@param worldPos Vec3
     function s.DrawNumber(number, worldPos)
-        local shape = shapes[number]
+        local shape = numbers[number]
         if shape ~= nil then
-            shape.worldPos = worldPos
+            shape.SetPos(worldPos)
         else
-            shapes[number] = Number.New(library.getCoreUnit(), number, worldPos)
+            numbers[number] = Number.New(library.getCoreUnit(), number, worldPos)
         end
     end
 
     function s.RemoveNumber(number)
-        local shape = shapes[number]
+        local shape = numbers[number]
         if shape then
             shape.Remove()
-            shapes[number] = nil
+            numbers[number] = nil
         end
     end
 
