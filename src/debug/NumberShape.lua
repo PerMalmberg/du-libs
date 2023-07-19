@@ -22,13 +22,12 @@ function NumberShape.New(core, number, worldPos)
     }
 
     function s.Draw()
-        local constructLocal = calc.WorldToLocal(s.worldPos)
+        local localPos = calc.WorldToLocal(s.worldPos)
         if s.index == -1 then
-            s.index = core.spawnNumberSticker(number, constructLocal.x, constructLocal.y, constructLocal.z,
+            s.index = core.spawnNumberSticker(number, localPos.x, localPos.y, localPos.z,
                 "front")
         else
-            system.print("moved: " .. tostring(s.index) .. " " .. tostring(
-                core.moveSticker(s.index, constructLocal.x, constructLocal.y, constructLocal.z)))
+            core.moveSticker(s.index, localPos.x, localPos.y, localPos.z)
         end
     end
 
