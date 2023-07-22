@@ -219,8 +219,9 @@ function Container.GetAllCo(filter)
         preFiltered[ContainerType.Space] = {}
         preFiltered[ContainerType.Rocket] = {}
 
+
         ---@diagnostic disable-next-line: undefined-field
-        for _, localId in ipairs(core.getElementIdList()) do
+        for i, localId in ipairs(core.getElementIdList()) do
             local elementClass = core.getElementClassById(localId) ---@type string
             elementClass = elementClass:lower()
 
@@ -235,7 +236,10 @@ function Container.GetAllCo(filter)
                     table.insert(preFiltered[ContainerType.Standard], makeContainer(localId))
                 end
             end
-            coroutine.yield()
+
+            if i % 10 == 0 then
+                coroutine.yield()
+            end
         end
     end
 
