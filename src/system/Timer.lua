@@ -16,17 +16,18 @@ function Timer.Instance()
 
     local s = {}
     local functions = {}
+    local toRemove = {} ---@type string[]
+    local toAdd = {} ---@type {id:string, f:fun(), interval:number}
 
     function s.Add(id, func, interval)
         s.Remove(id)
-
+        toAdd[#toAdd + 1] = { id = id, f = func, interval = interval }
         functions[id] = func
-        unit.setTimer(id, interval)
     end
 
     function s.Remove(id)
         if functions[id] ~= nil then
-            unit.stopTimer(id)
+            toRemove[#toRemove + 1] = id
             functions[id] = nil
         end
     end
@@ -38,6 +39,19 @@ function Timer.Instance()
             f()
         end
     end
+
+    -- Can't call unit.stopTimer/startTimer from flush so to anbled that possibility,
+    -- we do it via the update event. The timers are based on framerate anyhow so the
+    -- delay this induces is of no consequence.
+    system:onEvent("onUpdate", function()
+        while #toRemove > 0 do
+            unit.stopTimer(table.remove(toRemove, 1))
+        end
+        while #toAdd > 0 do
+            local add = table.remove(toAdd, 1)
+            unit.setTimer(add.id, add.interval)
+        end
+    end)
 
     -- Register with du-luac event handler
     unit:onEvent("onTimer", function(unit, id)
