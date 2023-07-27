@@ -14,6 +14,7 @@ describe("Timer", function()
 
         t.Add(id, function() end, interval)
         t.Remove(id)
+        system:triggerEvent("onUpdate")
 
         assert.stub(unit.setTimer).was_called_with(id, interval)
         assert.stub(unit.stopTimer).was_called_with(id)
