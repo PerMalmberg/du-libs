@@ -11,7 +11,7 @@ local core = library.getCoreUnit()
 ---@alias VAcceleration {Angular:fun3, Movement:fun3, localized: {Angular:fun3}}
 ---@alias VPosition {Current:fun3}
 ---@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AirFrictionAcceleration:fun3, AngularAirFrictionAcceleration:fun3, GravityDirection:fun3}
----@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}
+---@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}, IsFrozen:funb}
 ---@alias VSpeed {MaxSpeed:funn}
 
 ---@class Vehicle
@@ -137,6 +137,13 @@ function Vehicle.New()
             end
         },
         player = {
+            IsFrozen = function()
+                -- player.isFrozen() can return nil, reported to NQ in ticket 81865
+                local frozen = player.isFrozen()
+                -- Assume locked if it does
+                if frozen == nil then return true end
+                return frozen
+            end,
             position = {
                 Current = function()
                     return NV3(player.getWorldPosition())
