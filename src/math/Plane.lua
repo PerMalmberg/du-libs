@@ -27,6 +27,7 @@ function Plane.New(verticalFunc)
     end
 
     function s.Right()
+        -- Forward x Up instead of Up x Forward to get right instead of left dir
         return s.Forward():Cross(s.Up())
     end
 
