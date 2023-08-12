@@ -7,6 +7,7 @@ local clamp = require("util/Calc").Clamp
 ---@class Input
 ---@field Instance fun():Input
 ---@field Register fun(key:integer, criteria:Criteria, callback:InputCallback)
+---@field RegisterMany fun(keys:integer[], criteria:Criteria, callback:InputCallback)
 ---@field IsPressed fun(key:integer):boolean
 ---@field Clear fun()
 ---@field Throttle fun():number
@@ -87,6 +88,16 @@ function Input.Instance()
         end
 
         table.insert(cbPair, { criteria = criteria, func = callback })
+    end
+
+    ---Registers multiple keys to the same function
+    ---@param keys integer[]
+    ---@param critera Criteria
+    ---@param callback InputCallback
+    function s.RegisterMany(keys, critera, callback)
+        for _, v in ipairs(keys) do
+            s.Register(v, critera, callback)
+        end
     end
 
     ---Clears all registered callbacks
