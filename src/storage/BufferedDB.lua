@@ -8,7 +8,9 @@ local DBStoredData = require("storage/DBStoredData")
 ---@field Clear fun() Clears the databank
 ---@field IsLoaded fun():boolean Returns true when all keys have been loaded.
 ---@field IsDirty fun():boolean Returns true when a key has not yet been persisted
----@field Get fun(key:string, default):number|string|boolean|table|nil Returns the value of the key, or the default value
+---@field Get fun(key:string, default:any):number|string|boolean|table|nil Returns the value of the key, or the default value
+---@field Number fun(key:string, default:number):number Returns the value, or default
+---@field Bool fun(key:string, default:boolean):boolean Returns the value, or default
 ---@field Put fun(key:string, data:number|string|boolean|table) Stores the data in key. data can be string, number or (plain data) table.
 ---@field Size fun():number Returns the number of keys
 
@@ -49,7 +51,7 @@ function BufferedDB.New(databank)
     end
 
     ---Begins loading keys
-    function BufferedDB.BeginLoad()
+    function s.BeginLoad()
         if task then
             return
         end
@@ -72,7 +74,7 @@ function BufferedDB.New(databank)
         end)
     end
 
-    function BufferedDB.Clear()
+    function s.Clear()
         if not loaded then
             error("Call to Clear before loading is completed")
         end
@@ -84,21 +86,21 @@ function BufferedDB.New(databank)
 
     ---Checks if all keys are loaded
     ---@return boolean
-    function BufferedDB.IsLoaded()
+    function s.IsLoaded()
         return loaded
     end
 
     ---Checks if all data has been persisted
     ---@return boolean
-    function BufferedDB.IsDirty()
+    function s.IsDirty()
         return dirtyCount > 0
     end
 
     ---Gets data from key or default
     ---@param key string
-    ---@param default number|string|table
+    ---@param default number|string|boolean|table
     ---@return number|string|boolean|table|nil
-    function BufferedDB.Get(key, default)
+    function s.Get(key, default)
         if not loaded then
             error("Call to Get before loading is completed")
         end
@@ -111,10 +113,22 @@ function BufferedDB.New(databank)
         end
     end
 
+    ---@param key string
+    ---@param default number
+    function s.Number(key, default)
+        return s.Get(key, default)
+    end
+
+    ---@param key string
+    ---@param default boolean
+    function s.Boolean(key, default)
+        return s.Get(key, default)
+    end
+
     ---Puts data in key
     ---@param key string
     ---@param data number|string|boolean|table|boolean
-    function BufferedDB.Put(key, data)
+    function s.Put(key, data)
         if not loaded then
             error("Call to Put before loading is completed")
         end
@@ -123,7 +137,7 @@ function BufferedDB.New(databank)
         dirtyCount = dirtyCount + 1
     end
 
-    function BufferedDB.Size()
+    function s.Size()
         return TableLen(buffer)
     end
 
