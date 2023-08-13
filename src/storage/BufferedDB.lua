@@ -8,8 +8,8 @@ local DBStoredData = require("storage/DBStoredData")
 ---@field Clear fun() Clears the databank
 ---@field IsLoaded fun():boolean Returns true when all keys have been loaded.
 ---@field IsDirty fun():boolean Returns true when a key has not yet been persisted
----@field Get fun(key:string, default):number|string|table|nil Returns the value of the key, or the default value
----@field Put fun(key:string, data:number|string|table) Stores the data in key. data can be string, number or (plain data) table.
+---@field Get fun(key:string, default):number|string|boolean|table|nil Returns the value of the key, or the default value
+---@field Put fun(key:string, data:number|string|boolean|table) Stores the data in key. data can be string, number or (plain data) table.
 ---@field Size fun():number Returns the number of keys
 
 local BufferedDB = {}
@@ -35,7 +35,6 @@ function BufferedDB.New(databank)
         loaded = true
         while true do
             if s.IsDirty() then
-                local i = 0
                 for key, data in pairs(buffer) do
                     coroutine.yield()
 
@@ -98,7 +97,7 @@ function BufferedDB.New(databank)
     ---Gets data from key or default
     ---@param key string
     ---@param default number|string|table
-    ---@return number|string|table|nil
+    ---@return number|string|boolean|table|nil
     function BufferedDB.Get(key, default)
         if not loaded then
             error("Call to Get before loading is completed")
@@ -114,7 +113,7 @@ function BufferedDB.New(databank)
 
     ---Puts data in key
     ---@param key string
-    ---@param data number|string|table
+    ---@param data number|string|boolean|table|boolean
     function BufferedDB.Put(key, data)
         if not loaded then
             error("Call to Put before loading is completed")

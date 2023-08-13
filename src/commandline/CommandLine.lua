@@ -71,7 +71,7 @@ function CommandLine.Instance()
                         log.Info("Executing: ", commandString)
                         preparedCommand.exec(data)
                     else
-                        log.Error("Not authorized to execute command '", possibleCmd)
+                        log.Error("Not authorized to execute command '", possibleCmd, "'")
                     end
                 end
             end
