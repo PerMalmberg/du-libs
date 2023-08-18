@@ -10,7 +10,7 @@ local DBStoredData = require("storage/DBStoredData")
 ---@field IsDirty fun():boolean Returns true when a key has not yet been persisted
 ---@field Get fun(key:string, default:any):number|string|boolean|table|nil Returns the value of the key, or the default value
 ---@field Number fun(key:string, default:number):number Returns the value, or default
----@field Bool fun(key:string, default:boolean):boolean Returns the value, or default
+---@field Boolean fun(key:string, default:boolean):boolean Returns the value, or default
 ---@field Put fun(key:string, data:number|string|boolean|table) Stores the data in key. data can be string, number or (plain data) table.
 ---@field Size fun():number Returns the number of keys
 
