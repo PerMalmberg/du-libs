@@ -149,7 +149,7 @@ function Engine.Instance()
         local density = world.AtmoDensity()
 
         -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-        return Ternary(density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF, density, 1) * maxThrust / totalMass
+        return (density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF and density or 1) * maxThrust / totalMass
     end
 
     function s:MaxForwardThrust()
