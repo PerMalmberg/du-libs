@@ -156,7 +156,7 @@ function Container.New(localId, unitMass, containerData)
 
         local volume
         if containerData.FuelMass == xeronMass then
-            volume = fuelVolume(talents.RocketFuelTankHandling)
+            volume = standardVolume(talents.RocketFuelTankHandling)
         elseif containerData.FuelMass == kergonMass then
             volume = fuelVolume(talents.SpaceFuelTankHandling)
         else
