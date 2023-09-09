@@ -20,6 +20,7 @@ local max = math.max
 ---@field PvP {LocatedInSafeZone:boolean} Pvp properties
 ---@field DistanceToAtmo fun(self:Body, point:Vec3):number
 ---@field DistanceToAtmoEdge fun(self:Body, point:Vec3):number
+---@field HasAtmo fun():boolean
 ---@field IsInAtmo fun(self:Body, point:Vec3):boolean
 ---@field DistanceToHighestPossibleSurface fun(coordinate:Vec3):number
 ---@field AboveSeaLevel fun(coordinate:Vec3):boolean, number
@@ -88,6 +89,12 @@ function Body.New(galaxy, bodyData)
     ---@return boolean
     function s:IsInAtmo(coordinate)
         return s:DistanceToAtmo(coordinate) == 0
+    end
+
+    ---Returns true if the body has an atmosphere
+    ---@return boolean
+    function s:HasAtmo()
+        return s.Atmosphere.Radius > 0
     end
 
     ---Returns the distance to the highest possible point on the body or 0 if below higest surface
