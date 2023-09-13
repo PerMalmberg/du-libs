@@ -1,23 +1,26 @@
-local vehicle = require("abstraction/Vehicle").New()
-local G = vehicle.world.G
-local EngineGroup = require("abstraction/EngineGroup")
-local calc = require("util/Calc")
-local universe = require("universe/Universe").Instance()
-local constants = require("abstraction/Constants")
-local mass = vehicle.mass
-local world = vehicle.world
-local Ternary = calc.Ternary
-local IsInAtmo = world.IsInAtmo
-local localizedOrientation = vehicle.orientation.localized
-local abs = math.abs
-local min = math.min
+local vehicle                  = require("abstraction/Vehicle").New()
+local log                      = require("debug/Log").Instance()
+local G                        = vehicle.world.G
+local EngineGroup              = require("abstraction/EngineGroup")
+local calc                     = require("util/Calc")
+local universe                 = require("universe/Universe").Instance()
+local constants                = require("abstraction/Constants")
+local mass                     = vehicle.mass
+local world                    = vehicle.world
+local Ternary                  = calc.Ternary
+local IsInAtmo                 = world.IsInAtmo
+local localizedOrientation     = vehicle.orientation.localized
+local abs                      = math.abs
+local min                      = math.min
 
-local longitudinalAtmoEngines = EngineGroup.New("longitudinal", "atmospheric_engine")
+local longitudinalAtmoEngines  = EngineGroup.New("longitudinal", "atmospheric_engine")
 local longitudinalSpaceEngines = EngineGroup.New("longitudinal", "space_engine")
-local lateralAtmoEngines = EngineGroup.New("lateral", "atmospheric_engine")
-local lateralSpaceEngines = EngineGroup.New("lateral", "space_engine")
-local verticalAtmoEngines = EngineGroup.New("vertical", "atmospheric_engine")
-local verticalSpaceEngines = EngineGroup.New("vertical", "space_engine")
+local lateralAtmoEngines       = EngineGroup.New("lateral", "atmospheric_engine")
+local lateralSpaceEngines      = EngineGroup.New("lateral", "space_engine")
+local verticalAtmoEngines      = EngineGroup.New("vertical", "atmospheric_engine")
+local verticalHoverEngines     = EngineGroup.New("vertical", "hover_engine")
+local verticalSpaceEngines     = EngineGroup.New("vertical", "space_engine")
+local verticalBoosterEngines   = EngineGroup.New("vertical", "booster_engine")
 
 local function getLongitudinalForce()
     return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines).
@@ -34,24 +37,46 @@ local function getVerticalForce()
     , { localizedOrientation.Up():Unpack() })
 end
 
+local function getVerticalHoverForce()
+    return construct.getMaxThrustAlongAxis(verticalHoverEngines.Intersection(), { localizedOrientation.Up():Unpack() })
+end
+
+local function getVerticalBoosterForce()
+    return construct.getMaxThrustAlongAxis(verticalBoosterEngines.Intersection(), { localizedOrientation.Up():Unpack() })
+end
+
 local atmoRangeFMaxPlus = 1
 local atmoRangeFMaxMinus = 2
 local spaceRangeFMaxPlus = 3
 local spaceRangeFMaxMinus = 4
 
----@param range number[]
+---@alias rangeFunc fun():number[]
+---@alias rangeFuncArr rangeFunc[]
+
+---@param ranges rangeFunc[] The functions to call to get atmo and space forces. First one should be the regular engines, next hovers and vertical boosters
 ---@param positive boolean
 ---@return number
-local function getCurrent(range, positive)
-    local r
-
+local function getCurrent(ranges, positive)
+    local plus, minus
     if world.IsInAtmo() then
-        r = { FMaxPlus = range[atmoRangeFMaxPlus], FMaxMinus = range[atmoRangeFMaxMinus] }
+        plus = atmoRangeFMaxPlus
+        minus = atmoRangeFMaxMinus
     else
-        r = { FMaxPlus = range[spaceRangeFMaxPlus], FMaxMinus = range[spaceRangeFMaxMinus] }
+        plus = spaceRangeFMaxPlus
+        minus = spaceRangeFMaxMinus
     end
 
-    return calc.Ternary(positive, r.FMaxPlus, r.FMaxMinus)
+    local r = { FMaxPlus = 0, FMaxMinus = 0 }
+
+    for i, range in ipairs(ranges) do
+        local curr = range()
+
+        -- Only fallback to secondary ranges if first one doesn't have any force
+        r.FMaxPlus = r.FMaxPlus == 0 and curr[plus] or r.FMaxPlus
+        r.FMaxMinus = r.FMaxMinus == 0 and curr[minus] or r.FMaxMinus
+    end
+
+    return positive and r.FMaxPlus or r.FMaxMinus
 end
 
 ---@class EngineAbs
@@ -70,15 +95,6 @@ function Engine.Instance()
     end
 
     s = {}
-
-    function s:MaxForce(engineGroup, axis, positive)
-        local f = construct.getMaxThrustAlongAxis(engineGroup.Intersection(), { axis:Unpack() })
-        return getCurrent(f, positive)
-    end
-
-    function s:MaxAcceleration(engineGroup, axis, positive)
-        return self:MaxForce(engineGroup, axis, positive) / mass.Total()
-    end
 
     ---The maximum acceleration the construct can give without pushing itself more in one direction than the others.
     ---@param direction Vec3 Direction to move
@@ -100,9 +116,9 @@ function Engine.Instance()
 
         -- The 'negative' direction returns a negative value so abs() them.
         local maxForces = {
-            abs(Ternary(isRight, self:MaxRightwardThrust(), self:MaxLeftwardThrust())) * atmoInfluence,
-            abs(Ternary(isForward, self:MaxForwardThrust(), self:MaxBackwardThrust())) * atmoInfluence,
-            abs(Ternary(isUp, self:MaxUpwardThrust(), self:MaxDownwardThrust())) * atmoInfluence
+            abs(Ternary(isRight, s:MaxRightwardThrust(), s:MaxLeftwardThrust())) * atmoInfluence,
+            abs(Ternary(isForward, s:MaxForwardThrust(), s:MaxBackwardThrust())) * atmoInfluence,
+            abs(Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust())) * atmoInfluence
         }
 
         local totalMass = mass.Total()
@@ -153,27 +169,27 @@ function Engine.Instance()
     end
 
     function s:MaxForwardThrust()
-        return getCurrent(getLongitudinalForce(), true)
+        return getCurrent({ getLongitudinalForce }, true)
     end
 
     function s:MaxBackwardThrust()
-        return getCurrent(getLongitudinalForce(), false)
+        return getCurrent({ getLongitudinalForce }, false)
     end
 
     function s:MaxRightwardThrust()
-        return getCurrent(getLateralForce(), true)
+        return getCurrent({ getLateralForce }, true)
     end
 
     function s:MaxLeftwardThrust()
-        return getCurrent(getLateralForce(), false)
+        return getCurrent({ getLateralForce }, false)
     end
 
     function s:MaxUpwardThrust()
-        return getCurrent(getVerticalForce(), true)
+        return getCurrent({ getVerticalForce, getVerticalHoverForce, getVerticalBoosterForce }, true)
     end
 
     function s:MaxDownwardThrust()
-        return getCurrent(getVerticalForce(), false)
+        return getCurrent({ getVerticalForce }, false)
     end
 
     return setmetatable(s, Engine)
