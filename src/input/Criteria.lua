@@ -15,6 +15,7 @@ Criteria.__index = Criteria
 function Criteria.New()
     local s = {}
     local requiredMods = {} ---@type integer[]
+    local prohibitedMods = { [keys.lshift] = true, [keys.brake] = true } ---@type table<integer,boolean>
     local onRepeat = false
     local onPress = false
     local onRelease = false
@@ -38,8 +39,17 @@ function Criteria.New()
         end
 
         -- This check does not work with checking released keys, when the key is also a modifier key.
+
         for _, k in pairs(requiredMods) do
             if not input.IsPressed(k) then
+                return false
+            end
+        end
+
+        -- Also need to check that other modifier keys are *not* pressed
+        for k, v in pairs(prohibitedMods) do
+            if v and input.IsPressed(k) then
+                print(tostring(v) .. " " .. k)
                 return false
             end
         end
@@ -56,10 +66,14 @@ function Criteria.New()
         return "" .. str
     end
 
+    -- Q: Where is Alt key?
+    -- A: The game doesn't pass that though to us
+
     ---Requires left shift to be pressed
     ---@return Criteria
     function s.LShift()
         table.insert(requiredMods, keys.lshift)
+        prohibitedMods[keys.lshift] = false
         return s
     end
 
@@ -67,13 +81,7 @@ function Criteria.New()
     ---@return Criteria
     function s.LCtrl()
         table.insert(requiredMods, keys.brake)
-        return s
-    end
-
-    ---Requires left alt to be pressed
-    ---@return Criteria
-    function s.LAlt()
-        table.insert(requiredMods, keys.lalt)
+        prohibitedMods[keys.brake] = false
         return s
     end
 

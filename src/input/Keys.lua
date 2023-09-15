@@ -5,6 +5,7 @@ Keys.__index = Keys
 Keys["lshift"] = 1
 Keys["lalt"] = 2
 Keys["brake"] = 3
+Keys.FirstNonModifier = 4 -- this is the first key that Register() will accept
 Keys["forward"] = 4
 Keys["backward"] = 5
 Keys["yawleft"] = 6
@@ -33,18 +34,37 @@ Keys["option6"] = 28
 Keys["option7"] = 29
 Keys["option8"] = 30
 Keys["option9"] = 31
+Keys["option10"] = 32
+Keys["option11"] = 33
+Keys["option12"] = 34
+Keys["option13"] = 35
+Keys["option14"] = 36
+Keys["option15"] = 37
+Keys["option16"] = 38
+Keys["option17"] = 39
+Keys["option18"] = 40
+Keys["option19"] = 41
+Keys["option20"] = 42
+Keys["option21"] = 43
+Keys["option22"] = 44
+Keys["option23"] = 45
+Keys["option24"] = 46
+Keys["option25"] = 47
+Keys["option26"] = 48
+Keys["option27"] = 49
+Keys["option28"] = 50
+Keys["option29"] = 51
+
+local indexToName = {}
+for key, value in pairs(Keys) do
+    indexToName[value] = key
+end
 
 ---Returns the name of the key
 ---@param value integer
 ---@return string
 function Keys.Name(value)
-    for key, v in pairs(Keys) do
-        if value == v then
-            return key
-        end
-    end
-
-    return "unknown key"
+    return indexToName[value] or "unknown key"
 end
 
 return setmetatable({}, Keys)

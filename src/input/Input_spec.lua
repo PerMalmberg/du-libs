@@ -27,17 +27,17 @@ describe("Input", function()
     it("Can react to key press and release", function()
         local press = 0
         local release = 0
-        input.Register(keys.lshift, Criteria.New().OnPress(), function()
+        input.Register(keys.left, Criteria.New().OnPress(), function()
             press = press + 1
         end)
-        input.Register(keys.lshift, Criteria.New().OnRelease(), function()
+        input.Register(keys.left, Criteria.New().OnRelease(), function()
             release = release + 1
         end)
 
-        Press(keys.lshift)
+        Press(keys.left)
         assert.are_equal(1, press)
         assert.are_equal(0, release)
-        Release(keys.lshift)
+        Release(keys.left)
         assert.are_equal(1, press)
         assert.are_equal(1, release)
     end)
@@ -82,6 +82,5 @@ describe("Input", function()
         input.Clear()
         Press(keys.left)
         assert.are_equal(1, count)
-
     end)
 end)

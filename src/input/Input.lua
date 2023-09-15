@@ -9,6 +9,7 @@ local clamp = require("util/Calc").Clamp
 ---@field Register fun(key:integer, criteria:Criteria, callback:InputCallback)
 ---@field RegisterMany fun(keys:integer[], criteria:Criteria, callback:InputCallback)
 ---@field IsPressed fun(key:integer):boolean
+---@field KeyState fun():table<integer, boolean>
 ---@field Clear fun()
 ---@field Throttle fun():number
 ---@field SetThrottle fun(value:number)
@@ -75,11 +76,18 @@ function Input.Instance()
         return keyState[key] or false
     end
 
+    ---@return table<integer, boolean>
+    function s.KeyStates()
+        return keyState
+    end
+
     ---Register a function to be triggered when a key is pressed and certain modifiers are set
-    ---@param key integer
+    ---@param key integer Must be larger than Keys.FirstNonModifier
     ---@param criteria Criteria
     ---@param callback InputCallback
     function s.Register(key, criteria, callback)
+        if key < keys.FirstNonModifier then return end
+
         local cbPair = lookup[key]
 
         if cbPair == nil then
