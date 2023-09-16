@@ -3,8 +3,9 @@ local keys = require("input/Keys")
 ---@class Criteria
 ---@field Matches fun(input:Input, isRepeat:boolean, isPressed:boolean):boolean
 ---@field LShift fun():Criteria
+---@field IgnoreLShift fun():Criteria
 ---@field LCtrl fun():Criteria
----@field LAlt fun():Criteria
+---@field IgnoreLCtrl fun():Criteria
 ---@field OnPress fun():Criteria
 ---@field OnRelease fun():Criteria
 ---@field OnRepeat fun():Criteria
@@ -19,6 +20,7 @@ function Criteria.New()
     local onRepeat = false
     local onPress = false
     local onRelease = false
+    local lastPressed = false -- when reacting to release events, we must know that we've been pressed first
 
     ---Checks if the key events matches the set criterias
     ---@param input Input
@@ -26,35 +28,40 @@ function Criteria.New()
     ---@param isPressed boolean
     ---@return boolean
     function s.Matches(input, isRepeat, isPressed)
-        if (isRepeat and not onRepeat) then
-            return false
-        elseif not isRepeat then
-            if (not onPress and not onRelease) then
-                return false
-            end
+        local released = onRelease and not isPressed
 
-            if not ((onPress and isPressed) or (onRelease and not isPressed)) then
-                return false
-            end
+        if not onRepeat and isRepeat then
+            return false
         end
 
         -- This check does not work with checking released keys, when the key is also a modifier key.
-
-        for _, k in pairs(requiredMods) do
-            if not input.IsPressed(k) then
-                return false
+        -- Only when pressing the key
+        if isPressed then
+            for _, k in pairs(requiredMods) do
+                if not input.IsPressed(k) then
+                    return false
+                end
             end
+
+            -- Also need to check that other modifier keys are *not* pressed
+            for k, v in pairs(prohibitedMods) do
+                if v and input.IsPressed(k) then
+                    return false
+                end
+            end
+
+            lastPressed = true
         end
 
-        -- Also need to check that other modifier keys are *not* pressed
-        for k, v in pairs(prohibitedMods) do
-            if v and input.IsPressed(k) then
-                print(tostring(v) .. " " .. k)
+        if released then
+            if not lastPressed then
                 return false
             end
+
+            lastPressed = false
         end
 
-        return true
+        return (onRepeat and isRepeat) or (onPress and isPressed) or released
     end
 
     function Criteria.__tostring()
@@ -82,6 +89,18 @@ function Criteria.New()
     function s.LCtrl()
         table.insert(requiredMods, keys.brake)
         prohibitedMods[keys.brake] = false
+        return s
+    end
+
+    ---@return Criteria
+    function s.IgnoreLCtrl()
+        prohibitedMods[keys.brake] = false
+        return s
+    end
+
+    ---@return Criteria
+    function s.IgnoreLShift()
+        prohibitedMods[keys.lshift] = false
         return s
     end
 
