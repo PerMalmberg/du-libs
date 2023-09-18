@@ -1,48 +1,40 @@
-local vehicle                  = require("abstraction/Vehicle").New()
-local log                      = require("debug/Log").Instance()
-local G                        = vehicle.world.G
-local EngineGroup              = require("abstraction/EngineGroup")
-local calc                     = require("util/Calc")
-local universe                 = require("universe/Universe").Instance()
-local constants                = require("abstraction/Constants")
-local mass                     = vehicle.mass
-local world                    = vehicle.world
-local Ternary                  = calc.Ternary
-local IsInAtmo                 = world.IsInAtmo
-local localizedOrientation     = vehicle.orientation.localized
-local abs                      = math.abs
-local min                      = math.min
-
-local longitudinalAtmoEngines  = EngineGroup.New("longitudinal", "atmospheric_engine")
-local longitudinalSpaceEngines = EngineGroup.New("longitudinal", "space_engine")
-local lateralAtmoEngines       = EngineGroup.New("lateral", "atmospheric_engine")
-local lateralSpaceEngines      = EngineGroup.New("lateral", "space_engine")
-local verticalAtmoEngines      = EngineGroup.New("vertical", "atmospheric_engine")
-local verticalHoverEngines     = EngineGroup.New("vertical", "hover_engine")
-local verticalSpaceEngines     = EngineGroup.New("vertical", "space_engine")
-local verticalBoosterEngines   = EngineGroup.New("vertical", "booster_engine")
+local vehicle              = require("abstraction/Vehicle").New()
+local G                    = vehicle.world.G
+local calc                 = require("util/Calc")
+local universe             = require("universe/Universe").Instance()
+local constants            = require("abstraction/Constants")
+local TotalMass            = vehicle.mass.Total
+local world                = vehicle.world
+local Ternary              = calc.Ternary
+local IsInAtmo             = world.IsInAtmo
+local AtmoDensity          = world.AtmoDensity
+local localizedOrientation = vehicle.orientation.localized
+local abs                  = math.abs
+local min                  = math.min
+local mtaa                 = construct.getMaxThrustAlongAxis
 
 local function getLongitudinalForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), longitudinalAtmoEngines, longitudinalSpaceEngines).
-    Intersection(), { localizedOrientation.Forward():Unpack() })
+    return mtaa(
+        IsInAtmo() and "longitudinal atmospheric_engine" or "longitudinal space_engine",
+        { localizedOrientation.Forward():Unpack() })
 end
 
 local function getLateralForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), lateralAtmoEngines, lateralSpaceEngines).Intersection(),
+    return mtaa(IsInAtmo() and "lateral atmospheric_engine" or "lateral space_engine",
         { localizedOrientation.Right():Unpack() })
 end
 
 local function getVerticalForce()
-    return construct.getMaxThrustAlongAxis(Ternary(IsInAtmo(), verticalAtmoEngines, verticalSpaceEngines).Intersection()
-    , { localizedOrientation.Up():Unpack() })
+    return mtaa(IsInAtmo() and "vertical atmospheric_engine" or "vertical space_engine",
+        { localizedOrientation.Up():Unpack() })
 end
 
 local function getVerticalHoverForce()
-    return construct.getMaxThrustAlongAxis(verticalHoverEngines.Intersection(), { localizedOrientation.Up():Unpack() })
+    return mtaa("vertical hover_engine", { localizedOrientation.Up():Unpack() })
 end
 
 local function getVerticalBoosterForce()
-    return construct.getMaxThrustAlongAxis(verticalBoosterEngines.Intersection(), { localizedOrientation.Up():Unpack() })
+    return mtaa("vertical booster_engine", { localizedOrientation.Up():Unpack() })
 end
 
 local atmoRangeFMaxPlus = 1
@@ -112,7 +104,7 @@ function Engine.Instance()
         local isForward = directionParts[2] >= 0
         local isUp = directionParts[3] >= 0
 
-        local atmoInfluence = Ternary(world.IsInAtmo() and considerAtmoDensity, world.AtmoDensity(), 1)
+        local atmoInfluence = (IsInAtmo() and considerAtmoDensity) and AtmoDensity() or 1
 
         -- The 'negative' direction returns a negative value so abs() them.
         local maxForces = {
@@ -121,14 +113,14 @@ function Engine.Instance()
             abs(Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust())) * atmoInfluence
         }
 
-        local totalMass = mass.Total()
+        local totalMass = TotalMass()
 
         -- Add current gravity influence as force in Newtons, with the correct direction. As the force has a direction
         -- this works for knowing both available acceleration force as well as brake force.
         local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * G() * totalMass
-        maxForces[1] = maxForces[1] + gravityForce:Dot(localizedOrientation.Right() * calc.Ternary(isRight, 1, -1))
-        maxForces[2] = maxForces[2] + gravityForce:Dot(localizedOrientation.Forward() * calc.Ternary(isForward, 1, -1))
-        maxForces[3] = maxForces[3] + gravityForce:Dot(localizedOrientation.Up() * calc.Ternary(isUp, 1, -1))
+        maxForces[1] = maxForces[1] + gravityForce:Dot(localizedOrientation.Right() * (isRight and 1 or -1))
+        maxForces[2] = maxForces[2] + gravityForce:Dot(localizedOrientation.Forward() * (isForward and 1 or -1))
+        maxForces[3] = maxForces[3] + gravityForce:Dot(localizedOrientation.Up() * (isUp and 1 or -1))
 
         -- Find the index with the longest part, this is the main direction.
         -- If all are the same then we use the first one as the main direction
@@ -162,7 +154,7 @@ function Engine.Instance()
 
         -- Return the minimum of the forces divided by the mass to get acceleration.
         -- When space engines kick in, don't consider atmospheric density.
-        local density = world.AtmoDensity()
+        local density = AtmoDensity()
 
         -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
         return (density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF and density or 1) * maxThrust / totalMass
