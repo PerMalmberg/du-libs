@@ -83,10 +83,13 @@ calc.WorldToLocal = function(worldPos)
 
     return localPos
 end]]
---
+
+---Converts construct local coordinates to world coordinates
+---@param localCoord Vec3
+---@return Vec3
 calc.LocalToWorld = function(localCoord)
-    local xOffset = localCoord.x * Vec3.New(construct.getWorldOrientationForward())
-    local yOffset = localCoord.y * Vec3.New(construct.getWorldOrientationRight())
+    local xOffset = localCoord.x * Vec3.New(construct.getWorldOrientationRight())
+    local yOffset = localCoord.y * Vec3.New(construct.getWorldOrientationForward())
     local zOffset = localCoord.z * Vec3.New(construct.getWorldOrientationUp())
     return xOffset + yOffset + zOffset + Vec3.New(construct.getWorldPosition())
 end
