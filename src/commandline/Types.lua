@@ -4,6 +4,7 @@ local log = require("debug/Log").Instance()
 
 ---@enum ArgTypes
 local argType = {
+    EMPTY = 0,
     BOOLEAN = 1,
     NUMBER = 2,
     STRING = 3,

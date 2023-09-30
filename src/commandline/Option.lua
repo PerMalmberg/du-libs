@@ -7,7 +7,7 @@ local argType = require("commandline/Types")
 ---@field AsNumber fun():Option
 ---@field AsBoolean fun():Option
 ---@field AsEmptyBoolean fun():Option
----@field Mandatory fun():Option
+---@field Must fun():Option
 ---@field Default fun(v:ArgumentValueTypes):Option
 ---@field Parse fun(args:string[], target:table<string,ArgumentValueTypes>):boolean
 
@@ -51,7 +51,7 @@ function Option.New(name)
 
     ---Mark option as mandatory
     ---@return Option
-    function s.Mandatory()
+    function s.Must()
         mandatory = true
         return s
     end

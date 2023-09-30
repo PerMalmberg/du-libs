@@ -55,7 +55,7 @@ describe("Command line tests", function()
         local v
         local c = cmd.Accept("mandatory-arg", function(data)
             v = data.commandValue
-        end).AsString().Mandatory()
+        end).AsString().Must()
 
         test("mandatory-arg")
         assert.is_nil(v)
@@ -69,7 +69,7 @@ describe("Command line tests", function()
             v = data.mand
         end):AsEmpty()
 
-        c.Option("mand"):Mandatory():AsNumber()
+        c.Option("mand"):Must():AsNumber()
         test("mandatory-opt")
         assert.is_nil(v)
         test("mandatory-opt -mand 1")
@@ -81,7 +81,7 @@ describe("Command line tests", function()
 
         local c = cmd.Accept("bool", function(data)
             v = data.commandValue
-        end).AsBoolean().Mandatory()
+        end).AsBoolean().Must()
 
         test("bool")
         assert.is_nil(v)
@@ -96,7 +96,7 @@ describe("Command line tests", function()
             v = data.opt1
         end)
 
-        c.Option("opt1").AsBoolean().Mandatory()
+        c.Option("opt1").AsBoolean().Must()
 
         test("bool")
         assert.is_nil(v)
@@ -125,13 +125,13 @@ describe("Command line tests", function()
 
         local c = cmd.Accept("complex", function(data)
             d = data
-        end).AsString():Mandatory()
-        c.Option("-a").AsNumber().Mandatory()
-        c.Option("--boo").AsString().Mandatory()
-        c.Option("--c").AsBoolean().Mandatory()
-        c.Option("-f").AsNumber().Mandatory()
-        c.Option("-default").AsNumber().Mandatory().Default(678)
-        c.Option("-negative").AsNumber().Mandatory()
+        end).AsString():Must()
+        c.Option("-a").AsNumber().Must()
+        c.Option("--boo").AsString().Must()
+        c.Option("--c").AsBoolean().Must()
+        c.Option("-f").AsNumber().Must()
+        c.Option("-default").AsNumber().Must().Default(678)
+        c.Option("-negative").AsNumber().Must()
 
 
         test("complex -a 1 --boo abc --c true 'text with space' -f 123.456 -negative -123.456")

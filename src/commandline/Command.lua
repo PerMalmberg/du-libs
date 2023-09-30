@@ -14,7 +14,7 @@ require("util/Table")
 ---@field AsNumber fun():Command
 ---@field AsBoolean fun():Command
 ---@field AsEmpty fun():Command
----@field Mandatory fun():Command
+---@field Must fun():Command
 ---@field Option fun(name:string):Option
 ---@field Parse fun(args:string[]):CommandResult
 
@@ -22,7 +22,7 @@ local Command = {}
 Command.__index = Command
 
 function Command.New()
-    local s = {} ---@type Command
+    local s = {}
     local type = argType.EMPTY ---@type ArgTypes
     local option = {} ---@type table<string,Option>
     local mandatory = false
@@ -60,7 +60,7 @@ function Command.New()
 
     ---Marks command as mandatory
     ---@return Command
-    function s.Mandatory()
+    function s.Must()
         if type == argType.EMPTY then
             error("Command is of type empty, cannot set as mandatory")
         end
@@ -84,16 +84,15 @@ function Command.New()
         -- Let the options extract their data first; whatever is left is for the command
         local data = {} ---@type CommandResult
 
-        for _, option in pairs(option) do
-            if not option.Parse(args, data) then
+        for _, opt in pairs(option) do
+            if not opt.Parse(args, data) then
                 return nil
             end
         end
 
-        local expectedLength = calc.Ternary(type == argType.EMPTY, 0, 1)
+        local expectedLength = type == argType.EMPTY and 0 or 1
         local len = TableLen(args)
         if len < expectedLength then
-            table.remove(args, 1)
             log.Error("Too few arguments for command.")
             return nil
         elseif len > expectedLength then
