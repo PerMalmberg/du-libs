@@ -22,9 +22,9 @@ function Option.New(name)
         name = "-" .. name
     end
 
-    local s = {} ---@type Option
+    local s = {}
     local sanitizedName = name:gsub("^%-*", "")
-    local optType = nil
+    local optType = argType.EMPTY
     local mandatory = false
     local default = nil
 
