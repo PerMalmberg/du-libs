@@ -8,6 +8,7 @@ local world                = vehicle.world
 local Ternary              = calc.Ternary
 local IsInAtmo             = world.IsInAtmo
 local AtmoDensity          = world.AtmoDensity
+local GravityDirection     = world.GravityDirection
 local localizedOrientation = vehicle.orientation.localized
 local abs                  = math.abs
 local min                  = math.min
@@ -95,7 +96,6 @@ function Engine.Instance()
     function s:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
         considerAtmoDensity = Ternary(considerAtmoDensity == nil, false, considerAtmoDensity)
 
-        -- Convert world direction to local (need to add position since the function subtracts that.
         direction = calc.WorldDirectionToLocal(direction)
 
         local directionParts = { direction:Unpack() }
@@ -107,20 +107,24 @@ function Engine.Instance()
         local atmoInfluence = (IsInAtmo() and considerAtmoDensity) and AtmoDensity() or 1
 
         -- The 'negative' direction returns a negative value so abs() them.
-        local maxForces = {
-            abs(Ternary(isRight, s:MaxRightwardThrust(), s:MaxLeftwardThrust())) * atmoInfluence,
-            abs(Ternary(isForward, s:MaxForwardThrust(), s:MaxBackwardThrust())) * atmoInfluence,
-            abs(Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust())) * atmoInfluence
+        local rawEnginePower = {
+            abs(Ternary(isRight, s:MaxRightwardThrust(), s:MaxLeftwardThrust())),
+            abs(Ternary(isForward, s:MaxForwardThrust(), s:MaxBackwardThrust())),
+            abs(Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust()))
         }
 
         local totalMass = TotalMass()
 
         -- Add current gravity influence as force in Newtons, with the correct direction. As the force has a direction
         -- this works for knowing both available acceleration force as well as brake force.
-        local gravityForce = calc.WorldDirectionToLocal(universe:VerticalReferenceVector()) * G() * totalMass
-        maxForces[1] = maxForces[1] + gravityForce:Dot(localizedOrientation.Right() * (isRight and 1 or -1))
-        maxForces[2] = maxForces[2] + gravityForce:Dot(localizedOrientation.Forward() * (isForward and 1 or -1))
-        maxForces[3] = maxForces[3] + gravityForce:Dot(localizedOrientation.Up() * (isUp and 1 or -1))
+        local gravityForce = calc.WorldDirectionToLocal(GravityDirection()) * G() * totalMass
+        local maxForces = { 0, 0, 0 }
+        maxForces[1] = rawEnginePower[1] * atmoInfluence +
+            gravityForce:Dot(localizedOrientation.Right() * (isRight and 1 or -1))
+        maxForces[2] = rawEnginePower[2] * atmoInfluence +
+            gravityForce:Dot(localizedOrientation.Forward() * (isForward and 1 or -1))
+        maxForces[3] = rawEnginePower[3] * atmoInfluence +
+            gravityForce:Dot(localizedOrientation.Up() * (isUp and 1 or -1))
 
         -- Find the index with the longest part, this is the main direction.
         -- If all are the same then we use the first one as the main direction
@@ -135,20 +139,22 @@ function Engine.Instance()
             end
         end
 
-        -- Create a vector that represents the max force of the main direction, Unpack it to
-        -- get the required forces for each axis, in absolute values
-        local maxVec = maxForces[main] * direction
-        local requiredForces = { abs(maxVec.x), abs(maxVec.y), abs(maxVec.z) }
+        -- Create a vector that represents the desired force if traveling in the main direction
+        local desiredVec = direction * maxForces[main]
+        -- Unpack it to get the required forces for each axis, in absolute values
+        local desiredForces = { abs(desiredVec.x), abs(desiredVec.y), abs(desiredVec.z) }
 
         -- Start with the known largest force
-        local maxThrust = requiredForces[main]
+        local maxThrust = desiredForces[main]
 
         -- Now check if any of the axes can give less than what is required,
         -- if any is found to be too weak, the one with the least thrust is the limiter.
-        for i, required in ipairs(requiredForces) do
-            if required > maxForces[i] then
+        for i, available in ipairs(maxForces) do
+            local availableCurr = abs(available)
+            -- If there's not engine on an axis, then ingore it.
+            if rawEnginePower[i] > 0 and availableCurr < desiredForces[i] then
                 -- This engine can't deliver the required force
-                maxThrust = min(maxThrust, maxForces[i])
+                maxThrust = min(maxThrust, availableCurr)
             end
         end
 
