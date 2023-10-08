@@ -105,6 +105,19 @@ describe("Input", function()
         assert.are_equal(0, count)
     end)
 
+    it("Can react on only Ctrl", function()
+        input.Clear()
+        local count = 0
+
+        input.Register(keys.brake, Criteria.New().LCtrl().OnPress(), function()
+            count = count + 1
+        end)
+
+        Press(keys.brake)
+
+        assert.are_equal(1, count)
+    end)
+
     it("Can ignore modifier keys", function()
         input.Clear()
         local count = 0

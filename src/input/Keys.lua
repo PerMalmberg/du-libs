@@ -5,7 +5,6 @@ Keys.__index = Keys
 Keys["lshift"] = 1
 Keys["lalt"] = 2
 Keys["brake"] = 3
-Keys.FirstNonModifier = 4 -- this is the first key that Register() will accept
 Keys["forward"] = 4
 Keys["backward"] = 5
 Keys["yawleft"] = 6

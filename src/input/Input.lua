@@ -82,12 +82,10 @@ function Input.Instance()
     end
 
     ---Register a function to be triggered when a key is pressed and certain modifiers are set
-    ---@param key integer Must be larger than Keys.FirstNonModifier
+    ---@param key integer
     ---@param criteria Criteria
     ---@param callback InputCallback
     function s.Register(key, criteria, callback)
-        if key < keys.FirstNonModifier then return end
-
         local cbPair = lookup[key]
 
         if cbPair == nil then
@@ -111,6 +109,7 @@ function Input.Instance()
     ---Clears all registered callbacks
     function s.Clear()
         lookup = {}
+        keyState = {}
     end
 
     ---Returns the throttle value, 0...1
