@@ -67,7 +67,9 @@ function BufferedDB.New(databank)
                     log.Error("Could not load key '", k, "'")
                 end
 
-                coroutine.yield()
+                if i % 20 == 0 then
+                    coroutine.yield()
+                end
             end
         end).Then(persist).Catch(function(t)
             error("Error in BeginLoad:" .. t.Error())
