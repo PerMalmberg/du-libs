@@ -5,44 +5,21 @@ local core                    = library.getCoreUnit()
 ---@alias fun3 fun():Vec3
 ---@alias funn fun():number
 ---@alias funb fun():boolean
----@alias VMass { Own:funn, MassOfDockedConstructs:funn, MassOfPlayers:funn, Total:funn}
 ---@alias VPosition {Current:fun3}
 ---@alias VPlayer {position:{Current:fun3, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}}
 ---@alias VSpeed {MaxSpeed:funn}
 
 ---@class Vehicle
----@field mass VMass
 ---@field position VPosition
 ---@field player VPlayer
 ---@field speed VSpeed
 
 local Vehicle                 = {}
 Vehicle.__index               = Vehicle
-local singleton ---@type Vehicle
 
 local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
 
 local vehicle                 = {
-    mass = {
-        Own = function()
-            return construct.getMass()
-        end,
-        MassOfDockedConstructs = function()
-            local mass = 0
-            for _, id in ipairs(construct.getDockedConstructs()) do
-                mass = mass + construct.getDockedConstructMass(id)
-            end
-
-            return mass
-        end,
-        MassOfPlayers = function()
-            local mass = 0
-            for _, id in ipairs(construct.getPlayersOnBoard()) do
-                mass = mass + construct.getBoardedPlayerMass(id)
-            end
-            return mass
-        end
-    },
     acceleration = {
         Angular = function()
             return NV3(construct.getWorldAngularAcceleration())
@@ -87,7 +64,6 @@ MaxSpeed                      = function()
     return construct.getMaxSpeed()
 end
 
-TotalMass                     = construct.getTotalMass
 Acceleration                  = function() return NV3(construct.getWorldAcceleration()) end
 Velocity                      = function() return NV3(construct.getWorldAbsoluteVelocity()) end
 LocalAngVel                   = function() return NV3(construct.getAngularVelocity()) end
@@ -96,5 +72,7 @@ LocalAngAcc                   = function() return NV3(construct.getAngularAccele
 -- player.isFrozen() can return nil, reported to NQ in ticket 81865
 -- Their answer is "don't call from flush"
 IsFrozen                      = player.isFrozen
+
+TotalMass                     = construct.getTotalMass
 
 return vehicle
