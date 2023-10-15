@@ -1,4 +1,4 @@
-local vehicle = require("abstraction/Vehicle").New()
+require("abstraction/Vehicle")
 local universe = require("universe/Universe").Instance()
 
 ---@alias Fun3 fun():Vec3
@@ -18,7 +18,7 @@ Plane.__index = Plane
 ---@return Plane
 function Plane.New(verticalFunc)
     local s = {}
-    local constructRight = vehicle.orientation.Right
+    local constructRight = Right
 
     s.Up = verticalFunc
 

@@ -1,41 +1,33 @@
-local vehicle              = require("abstraction/Vehicle").New()
-local G                    = vehicle.world.G
-local calc                 = require("util/Calc")
-local universe             = require("universe/Universe").Instance()
-local constants            = require("abstraction/Constants")
-local TotalMass            = vehicle.mass.Total
-local world                = vehicle.world
-local Ternary              = calc.Ternary
-local IsInAtmo             = world.IsInAtmo
-local AtmoDensity          = world.AtmoDensity
-local GravityDirection     = world.GravityDirection
-local localizedOrientation = vehicle.orientation.localized
-local abs                  = math.abs
-local min                  = math.min
-local mtaa                 = construct.getMaxThrustAlongAxis
+require("abstraction/Vehicle")
+local calc      = require("util/Calc")
+local constants = require("abstraction/Constants")
+local Ternary   = calc.Ternary
+local abs       = math.abs
+local min       = math.min
+local mtaa      = construct.getMaxThrustAlongAxis
 
 local function getLongitudinalForce()
     return mtaa(
         IsInAtmo() and "longitudinal atmospheric_engine" or "longitudinal space_engine",
-        { localizedOrientation.Forward():Unpack() })
+        { LocalForward():Unpack() })
 end
 
 local function getLateralForce()
     return mtaa(IsInAtmo() and "lateral atmospheric_engine" or "lateral space_engine",
-        { localizedOrientation.Right():Unpack() })
+        { LocalRight():Unpack() })
 end
 
 local function getVerticalForce()
     return mtaa(IsInAtmo() and "vertical atmospheric_engine" or "vertical space_engine",
-        { localizedOrientation.Up():Unpack() })
+        { LocalUp():Unpack() })
 end
 
 local function getVerticalHoverForce()
-    return mtaa("vertical hover_engine", { localizedOrientation.Up():Unpack() })
+    return mtaa("vertical hover_engine", { LocalUp():Unpack() })
 end
 
 local function getVerticalBoosterForce()
-    return mtaa("vertical booster_engine", { localizedOrientation.Up():Unpack() })
+    return mtaa("vertical booster_engine", { LocalUp():Unpack() })
 end
 
 local atmoRangeFMaxPlus = 1
@@ -51,7 +43,7 @@ local spaceRangeFMaxMinus = 4
 ---@return number
 local function getCurrent(ranges, positive)
     local plus, minus
-    if world.IsInAtmo() then
+    if IsInAtmo() then
         plus = atmoRangeFMaxPlus
         minus = atmoRangeFMaxMinus
     else
@@ -120,11 +112,11 @@ function Engine.Instance()
         local gravityForce = calc.WorldDirectionToLocal(GravityDirection()) * G() * totalMass
         local maxForces = { 0, 0, 0 }
         maxForces[1] = rawEnginePower[1] * atmoInfluence +
-            gravityForce:Dot(localizedOrientation.Right() * (isRight and 1 or -1))
+            gravityForce:Dot(LocalRight() * (isRight and 1 or -1))
         maxForces[2] = rawEnginePower[2] * atmoInfluence +
-            gravityForce:Dot(localizedOrientation.Forward() * (isForward and 1 or -1))
+            gravityForce:Dot(LocalForward() * (isForward and 1 or -1))
         maxForces[3] = rawEnginePower[3] * atmoInfluence +
-            gravityForce:Dot(localizedOrientation.Up() * (isUp and 1 or -1))
+            gravityForce:Dot(LocalUp() * (isUp and 1 or -1))
 
         -- Find the index with the longest part, this is the main direction.
         -- If all are the same then we use the first one as the main direction

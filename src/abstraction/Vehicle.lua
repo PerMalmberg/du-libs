@@ -1,191 +1,100 @@
-local Vec3 = require("math/Vec3")
-local NV3 = Vec3.New
-local core = library.getCoreUnit()
+local Vec3                    = require("math/Vec3")
+local NV3                     = Vec3.New
+local core                    = library.getCoreUnit()
 
 ---@alias fun3 fun():Vec3
 ---@alias funn fun():number
 ---@alias funb fun():boolean
----@alias VOrientation { Up:fun3, Right:fun3, Forward:fun3, localized: { Up:fun3, Right:fun3, Forward:fun3 } }
 ---@alias VMass { Own:funn, MassOfDockedConstructs:funn, MassOfPlayers:funn, Total:funn}
----@alias VVelocity {Angular:fun3, Movement:fun3, localized:{Angular:fun3}}
----@alias VAcceleration {Angular:fun3, Movement:fun3, localized: {Angular:fun3}}
 ---@alias VPosition {Current:fun3}
----@alias VWorld {AtmoDensity:funn, IsInAtmo:funb, IsInSpace:funb, G:funn, AirFrictionAcceleration:fun3, AngularAirFrictionAcceleration:fun3, GravityDirection:fun3}
----@alias VPlayer {position:{Current:fun3, orientation:{Up:fun3}}, camera:{position:{Current:fun3}, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}, IsFrozen:funb}
+---@alias VPlayer {position:{Current:fun3, orientation:{Forward:fun3, Up:fun3, Right:fun3, IsFirstPerson:funb}}}}
 ---@alias VSpeed {MaxSpeed:funn}
 
 ---@class Vehicle
----@field orientation VOrientation
 ---@field mass VMass
----@field velocity VVelocity
----@field acceleration VAcceleration
 ---@field position VPosition
----@field world VWorld
 ---@field player VPlayer
 ---@field speed VSpeed
 
-local Vehicle = {}
-Vehicle.__index = Vehicle
+local Vehicle                 = {}
+Vehicle.__index               = Vehicle
 local singleton ---@type Vehicle
 
 local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
 
----Creates a new Core
----@return Vehicle
-function Vehicle.New()
-    if singleton ~= nil then
-        return singleton
-    end
-
-    singleton = {
-        orientation = {
-            Up = function()
-                -- This points in the current up direction of the vehicle
-                return NV3(construct.getWorldOrientationUp())
-            end,
-            Right = function()
-                -- This points in the current right direction of the vehicle
-                return NV3(construct.getWorldOrientationRight())
-            end,
-            Forward = function()
-                -- This points in the current forward direction of the vehicle
-                return NV3(construct.getWorldOrientationForward())
-            end,
-            localized = {
-                Up = function()
-                    return NV3(construct.getOrientationUp())
-                end,
-                Right = function()
-                    return NV3(construct.getOrientationRight())
-                end,
-                Forward = function()
-                    return NV3(construct.getOrientationForward())
-                end
-            }
-        },
-        mass = {
-            Own = function()
-                return construct.getMass()
-            end,
-            Total = function()
-                return construct.getTotalMass()
-            end,
-            MassOfDockedConstructs = function()
-                local mass = 0
-                for _, id in ipairs(construct.getDockedConstructs()) do
-                    mass = mass + construct.getDockedConstructMass(id)
-                end
-
-                return mass
-            end,
-            MassOfPlayers = function()
-                local mass = 0
-                for _, id in ipairs(construct.getPlayersOnBoard()) do
-                    mass = mass + construct.getBoardedPlayerMass(id)
-                end
-                return mass
+local vehicle                 = {
+    mass = {
+        Own = function()
+            return construct.getMass()
+        end,
+        MassOfDockedConstructs = function()
+            local mass = 0
+            for _, id in ipairs(construct.getDockedConstructs()) do
+                mass = mass + construct.getDockedConstructMass(id)
             end
-        },
-        velocity = {
-            Angular = function()
-                return NV3(construct.getWorldAngularVelocity())
-            end,
-            Movement = function()
-                return NV3(construct.getWorldAbsoluteVelocity())
-            end,
-            localized = {
-                Angular = function()
-                    return NV3(construct.getAngularVelocity())
-                end
-            }
-        },
-        acceleration = {
-            Angular = function()
-                return NV3(construct.getWorldAngularAcceleration())
-            end,
-            Movement = function()
-                return NV3(construct.getWorldAcceleration())
-            end,
-            localized = {
-                Angular = function()
-                    return NV3(construct.getAngularAcceleration())
-                end
-            }
-        },
+
+            return mass
+        end,
+        MassOfPlayers = function()
+            local mass = 0
+            for _, id in ipairs(construct.getPlayersOnBoard()) do
+                mass = mass + construct.getBoardedPlayerMass(id)
+            end
+            return mass
+        end
+    },
+    acceleration = {
+        Angular = function()
+            return NV3(construct.getWorldAngularAcceleration())
+        end,
+    },
+    player = {
         position = {
             Current = function()
-                return NV3(construct.getWorldPosition())
+                return NV3(player.getWorldPosition())
             end
         },
-        world = {
-            AtmoDensity = unit.getAtmosphereDensity,
-            IsInAtmo = function()
-                return unit.getAtmosphereDensity() > atmoToSpaceDensityLimit
-            end,
-            IsInSpace = function()
-                return not singleton.world.IsInAtmo()
-            end,
-            G = core.getGravityIntensity,
-            AngularAirFrictionAcceleration = function()
-                return NV3(construct.getWorldAirFrictionAngularAcceleration())
-            end,
-            AirFrictionAcceleration = function()
-                return NV3(construct.getWorldAirFrictionAcceleration())
-            end,
-            GravityDirection = function()
-                return NV3(core.getWorldVertical())
+        orientation = {
+            Up = function()
+                return NV3(player.getWorldUp())
             end
         },
-        player = {
-            IsFrozen = function()
-                -- player.isFrozen() can return nil, reported to NQ in ticket 81865
-                local frozen = player.isFrozen()
-                -- Assume locked if it does
-                if frozen == nil then return true end
-                return frozen
-            end,
-            position = {
-                Current = function()
-                    return NV3(player.getWorldPosition())
-                end
-            },
-            orientation = {
-                Up = function()
-                    return NV3(player.getWorldUp())
-                end
-            },
-            camera = {
-                position = {
-                    Current = function()
-                        return NV3(system.getCameraWorldPos())
-                    end
-                },
-                orientation = {
-                    Forward = function()
-                        return NV3(system.getCameraWorldForward())
-                    end,
-                    Up = function()
-                        return NV3(system.getCameraWorldUp())
-                    end,
-                    Right = function()
-                        return NV3(system.getCameraWorldRight())
-                    end,
-                    IsFirstPerson = system.isFirstPerson
-                }
-            }
-        },
-        speed = {
-            MaxSpeed = function()
-                if singleton.world.IsInAtmo() then
-                    return construct.getFrictionBurnSpeed() * 0.99
-                end
+    },
+}
 
-                return construct.getMaxSpeed()
-            end
-        }
-    }
+Current                       = function() return NV3(construct.getWorldPosition()) end
+Up                            = function() return NV3(construct.getWorldOrientationUp()) end
+Right                         = function() return NV3(construct.getWorldOrientationRight()) end
+Forward                       = function() return NV3(construct.getWorldOrientationForward()) end
 
-    return singleton
+LocalUp                       = function() return NV3(construct.getOrientationUp()) end
+LocalRight                    = function() return NV3(construct.getOrientationRight()) end
+LocalForward                  = function() return NV3(construct.getOrientationForward()) end
+
+local w                       = vehicle.world
+AtmoDensity                   = unit.getAtmosphereDensity
+IsInAtmo                      = function() return AtmoDensity() > atmoToSpaceDensityLimit end
+IsInSpace                     = function() return not IsInAtmo() end
+GravityDirection              = function() return NV3(core.getWorldVertical()) end
+G                             = core.getGravityIntensity
+AirFrictionAcceleration       = function() return NV3(construct.getWorldAirFrictionAcceleration()) end
+
+MaxSpeed                      = function()
+    if IsInAtmo() then
+        return construct.getFrictionBurnSpeed() * 0.99
+    end
+
+    return construct.getMaxSpeed()
 end
 
-return Vehicle
+TotalMass                     = construct.getTotalMass
+Acceleration                  = function() return NV3(construct.getWorldAcceleration()) end
+Velocity                      = function() return NV3(construct.getWorldAbsoluteVelocity()) end
+LocalAngVel                   = function() return NV3(construct.getAngularVelocity()) end
+LocalAngAcc                   = function() return NV3(construct.getAngularAcceleration()) end
+
+-- player.isFrozen() can return nil, reported to NQ in ticket 81865
+-- Their answer is "don't call from flush"
+IsFrozen                      = player.isFrozen
+
+return vehicle
