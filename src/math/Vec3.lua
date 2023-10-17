@@ -1,10 +1,10 @@
 --- A 3 component vector.
 -- https://github.com/excessive/cpml/blob/master/modules/Vec3.lua
 
-local sqrt = math.sqrt
-local cos  = math.cos
-local sin  = math.sin
-local acos = math.acos
+local sqrt    = math.sqrt
+local cos     = math.cos
+local sin     = math.sin
+local acos    = math.acos
 
 ---@class Vec3
 ---@field x number
@@ -43,6 +43,7 @@ local acos = math.acos
 ---@field FlipY fun(a:Vec3):Vec3
 ---@field FlipZ fun(a:Vec3):Vec3
 ---@field AngleTo fun(a:Vec3, b:Vec3):number
+---@field AngleToDeg fun(a:Vec3, b:Vec3):number
 ---@field ProjectOn fun(a:Vec3, b:Vec3):Vec3
 ---@field ProjectOnPlane fun(a:Vec3, planeNormal:Vec3):Vec3
 ---@field IsVec3 fun(a:any):boolean
@@ -56,8 +57,10 @@ local acos = math.acos
 ---@operator mul(number):Vec3
 ---@operator unm:Vec3
 
-local Vec3   = {}
-Vec3.__index = Vec3
+local rad2deg = 180 / math.pi
+
+local Vec3    = {}
+Vec3.__index  = Vec3
 
 
 ---Creates a new Vec3
@@ -375,6 +378,14 @@ end
 function Vec3.AngleTo(a, b)
     local v = a:Normalize():Dot(b:Normalize())
     return acos(v)
+end
+
+---Gets the angle to b from a in degrees
+---@param a Vec3
+---@param b Vec3
+---@return number
+function Vec3.AngleToDeg(a, b)
+    return a:AngleTo(b) * rad2deg
 end
 
 ---Projects vector a onto b

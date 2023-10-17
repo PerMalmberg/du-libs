@@ -320,12 +320,6 @@ calc.ProjectPointOnPlane = function(planeNormal, planePoint, point)
     return point + translationVector
 end
 
----Returns the corresponding dot product for the given angle
----@param angleDegrees number degrees
----@return number
-calc.AngleToDot = function(angleDegrees)
-    return cos(angleDegrees * deg2rad)
-end
 
 ---Returns the corresponding angle for the given dot product (for unit vectors)
 ---@param dot number Dot product
