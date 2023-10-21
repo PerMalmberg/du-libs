@@ -9,6 +9,7 @@ local clamp = require("util/Calc").Clamp
 ---@field Register fun(key:integer, criteria:Criteria, callback:InputCallback)
 ---@field RegisterMany fun(keys:integer[], criteria:Criteria, callback:InputCallback)
 ---@field IsPressed fun(key:integer):boolean
+---@field AnyPressed fun(keys:integer[]):boolean
 ---@field KeyState fun():table<integer, boolean>
 ---@field Clear fun()
 ---@field Throttle fun():number
@@ -74,6 +75,17 @@ function Input.Instance()
     ---@return boolean
     function s.IsPressed(key)
         return keyState[key] or false
+    end
+
+    ---Indicates if any of the keys are pressed
+    ---@param keys Keys[]
+    ---@return boolean
+    function s.AnyPressed(keys)
+        for _, k in ipairs(keys) do
+            if s.IsPressed(k) then return true end
+        end
+
+        return false
     end
 
     ---@return table<integer, boolean>
