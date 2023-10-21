@@ -12,6 +12,7 @@ local Vec3 = require("math/Vec3")
 ---@field New fun(telemeter:TelementerAPI):Telemeter
 ---@field Measure fun():TelemeterResult
 ---@field IsTelemeter fun():boolean
+---@field MaxDistance fun():number
 
 local Telemeter = {}
 Telemeter.__index = Telemeter
@@ -35,6 +36,12 @@ function Telemeter.New(api)
         return type(api.getMaxDistance) == "function"
             and type(api.raycast) == "function"
             and type(api.getRayWorldOrigin) == "function"
+    end
+
+    ---Gets the max measure distance
+    ---@return number
+    function s.MaxDistance()
+        return api.getMaxDistance()
     end
 
     return setmetatable(s, Telemeter)

@@ -126,12 +126,13 @@ function Universe.Instance()
     --- @return Vec3
     function s.VerticalReferenceVector()
         local worldGrav = Vec3.New(core.getWorldGravity())
-        if worldGrav:Len2() == 0 then
+        local wDir, wLen = worldGrav:NormalizeLen()
+        if wLen == 0 then
             local position = Vec3.New(construct.getWorldPosition())
             local body = s.ClosestBody(position)
             return (body.Geography.Center - position):Normalize()
         else
-            return worldGrav:Normalize()
+            return wDir
         end
     end
 
