@@ -72,13 +72,13 @@ function BufferedDB.New(databank)
                 end
             end
         end).Then(persist).Catch(function(t)
-            error("Error in BeginLoad:" .. t.Error())
+            log.Error("Error in BeginLoad:", t.Error())
         end)
     end
 
     function s.Clear()
         if not loaded then
-            error("Call to Clear before loading is completed")
+            log.Error("Call to Clear before loading is completed")
         end
 
         buffer = {}
@@ -104,7 +104,7 @@ function BufferedDB.New(databank)
     ---@return number|string|boolean|table|nil
     function s.Get(key, default)
         if not loaded then
-            error("Call to Get before loading is completed")
+            log.Error("Call to Get before loading is completed")
         end
 
         local entry = buffer[key]
@@ -132,7 +132,7 @@ function BufferedDB.New(databank)
     ---@param data number|string|boolean|table|boolean
     function s.Put(key, data)
         if not loaded then
-            error("Call to Put before loading is completed")
+            log.Error("Call to Put before loading is completed")
         end
 
         buffer[key] = DBStoredData.New(data, true)
