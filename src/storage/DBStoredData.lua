@@ -63,7 +63,13 @@ end
 ---@return DBStoredData|nil
 function DBStoredData.NewFromDB(readData)
     if readData ~= nil then
-        local decoded = json.decode(readData)
+        local decoded
+
+        -- Suppress decoding errors
+        xpcall(function()
+            decoded = json.decode(readData)
+        end, traceback)
+
         if decoded ~= nil
             and type(decoded) == "table"
             and decoded.t
