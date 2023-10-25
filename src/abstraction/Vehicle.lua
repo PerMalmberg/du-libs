@@ -48,7 +48,6 @@ LocalUp                       = function() return NV3(construct.getOrientationUp
 LocalRight                    = function() return NV3(construct.getOrientationRight()) end
 LocalForward                  = function() return NV3(construct.getOrientationForward()) end
 
-local w                       = vehicle.world
 AtmoDensity                   = unit.getAtmosphereDensity
 IsInAtmo                      = function() return AtmoDensity() > atmoToSpaceDensityLimit end
 IsInSpace                     = function() return not IsInAtmo() end
