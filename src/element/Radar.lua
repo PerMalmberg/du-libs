@@ -61,8 +61,6 @@ function RadarControl.Instance()
     local count = radars[1] ~= nil and 1 or 0
     count = count + (radars[2] ~= nil and 1 or 0)
 
-    log.Info("Radars found: ", count)
-
     local function update()
         for _, r in ipairs(radars) do
             if r then
