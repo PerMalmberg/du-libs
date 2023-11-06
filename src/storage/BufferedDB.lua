@@ -77,13 +77,13 @@ function BufferedDB.New(databank)
     end
 
     function s.Clear()
-        if not loaded then
-            log.Error("Call to Clear before loading is completed")
+        if loaded then
+            buffer = {}
+            dirtyCount = 0
+            db.clear()
+        else
+            error("Call to Clear before loading is completed")
         end
-
-        buffer = {}
-        dirtyCount = 0
-        db.clear()
     end
 
     ---Checks if all keys are loaded
@@ -103,16 +103,16 @@ function BufferedDB.New(databank)
     ---@param default number|string|boolean|table
     ---@return number|string|boolean|table|nil
     function s.Get(key, default)
-        if not loaded then
-            log.Error("Call to Get before loading is completed")
+        if loaded then
+            local entry = buffer[key]
+            if entry then
+                return entry.value
+            end
+        else
+            error("Call to Get before loading is completed")
         end
 
-        local entry = buffer[key]
-        if entry then
-            return entry.value
-        else
-            return default
-        end
+        return default
     end
 
     ---@param key string
@@ -131,12 +131,12 @@ function BufferedDB.New(databank)
     ---@param key string
     ---@param data number|string|boolean|table|boolean
     function s.Put(key, data)
-        if not loaded then
-            log.Error("Call to Put before loading is completed")
+        if loaded then
+            buffer[key] = DBStoredData.New(data, true)
+            dirtyCount = dirtyCount + 1
+        else
+            error("Call to Put before loading is completed")
         end
-
-        buffer[key] = DBStoredData.New(data, true)
-        dirtyCount = dirtyCount + 1
     end
 
     function s.Size()
