@@ -3,7 +3,6 @@ local calc      = require("util/Calc")
 local constants = require("abstraction/Constants")
 local Ternary   = calc.Ternary
 local abs       = math.abs
-local min       = math.min
 local mtaa      = construct.getMaxThrustAlongAxis
 
 local function getLongitudinalForce()
@@ -84,78 +83,40 @@ function Engine.Instance()
     ---The maximum acceleration the construct can give without pushing itself more in one direction than the others.
     ---@param direction Vec3 Direction to move
     ---@param considerAtmoDensity? boolean If true, consider atmo influence on engine power
-    ---@return number
+    ---@return number # Avaliable acceleration
     function s:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
         considerAtmoDensity = Ternary(considerAtmoDensity == nil, false, considerAtmoDensity)
 
         direction = calc.WorldDirectionToLocal(direction)
 
-        local directionParts = { direction:Unpack() }
-
-        local isRight = directionParts[1] >= 0
-        local isForward = directionParts[2] >= 0
-        local isUp = directionParts[3] >= 0
+        local isRight = direction.x >= 0
+        local isForward = direction.y >= 0
+        local isUp = direction.z >= 0
 
         local atmoInfluence = (IsInAtmo() and considerAtmoDensity) and AtmoDensity() or 1
 
-        -- The 'negative' direction returns a negative value so abs() them.
-        local rawEnginePower = {
-            abs(Ternary(isRight, s:MaxRightwardThrust(), s:MaxLeftwardThrust())),
-            abs(Ternary(isForward, s:MaxForwardThrust(), s:MaxBackwardThrust())),
-            abs(Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust()))
-        }
+        local rawEnginePower = Vec3.New(
+            Ternary(isRight, s:MaxRightwardThrust(), s:MaxLeftwardThrust()),
+            Ternary(isForward, s:MaxForwardThrust(), s:MaxBackwardThrust()),
+            Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust()))
 
         local totalMass = TotalMass()
 
-        -- Add current gravity influence as force in Newtons, with the correct direction. As the force has a direction
-        -- this works for knowing both available acceleration force as well as brake force.
+        -- Add current gravity influence as force in Newtons, to get available engine force
         local gravityForce = calc.WorldDirectionToLocal(GravityDirection()) * G() * totalMass
-        local maxForces = { 0, 0, 0 }
-        maxForces[1] = rawEnginePower[1] * atmoInfluence +
-            gravityForce:Dot(LocalRight() * (isRight and 1 or -1))
-        maxForces[2] = rawEnginePower[2] * atmoInfluence +
-            gravityForce:Dot(LocalForward() * (isForward and 1 or -1))
-        maxForces[3] = rawEnginePower[3] * atmoInfluence +
-            gravityForce:Dot(LocalUp() * (isUp and 1 or -1))
+        local maxForces = rawEnginePower * atmoInfluence + gravityForce
 
-        -- Find the index with the longest part, this is the main direction.
-        -- If all are the same then we use the first one as the main direction
+        if direction:IsZero() then
+            return 0
+        else
+            local availableForce = maxForces:ProjectOn(direction):Len()
 
-        local main = 1
-        local longest = abs(directionParts[main])
-        for i, v in ipairs(directionParts) do
-            v = abs(v)
-            if v > longest then
-                longest = v
-                main = i
-            end
+            -- When space engines kick in, don't consider atmospheric density.
+            local density = AtmoDensity()
+
+            -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
+            return (density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF and density or 1) * availableForce / totalMass
         end
-
-        -- Create a vector that represents the desired force if traveling in the main direction
-        local desiredVec = direction * maxForces[main]
-        -- Unpack it to get the required forces for each axis, in absolute values
-        local desiredForces = { abs(desiredVec.x), abs(desiredVec.y), abs(desiredVec.z) }
-
-        -- Start with the known largest force
-        local maxThrust = desiredForces[main]
-
-        -- Now check if any of the axes can give less than what is required,
-        -- if any is found to be too weak, the one with the least thrust is the limiter.
-        for i, available in ipairs(maxForces) do
-            local availableCurr = abs(available)
-            -- If there's not engine on an axis, then ingore it.
-            if rawEnginePower[i] > 0 and availableCurr < desiredForces[i] then
-                -- This engine can't deliver the required force
-                maxThrust = min(maxThrust, availableCurr)
-            end
-        end
-
-        -- Return the minimum of the forces divided by the mass to get acceleration.
-        -- When space engines kick in, don't consider atmospheric density.
-        local density = AtmoDensity()
-
-        -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-        return (density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF and density or 1) * maxThrust / totalMass
     end
 
     function s:MaxForwardThrust()
