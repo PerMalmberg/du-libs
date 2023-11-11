@@ -3,6 +3,7 @@ local calc      = require("util/Calc")
 local constants = require("abstraction/Constants")
 local Ternary   = calc.Ternary
 local abs       = math.abs
+local min       = math.min
 local mtaa      = construct.getMaxThrustAlongAxis
 
 local function getLongitudinalForce()
@@ -109,7 +110,8 @@ function Engine.Instance()
         if direction:IsZero() then
             return 0
         else
-            local availableForce = maxForces:ProjectOn(direction):Len()
+            -- Based on how aligned we are to the direction, opt to limit acceleration
+            local availableForce = maxForces:Dot(direction)
 
             -- When space engines kick in, don't consider atmospheric density.
             local density = AtmoDensity()
