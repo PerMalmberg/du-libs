@@ -113,6 +113,12 @@ function Engine.Instance()
             -- Based on how aligned we are to the direction, opt to limit acceleration
             local availableForce = maxForces:Dot(direction)
 
+            -- If moving more to the weaker side, limit acceleration to that available thrust
+            -- This assumes that main engines are the VTOL ones.
+            if LocalUp():AngleToDeg(direction) > 10 then
+                availableForce = min(abs(rawEnginePower:Dot(LocalRight())), abs(rawEnginePower:Dot(LocalForward())))
+            end
+
             -- When space engines kick in, don't consider atmospheric density.
             local density = AtmoDensity()
 
