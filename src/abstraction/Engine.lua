@@ -100,7 +100,7 @@ function Engine.Instance()
 
         local gravityForce = Vec3.zero
         if gravDir:Dot(direction) > 0 then
-            -- Moving towards gravity, consider it as an engine.
+            -- Moving along gravity, consider it as an engine.
             -- Note to self: Don't add gravity if not travling along it, that will reduce reported available engine force.
             gravityForce = gravDir * G() * totalMass
         end
@@ -117,7 +117,7 @@ function Engine.Instance()
             { dir = LocalForward(),  thrust = abs(s:MaxForwardThrust()) }
         }
 
-        -- Find engines that contribute to the movement in the direction
+        -- Find engines that contribute to the movement in the desired direction
         local minThrust = math.huge
         local mainEngine = nil ---@type ThrustAndDir|nil
 
