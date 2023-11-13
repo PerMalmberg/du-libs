@@ -123,11 +123,14 @@ function Engine.Instance()
 
         for _, engine in ipairs(engines) do
             local dot = engine.dir:Dot(direction)
+
+            -- Add gravity before any use of the engine (or we'll think we can't move downward due to "no engine")
+            engine.thrust = engine.thrust + gravityForce:Dot(engine.dir)
             -- Compare with a near-zero value for dot as we get values like 1e-11 which are still > 0 but too small to use.
+
             if dot > 0.001 and engine.thrust > 0.01 then
                 -- Calculate the thrust this engine can give for the direction and add the gravity force
-                local thrust = dot * engine.thrust + gravityForce:Dot(engine.dir)
-
+                local thrust = dot * engine.thrust
                 if thrust < minThrust then
                     minThrust = thrust
                 end
