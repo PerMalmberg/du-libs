@@ -92,36 +92,41 @@ function Engine.Instance()
         end
 
         direction = calc.WorldDirectionToLocal(direction)
+        local totalMass = TotalMass()
+
+        -- Add current gravity influence as force in Newtons
+
+        local gravDir = calc.WorldDirectionToLocal(GravityDirection())
+
+        local gravityForce = Vec3.zero
+        if gravDir:Dot(direction) > 0 then
+            -- Moving towards gravity, consider it as an engine.
+            -- Note to self: Don't add gravity if not travling along it, that will reduce reported available engine force.
+            gravityForce = gravDir * G() * totalMass
+        end
 
         -- Setup engines using the thrust for the direction they make the construct move (i.e. oposite to thrust direction)
         ---@alias ThrustAndDir { dir:Vec3, thrust:number }
         ---@type ThrustAndDir
         local engines = {
-            { dir = LocalRight(),    thrust = abs(s:MaxLeftwardThrust()) },
-            { dir = -LocalRight(),   thrust = abs(s:MaxRightwardThrust()) },
-            { dir = LocalUp(),       thrust = abs(s:MaxDownwardThrust()) },
-            { dir = -LocalUp(),      thrust = abs(s:MaxUpwardThrust()) },
-            { dir = LocalForward(),  thrust = abs(s:MaxBackwardThrust()) },
-            { dir = -LocalForward(), thrust = abs(s:MaxForwardThrust()) }
+            { dir = -LocalRight(),   thrust = abs(s:MaxLeftwardThrust()) },
+            { dir = LocalRight(),    thrust = abs(s:MaxRightwardThrust()) },
+            { dir = -LocalUp(),      thrust = abs(s:MaxDownwardThrust()) },
+            { dir = LocalUp(),       thrust = abs(s:MaxUpwardThrust()) },
+            { dir = -LocalForward(), thrust = abs(s:MaxBackwardThrust()) },
+            { dir = LocalForward(),  thrust = abs(s:MaxForwardThrust()) }
         }
 
         -- Find engines that contribute to the movement in the direction
-        local contributingEngines = {} ---@type ThrustAndDir[]
+        local minThrust = math.huge
+        local mainEngine = nil ---@type ThrustAndDir|nil
+
         for _, engine in ipairs(engines) do
             local dot = engine.dir:Dot(direction)
-            if dot > 0 then
-                contributingEngines[#contributingEngines + 1] = engine
-            end
-        end
-
-        -- Find weakest and main engine
-        local minThrust = math.huge
-        local mainEngine = nil ---@type ThrustAndDir
-
-        for _, engine in ipairs(contributingEngines) do
-            if engine.thrust > 0 then
-                local dot = engine.dir:Dot(direction)
-                local thrust = dot * engine.thrust
+            -- Compare with a near-zero value for dot as we get values like 1e-11 which are still > 0 but too small to use.
+            if dot > 0.001 and engine.thrust > 0.01 then
+                -- Calculate the thrust this engine can give for the direction and add the gravity force
+                local thrust = dot * engine.thrust + gravityForce:Dot(engine.dir)
 
                 if thrust < minThrust then
                     minThrust = thrust
@@ -149,19 +154,15 @@ function Engine.Instance()
             availableForce = minThrust
         end
 
-        local totalMass = TotalMass()
-
-        -- Add current gravity influence as force in Newtons, to get available engine force
-        local gravityForce = calc.WorldDirectionToLocal(GravityDirection()) * G() * totalMass
-
-        local availableThrust = direction * availableForce + gravityForce
+        local availableThrust = direction * availableForce
 
         -- When space engines kick in, don't consider atmospheric density.
-        considerAtmoDensity = considerAtmoDensity and considerAtmoDensity or false
-        local atmoInfluence = (IsInAtmo() and considerAtmoDensity) and AtmoDensity() or 1
+        if considerAtmoDensity and IsInAtmo() then
+            availableThrust = availableThrust * AtmoDensity()
+        end
 
         -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-        return atmoInfluence * availableThrust:Len() / totalMass
+        return availableThrust:Len() / totalMass
     end
 
     function s:MaxForwardThrust()
