@@ -66,7 +66,7 @@ end
 
 ---@class EngineAbs
 ---@field Instance fun():EngineAbs
----@field GetMaxPossibleAccelerationInWorldDirectionForPathFollow fun(self:EngineAbs, direction:Vec3, considerAtmoDensity?:boolean):number
+---@field GetAvailableThrust fun(reduceMode:boolean, direction:Vec3, considerAtmoDensity?:boolean):number
 
 local Engine = {}
 Engine.__index = Engine
@@ -82,49 +82,86 @@ function Engine.Instance()
     s = {}
 
     ---The maximum acceleration the construct can give without pushing itself more in one direction than the others.
+    ---@param reduceMode boolean If true, returns the available thust while taking the weaker engines into account
     ---@param direction Vec3 Direction to move
     ---@param considerAtmoDensity? boolean If true, consider atmo influence on engine power
     ---@return number # Avaliable acceleration
-    function s:GetMaxPossibleAccelerationInWorldDirectionForPathFollow(direction, considerAtmoDensity)
-        considerAtmoDensity = Ternary(considerAtmoDensity == nil, false, considerAtmoDensity)
+    function s.GetAvailableThrust(reduceMode, direction, considerAtmoDensity)
+        if direction:IsZero() then
+            return 0
+        end
 
         direction = calc.WorldDirectionToLocal(direction)
 
-        local isRight = direction.x >= 0
-        local isForward = direction.y >= 0
-        local isUp = direction.z >= 0
+        -- Setup engines using the thrust for the direction they make the construct move (i.e. oposite to thrust direction)
+        ---@alias ThrustAndDir { dir:Vec3, thrust:number }
+        ---@type ThrustAndDir
+        local engines = {
+            { dir = LocalRight(),    thrust = abs(s:MaxLeftwardThrust()) },
+            { dir = -LocalRight(),   thrust = abs(s:MaxRightwardThrust()) },
+            { dir = LocalUp(),       thrust = abs(s:MaxDownwardThrust()) },
+            { dir = -LocalUp(),      thrust = abs(s:MaxUpwardThrust()) },
+            { dir = LocalForward(),  thrust = abs(s:MaxBackwardThrust()) },
+            { dir = -LocalForward(), thrust = abs(s:MaxForwardThrust()) }
+        }
 
-        local atmoInfluence = (IsInAtmo() and considerAtmoDensity) and AtmoDensity() or 1
+        -- Find engines that contribute to the movement in the direction
+        local contributingEngines = {} ---@type ThrustAndDir[]
+        for _, engine in ipairs(engines) do
+            local dot = engine.dir:Dot(direction)
+            if dot > 0 then
+                contributingEngines[#contributingEngines + 1] = engine
+            end
+        end
 
-        local rawEnginePower = Vec3.New(
-            Ternary(isRight, s:MaxRightwardThrust(), s:MaxLeftwardThrust()),
-            Ternary(isForward, s:MaxForwardThrust(), s:MaxBackwardThrust()),
-            Ternary(isUp, s:MaxUpwardThrust(), s:MaxDownwardThrust()))
+        -- Find weakest and main engine
+        local minThrust = math.huge
+        local mainEngine = nil ---@type ThrustAndDir
+
+        for _, engine in ipairs(contributingEngines) do
+            if engine.thrust > 0 then
+                local dot = engine.dir:Dot(direction)
+                local thrust = dot * engine.thrust
+
+                if thrust < minThrust then
+                    minThrust = thrust
+                end
+
+                -- Find "main" engine closest to direction
+                if not mainEngine then
+                    mainEngine = engine
+                elseif engine.dir:AngleTo(direction) < mainEngine.dir:AngleTo(direction) then
+                    mainEngine = engine
+                end
+            end
+        end
+
+        -- No engine?
+        if not mainEngine then
+            return 0
+        end
+
+        local availableForce = mainEngine.thrust
+
+        -- Should we limit thrust to weaker engine?
+        if reduceMode and mainEngine.dir:AngleToDeg(direction) > 10 then
+            -- Closest engine is outside limit so limit to weakest
+            availableForce = minThrust
+        end
 
         local totalMass = TotalMass()
 
         -- Add current gravity influence as force in Newtons, to get available engine force
         local gravityForce = calc.WorldDirectionToLocal(GravityDirection()) * G() * totalMass
-        local maxForces = rawEnginePower * atmoInfluence + gravityForce
 
-        if direction:IsZero() then
-            return 0
-        else
-            -- Based on how aligned we are to the direction, opt to limit acceleration
-            local availableForce = maxForces:Dot(direction)
+        local availableThrust = direction * availableForce + gravityForce
 
-            -- If moving more to the weaker side, limit acceleration to that available thrust
-            -- This assumes that main engines are the VTOL ones.
-            if LocalUp():AngleToDeg(direction) > 10 then
-                availableForce = min(abs(rawEnginePower:Dot(LocalRight())), abs(rawEnginePower:Dot(LocalForward())))
-            end
+        -- When space engines kick in, don't consider atmospheric density.
+        considerAtmoDensity = considerAtmoDensity and considerAtmoDensity or false
+        local atmoInfluence = (IsInAtmo() and considerAtmoDensity) and AtmoDensity() or 1
 
-            -- When space engines kick in, don't consider atmospheric density.
-            local density = AtmoDensity()
-
-            -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
-            return (density > constants.SPACE_ENGINE_ATMO_DENSITY_CUTOFF and density or 1) * availableForce / totalMass
-        end
+        -- Remember that this value is the acceleration, m/s2, not how many g:s we can give. To get that, divide by the current world gravity.
+        return atmoInfluence * availableThrust:Len() / totalMass
     end
 
     function s:MaxForwardThrust()
