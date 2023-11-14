@@ -18,7 +18,7 @@ local ct                      = construct
 local Vehicle                 = {}
 Vehicle.__index               = Vehicle
 
-local atmoToSpaceDensityLimit = 0.0001 -- At what density level we consider space to begin. Densities higher than this is atmo.
+local atmoToSpaceDensityLimit = 0.09 -- At what density level we consider space to begin. Densities higher than this is atmo.
 
 local vehicle                 = {
     acceleration = {
