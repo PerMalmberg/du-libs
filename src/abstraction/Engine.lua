@@ -130,7 +130,7 @@ function Engine.Instance()
 
             if dot > 0.001 and engine.thrust > 0.01 then
                 -- Calculate the thrust this engine can give for the direction and add the gravity force
-                local thrust = dot * engine.thrust
+                local thrust = engine.thrust
                 if thrust < minThrust then
                     minThrust = thrust
                 end
