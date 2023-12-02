@@ -328,4 +328,8 @@ calc.DotToAngle = function(dot)
     return rad2deg * acos(dot)
 end
 
+calc.AngleToDot = function(angleDeg)
+    return cos(angleDeg * deg2rad)
+end
+
 return calc
