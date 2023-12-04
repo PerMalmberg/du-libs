@@ -332,4 +332,12 @@ calc.AngleToDot = function(angleDeg)
     return cos(angleDeg * deg2rad)
 end
 
+---@param v number
+---@param minV number
+---@param maxV number
+---@return boolean
+calc.BetweenOrEqual = function(v, minV, maxV)
+    return v >= minV and v <= maxV
+end
+
 return calc

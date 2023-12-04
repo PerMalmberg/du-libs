@@ -35,8 +35,7 @@ function Plane.New(verticalFunc)
 end
 
 function Plane.NewByVertialReference()
-    local up = universe.VerticalReferenceVector
-    return Plane.New(function() return -up() end)
+    return Plane.New(function() return -universe.VerticalReferenceVector() end)
 end
 
 return Plane
