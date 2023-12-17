@@ -38,21 +38,32 @@ function D3dDraw.Instance()
         layer[index] = l
     end
 
+    ---@return D3dLayer[]
+    local function getSortedLayers()
+        local indexes = {} ---@type integer[]
+        for ix, _ in pairs(layer) do
+            indexes[#indexes + 1] = ix
+        end
+
+        table.sort(indexes)
+
+        local sorted = {} ---@type D3dLayer[]
+
+        for _, l in ipairs(indexes) do
+            sorted[#sorted + 1] = layer[l]
+        end
+
+        return sorted
+    end
+
     ---Renders all layers as a single SVG
     ---@return string
     function s.Render()
         local r = res()
 
-        local indexes = {}
-        for i, _ in pairs(layer) do
-            indexes[#indexes + 1] = i
-        end
-
-        table.sort(indexes)
-
         local layers = ""
-        for _, l in ipairs(indexes) do
-            layers = layers .. layers[l].G(r)
+        for _, l in ipairs(getSortedLayers()) do
+            layers = layers .. layer[l].G(r)
         end
 
         local svg = string.format(svgTpl, r.x, r.y, layers)
@@ -67,7 +78,7 @@ function D3dDraw.Instance()
         -- Put each layer in a div to make them layered
         local divs = ""
 
-        for _, l in ipairs(layer) do
+        for _, l in ipairs(getSortedLayers()) do
             divs = divs .. string.format(divTpl, string.format(svgTpl, r.x, r.y, l.G(r)))
         end
 

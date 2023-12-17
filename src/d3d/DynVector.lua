@@ -2,8 +2,8 @@ local Line = require("d3d/Line")
 local Pos  = require("d3d/Pos")
 require("d3d/Common")
 
-local D3dVector   = {}
-D3dVector.__index = D3dVector
+local DynVector   = {}
+DynVector.__index = DynVector
 
 ---@alias VectorFunc fun():Vec3, Vec3
 
@@ -11,7 +11,8 @@ D3dVector.__index = D3dVector
 ---@param baseAndDir VectorFunc
 ---@param width number
 ---@param color string
-function D3dVector.New(length, baseAndDir, width, color)
+---@returns D3dVector
+function DynVector.New(length, baseAndDir, width, color)
     local s = {}
 
     local line = Line.New(Pos.New(0, 0), Pos.New(0, 0), width, color)
@@ -26,7 +27,7 @@ function D3dVector.New(length, baseAndDir, width, color)
         return line.R(res)
     end
 
-    return setmetatable(s, D3dVector)
+    return setmetatable(s, DynVector)
 end
 
-return D3dVector
+return DynVector
